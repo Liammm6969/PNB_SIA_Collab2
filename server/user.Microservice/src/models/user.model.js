@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   address: String,
   gender: { type: String, enum: ['Male', 'Female', 'Other'] },
-  dateOfBirth: Date,
+  dateOfBirth: { type: Date, max: '2025-12-31' },
   balance: { type: Number, default: 0 },
   currency: { type: String, default: 'PHP' },
   withdrawalMethods: [
