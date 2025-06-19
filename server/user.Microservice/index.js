@@ -1,27 +1,24 @@
 const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config();
-const userRoutes = require('./routes/user.route');
+
+const userRoutes = require('./src/routes/user.route');
+const config = require('./src/lib/config.js');
+const ConnectToDb = require('./src/db/index');
+const { RouteNotFoundErrorMiddleware } = require('./src/middleware/index');
 
 const app = express();
 app.use(express.json());
 
+// Connect to MongoDB
+ConnectToDb();
+
 // Routes
 app.use('/api/users', userRoutes);
 
-// MongoDB connection
-const PORT = process.env.USER_PORT;
-const HOST = process.env.HOST;
-const MONGO_URI = process.env.USER_MONGO_URI;
+app.use(RouteNotFoundErrorMiddleware);
 
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, HOST, () => console.log(`User Service running on http://${HOST}:${PORT}`));
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-  });
+
+
+
+app.listen(config.PORT, config.HOST, () => {
+  console.log(`User Microservice running at http://${config.HOST}:${config.PORT}`);
+});
