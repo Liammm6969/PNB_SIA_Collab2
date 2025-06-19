@@ -19,6 +19,8 @@ app.use(RouteNotFoundErrorMiddleware);
 
 
 
+
+
 app.listen(config.PORT, config.HOST, () => {
   console.log(`User Microservice running at http://${config.HOST}:${config.PORT}`);
 });
