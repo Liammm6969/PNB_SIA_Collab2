@@ -1,27 +1,21 @@
 const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config();
-const transactionsRoutes = require('./routes/transactions.route');
+const config = require("./src/lib/config.js");
+const transactionsRoutes = require('./src/routes/transactions.route.js');
 
 const app = express();
 app.use(express.json());
 
+
+const connectToDatabase = require("./src/db/index.js");
+
+
+connectToDatabase();
 // Routes
 app.use('/api/transactions', transactionsRoutes);
 
-// MongoDB connection
-const PORT = process.env.TRANSACTION_PORT;
-const HOST = process.env.HOST;
-const MONGO_URI = process.env.TRANSACTION_MONGO_URI;
 
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, HOST, () => console.log(`Transaction Service running on http://${HOST}:${PORT}`));
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-  });
+app.listen(config.PORT, () => {
+  console.log(`Transactions Microservice running on http://${config.HOST}:${config.PORT}`);
+});
+
+

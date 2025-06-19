@@ -2,7 +2,12 @@ const User = require("../models/user.model.js");
 const bcrypt = require('bcrypt');
 const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError } = require('../errors');
 class UserService {
-  constructor() { }
+  constructor() {
+    this.registerUser = this.registerUser.bind(this);
+    this.loginUser = this.loginUser.bind(this);
+    this.getUserProfile = this.getUserProfile.bind(this);
+    this.listUsers = this.listUsers.bind(this);
+  }
 
   async registerUser(userData) {
     try {

@@ -1,11 +1,16 @@
 const ValidateRequestRouteParameterMiddleware = (joiInstance) => {
   return async (req, res, next) => {
     try {
-      await joiInstance.validateAsync(req.params);
+      const { error, value } = await joiInstance.validateAsync(req.params);
+console.log(value)
+      if (error) {
+        return next(error);
+      }
 
+      req.params = value;
       return next();
-    } catch (err) {
-      return next(err);
+    } catch (error) {
+      return next(error);
     }
   };
 };
