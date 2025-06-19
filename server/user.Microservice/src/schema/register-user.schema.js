@@ -10,7 +10,13 @@ const registerUserSchema = joi.object({
   address: joi.string().optional(),
   gender: joi.string().valid('Male', 'Female', 'Other').optional(),
   dateOfBirth: joi.date().max('12-31-2025').optional(),
-  withdrawalMethods: joi.array().items(joi.string(), joi.number()).optional()
+  withdrawalMethods: joi.array().items(
+    joi.object({
+      type: joi.string().required(),
+      cardNumber: joi.string().required(),
+      local: joi.boolean().required()
+    })
+  ).optional()
 });
 
 module.exports = registerUserSchema;
