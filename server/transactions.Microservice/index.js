@@ -10,6 +10,10 @@ const connectToDatabase = require("./src/db/index.js");
 
 
 connectToDatabase();
+
+app.get('/', (req, res) => {
+  res.send('Transactions Microservice is running');
+});
 // Routes
 app.use('/api/transactions', transactionsRoutes);
 

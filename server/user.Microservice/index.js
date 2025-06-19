@@ -11,6 +11,9 @@ app.use(express.json());
 // Connect to MongoDB
 ConnectToDb();
 
+app.get('/', (req, res) => {
+  res.send('User Microservice is running');
+});
 // Routes
 app.use('/api/users', userRoutes);
 
