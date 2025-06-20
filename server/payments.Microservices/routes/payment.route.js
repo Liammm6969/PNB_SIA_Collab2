@@ -2,7 +2,7 @@ const {
     createPayment,
     getPayments,
     getPaymentById,
-    updatePayment,
+  transferPayment,
     deletePayment
 } = require('../controllers/payment.controller');
 
@@ -16,7 +16,7 @@ router.get('/', getPayments);
 // Get a payment by ID
 router.get('/:id', getPaymentById);
 // Update a payment by ID
-router.put('/:id', updatePayment);
+router.put('/:id', transferPayment);
 // Delete a payment by ID
 router.delete('/:id', deletePayment);
 

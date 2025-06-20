@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
-  fromUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  toUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  fromUser: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
+  toUser: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
   amount: Number,
   details: String,
   balanceAfterPayment: Number,
