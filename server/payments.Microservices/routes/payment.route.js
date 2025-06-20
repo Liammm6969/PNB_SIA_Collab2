@@ -5,6 +5,7 @@ const {
   transferPayment,
     deletePayment
 } = require('../controllers/payment.controller');
+const transferController = require('../controllers/transfer.controller');
 
 const express = require('express');
 const router = express.Router();
@@ -19,5 +20,7 @@ router.get('/:id', getPaymentById);
 router.put('/:id', transferPayment);
 // Delete a payment by ID
 router.delete('/:id', deletePayment);
+// Transfer money between users
+router.post('/transfer', transferController.transferMoney);
 
 module.exports = router;
