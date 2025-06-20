@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: "./.env" });
 
 module.exports = {
+  JWT_SECRET: process.env.JWT_SECRET,
   PORT: process.env.USER_PORT,
   HOST: process.env.HOST,
   mongoDb: {

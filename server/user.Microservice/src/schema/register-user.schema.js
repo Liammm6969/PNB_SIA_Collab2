@@ -7,9 +7,9 @@ const registerUserSchema = joi.object({
     .required(),
   email: joi.string().email().required(),
   password: joi.string().pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};:\'",.<>?]{3,30}$')).required(),
+  accountNumber: joi.string().required(),
   role: joi.string().valid('Admin', 'Finance', 'User').default('User'),
   address: joi.string().optional(),
-  gender: joi.string().valid('Male', 'Female', 'Other').optional(),
   dateOfBirth: joi.date().max('12-31-2025').optional(),
   withdrawalMethods: joi.array().items(
     joi.object({

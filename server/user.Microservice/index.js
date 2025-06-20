@@ -1,5 +1,5 @@
 const express = require('express');
-
+const cors = require('cors');
 const userRoutes = require('./src/routes/user.route');
 const config = require('./src/lib/config.js');
 const ConnectToDb = require('./src/db/index');
@@ -7,7 +7,7 @@ const { RouteNotFoundErrorMiddleware } = require('./src/middleware/index');
 
 const app = express();
 app.use(express.json());
-
+app.use(cors());
 // Connect to MongoDB
 ConnectToDb();
 
