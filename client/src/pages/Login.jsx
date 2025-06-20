@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader } from 'lucide-react';
 import '../styles/Login.css';
+import '../styles/AccountTypeModal.css';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/users.Service';
-
+import AccountTypeModal from '../components/AccountTypeModal';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -12,9 +13,16 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const navigate = useNavigate();
-  const handleSignUp = () => {
-    navigate('/signup');
+  const [showAccountTypeModal, setShowAccountTypeModal] = useState(false);
+  const [accountType, setAccountType] = useState('');
+  const navigate = useNavigate();  const handleSignUp = () => {
+    setShowAccountTypeModal(true);
+  }
+  
+  const handleSelectAccountType = (type) => {
+    setAccountType(type);
+    setShowAccountTypeModal(false);
+    navigate('/signup', { state: { accountType: type } });
   }
 
   useEffect(() => {
@@ -89,7 +97,7 @@ export default function Login() {
             </div>
           </div>
 
-          <h2 className="pnb-login-title">Welcome Back</h2>
+          <h2 className="pnb-login-title">Login</h2>
           
           {error && (
             <div className="pnb-error-message">
@@ -183,7 +191,14 @@ export default function Login() {
           </div>
         </div>
       </div>
+      
+      {/* Account Type Selection Modal */}
+      <AccountTypeModal 
+        isOpen={showAccountTypeModal} 
+        onClose={() => setShowAccountTypeModal(false)} 
+        onSelectAccountType={handleSelectAccountType}
+      />
     </div>
   );
 }
-  
+

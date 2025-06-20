@@ -205,6 +205,32 @@
   cursor: not-allowed;
 }
 
+.pnb-login-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #1147ea;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.15s ease-in-out;
+  margin-top: 1rem;
+}
+
+.pnb-login-button:hover {
+  background-color: #0c2b99;
+}
+
+.pnb-login-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
 .pnb-spinner {
   animation: spin 1s linear infinite;
 }
@@ -267,7 +293,41 @@
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: #6B7280;
+}
+
+.pnb-eye-button {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  padding: 0.25rem;
+}
+
+.pnb-signup-section {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-top: 1rem;
+}
+
+.pnb-signup-link {
+  color: #2563eb;
+  font-weight: 500;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pnb-signup-link:hover {
+  text-decoration: underline;
 }
 
 /* Animation for card entry */
@@ -312,4 +372,29 @@
   .pnb-signup-card {
     padding: 1.5rem;
   }
+}
+
+.pnb-divider-container {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.pnb-divider-text {
+  display: inline-block;
+  position: relative;
+  padding: 0 10px;
+  color: #6B7280;
+  background-color: white;
+}
+
+.pnb-divider-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #E5E7EB;
+  z-index: -1;
 }
