@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
-const TransactionService = require('../services/transactions.service');
+const TransactionService = require("../services/transactions.service");
 
 // Create a new transaction
 exports.createTransaction = async (req, res) => {
@@ -18,7 +18,7 @@ exports.getTransactionsByUser = async (req, res) => {
     const transactions = await TransactionService.getTransactionsByUser(userId);
     res.status(StatusCodes.OK).json(transactions);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message })
   }
 };
 
