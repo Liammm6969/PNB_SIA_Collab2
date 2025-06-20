@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader } from 'lucide-react';
 import '../styles/Login.css';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../services/users.Service';
 
 export default function PNBLogin() {
   const [email, setEmail] = useState('');
@@ -32,8 +33,7 @@ export default function PNBLogin() {
     }
     return true;
   };
-
-  const handleClick = () => {
+  const handleClick = async () => {
     setError('');
     
     if (!validateForm()) return;
@@ -46,12 +46,18 @@ export default function PNBLogin() {
     } else {
       localStorage.removeItem('pnb-remembered-email');
     }
-    
-    // Simulating API call with timeout
-    setTimeout(() => {
+      try {
+      const response = await loginUser(email, password);
+      
+      // Store user data in localStorage for persistence across sessions
+      localStorage.setItem('pnb-user', JSON.stringify(response.user));
+      
       setLoading(false);
       navigate('/home');
-    }, 1500);
+    } catch (error) {
+      setLoading(false);
+      setError(error.message || 'Invalid email or password');
+    }
   };
   return (
     <div className="pnb-container">
@@ -73,10 +79,9 @@ export default function PNBLogin() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="pnb-login-card">          {/* PNB Logo */}
-          <div className="pnb-logo-section">
+        <div className="pnb-login-card">          {/* PNB Logo */}          <div className="pnb-logo-section">
             <div className="pnb-logo-text">
-             <img src="./src/assets/pnb.png" alt="PNB Logo" />
+             <img src="/src/assets/pnb.png" alt="PNB Logo" />
             </div>
           </div>
 
