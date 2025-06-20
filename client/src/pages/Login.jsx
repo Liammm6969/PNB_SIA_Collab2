@@ -4,7 +4,8 @@ import '../styles/Login.css';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/users.Service';
 
-export default function PNBLogin() {
+
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +13,9 @@ export default function PNBLogin() {
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const handleSignUp = () => {
+    navigate('/signup');
+  }
 
   useEffect(() => {
     // Check for stored email in local storage
@@ -164,7 +168,7 @@ export default function PNBLogin() {
             {/* Sign Up Link */}
             <div className="pnb-signup-section">
               Don't have an account?{' '}
-              <button className="pnb-signup-link">Sign up</button>
+              <button className="pnb-signup-link" onClick={handleSignUp}>Sign up</button>
             </div>
 
             {/* Divider */}
@@ -182,3 +186,4 @@ export default function PNBLogin() {
     </div>
   );
 }
+  
