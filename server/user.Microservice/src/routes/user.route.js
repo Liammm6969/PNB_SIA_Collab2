@@ -14,6 +14,8 @@ router.post('/register', ValidateRequestBodyMiddleware(RegisterUserSchema), user
 router.post('/login', ValidateRequestBodyMiddleware(LoginUserSchema), userController.loginUser);
 
 router.use(verifyAccessToken);
+
+
 // Get user profile by ID
 router.get('/:id', ValidateRequestRouteParameterMiddleware(ValidateIdSchema), userController.getUserProfile);
 
