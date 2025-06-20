@@ -1,0 +1,276 @@
+.pnb-container {
+  height: 100vh;
+  background: linear-gradient(#4C95FD 0%, #0F3DCE 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.pnb-main-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.pnb-left-section {
+  flex: 1;
+  color: white;
+  padding-right: 2rem;
+}
+
+.pnb-welcome-title {
+  font-size: 4rem;
+  font-weight: 300;
+  line-height: 1.1;
+  margin: 0 0 0.5rem 0;
+}
+
+.pnb-success-title {
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0 0 1.5rem 0;
+}
+
+.pnb-subtitle {
+  font-size: 1.25rem;
+  font-weight: 300;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.pnb-login-card {
+  background-color: white;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 210px;
+  height: 70vh;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  position: relative;
+}
+
+.pnb-logo-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.pnb-logo-icon {
+  background-color: #2563eb;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+}
+
+.pnb-logo-icon-inner {
+  width: 1rem;
+  height: 1rem;
+  background-color: white;
+  border-radius: 0.125rem;
+}
+
+.pnb-logo-text {
+    width: 154px;
+    height: 102px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pnb-logo-pnb {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.pnb-logo-tagline {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-style: italic;
+  margin-top: -0.125rem;
+}
+
+.pnb-login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.pnb-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pnb-field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.pnb-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.pnb-input-wrapper {
+  position: relative;
+}
+
+.pnb-input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+}
+
+.pnb-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  padding-left: 3rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: #374151;
+  outline: none;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.pnb-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.pnb-eye-button {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.pnb-eye-button:hover {
+  color: #6b7280;
+}
+
+.pnb-forgot-password {
+  text-align: right;
+  margin-top: 0.5rem;
+}
+
+.pnb-forgot-link {
+  color: #2563eb;
+  font-size: 0.875rem;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.pnb-forgot-link:hover {
+  text-decoration: underline;
+}
+
+.pnb-login-button {
+  width: 100%;
+  background-color: #2563eb;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.pnb-login-button:hover {
+  background-color: #1d4ed8;
+}
+
+.pnb-signup-section {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.pnb-signup-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.pnb-signup-link:hover {
+  text-decoration: underline;
+}
+
+.pnb-divider {
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.pnb-divider-line {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+}
+
+.pnb-divider-border {
+  width: 100%;
+  border-top: 1px solid #d1d5db;
+}
+
+.pnb-google-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background-color: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.pnb-google-button:hover {
+  background-color: #f9fafb;
+}
+
+.pnb-google-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.75rem;
+}
+
+.pnb-google-text {
+  color: #374151;
+  font-weight: 500;
+}

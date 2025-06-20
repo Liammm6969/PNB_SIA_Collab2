@@ -1,0 +1,81 @@
+.sidebar {
+  width: 160px;
+  background: linear-gradient(to bottom, #4C95FD, #0F3DCE);
+  box-shadow: 7px 4px 53.4px rgba(0, 0, 0, 0.1);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius:  0 116px 0 0;
+}
+
+.logo {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-icon img{
+  width: 142px;
+  height: 35px;
+}
+.logo-icon {
+  width: 75px;
+  height: 15px;
+  border-radius: 4px;
+  margin-top: 45%;
+  margin-left: 20px;
+  padding-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  color: #2563eb;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.logo-title {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.navigation {
+  flex: 1;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-item,
+.nav-item-active {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.nav-item-active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-icon {
+  margin-bottom: 8px;
+}
+
+.nav-text {
+  font-size: 12px;
+}
+
+.settings-container {
+  padding: 16px;
+}
