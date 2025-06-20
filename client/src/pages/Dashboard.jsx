@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Bell,
@@ -10,8 +10,31 @@ import {
 } from 'lucide-react';
 import '../styles/Dashboard.css';
 import Sidebar from '../components/Sidebar';
+import { useNavigate } from 'react-router-dom';
 
 export default function PNBDashboard() {
+  const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Check if user is logged in
+    const storedUser = localStorage.getItem('pnb-user');
+    if (!storedUser) {
+      // Redirect to login if no user data found
+      navigate('/');
+      return;
+    }
+    
+    try {
+      const parsedUser = JSON.parse(storedUser);
+      setUserData(parsedUser);
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      localStorage.removeItem('pnb-user');
+      navigate('/');
+    }
+  }, [navigate]);
+
   const transactions = [
     { id: 132, date: '09/09/09:00', company: 'Jollibee', details: 'Payment for food', amount: '₱1322.79', status: 'Pending' },
     { id: 133, date: '09/09/09:00', company: 'Jollibee', details: 'Payment for food', amount: '₱1322.79', status: 'Completed' },
@@ -35,19 +58,24 @@ export default function PNBDashboard() {
           <div className="search-container">
             <Search size={16} className="search-icon" />
             <input type="text" placeholder="Search for..." className="search-input" />
-          </div>
-          <div className="header-right">
-            <span className="greeting">Hello, User!</span>
+          </div>          <div className="header-right">
+            <span className="greeting">
+              Hello, {userData ? userData.fullName || userData.email.split('@')[0] : 'User'}!
+            </span>
             <Bell size={20} className="bell-icon" />
-            <div className="avatar">U</div>
+            <div className="avatar">
+              {userData ? (userData.fullName ? userData.fullName.charAt(0) : userData.email.charAt(0).toUpperCase()) : 'U'}
+            </div>
           </div>
-        </div>
-
-        <div className="content">
+        </div>        <div className="content">
           <div className="balance-section">
             <h2 className="balance-label">My Balance</h2>
-            <h1 className="balance-amount">896.31 Pesos</h1>
-            <p className="available-balance">Available Balance: 896.31</p>
+            <h1 className="balance-amount">
+              {userData && userData.balance ? `${userData.balance} Pesos` : '896.31 Pesos'}
+            </h1>
+            <p className="available-balance">
+              Available Balance: {userData && userData.balance ? userData.balance : '896.31'}
+            </p>
           </div>
 
           <div className="overview-section">
