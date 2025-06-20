@@ -28,9 +28,9 @@ class UserService {
         dateOfBirth,
         withdrawalMethods
       });
-    
+
       await user.save();
-      return { message: 'User registered', userId: user._id, accessToken };
+      return { message: 'User registered', userId: user._id };
     } catch (err) {
       throw new Error(err.message);
     }

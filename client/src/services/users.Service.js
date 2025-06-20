@@ -1,4 +1,5 @@
-const HOST_BASE = '192.168.9.23:4001';
+// const HOST_BASE = '192.168.9.23:4001';
+const HOST_BASE = 'localhost:4001';
 
 export const loginUser = async (email, password) => {
   try {
@@ -9,12 +10,11 @@ export const loginUser = async (email, password) => {
       },
       body: JSON.stringify({ email, password }),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || 'Login failed');
     }
-    
     return await response.json();
   } catch (error) {
     console.error('Login error:', error);
@@ -28,6 +28,7 @@ export const getUsers = async () => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'authorization': `Bearer ${localStorage.getItem('token')}`,
       },
     });
     if (!response.ok) {
