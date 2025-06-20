@@ -1,5 +1,5 @@
 const TransactionModel = require('../models/transaction.model');
-const { DuplicateTransactionError, TransactionNotFoundError } = require("../errors/index.js");
+const {  TransactionNotFoundError } = require("../errors/index.js");
 class TransactionService {
   constructor() {
     this.createTransaction = this.createTransaction.bind(this);

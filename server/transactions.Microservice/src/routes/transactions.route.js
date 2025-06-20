@@ -3,7 +3,7 @@ const router = express.Router();
 const transactionsController = require('../controllers/transactions.controller');
 const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware } = require('../middleware');
 const { addTransactionSchema,
-  validateIdSchema, validateUserIdSchema } = require('../schema');
+  validateIdSchema, validateUserIdSchema, updateTransactionSchema } = require('../schema');
 
 // Create a new transaction
 router.post('/', ValidateRequestBodyMiddleware(addTransactionSchema), transactionsController.createTransaction);
@@ -15,7 +15,7 @@ router.get('/user/:userId', ValidateRequestRouteParameterMiddleware(validateUser
 router.get('/transaction/:id', ValidateRequestRouteParameterMiddleware(validateIdSchema), transactionsController.getTransactionById);
 
 // Update transaction status
-router.patch('/:id/status', ValidateRequestRouteParameterMiddleware(validateIdSchema), transactionsController.updateTransactionStatus);
+router.patch('/:id/status', ValidateRequestRouteParameterMiddleware(validateIdSchema), ValidateRequestBodyMiddleware(updateTransactionSchema), transactionsController.updateTransactionStatus);
 
 // Delete a transaction
 router.delete('/:id', ValidateRequestRouteParameterMiddleware(validateIdSchema), transactionsController.deleteTransaction);

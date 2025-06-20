@@ -1,7 +1,6 @@
 const joi = require('joi');
 
-
-const addTransactionSchema = joi.object({
+const updateTransactionSchema = joi.object({
   userId: joi.string().required().messages({
     'string.empty': 'User ID cannot be empty',
     'any.required': 'User ID is required'
@@ -24,6 +23,6 @@ const addTransactionSchema = joi.object({
     'any.only': 'Status must be one of Pending, Cancelled, or Paid',
     'any.required': 'Status is required'
   })
-});
+})
 
-module.exports = addTransactionSchema;
+module.exports = updateTransactionSchema;

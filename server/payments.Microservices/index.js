@@ -1,31 +1,24 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
-require('dotenv').config();
-
-const paymentRoutes = require('./routes/payment.route');
-
-
+const config = require("./src/lib/config.js");
+const paymentRoutes = require('./src/routes/payment.route.js');
+const connectDB = require('./src/db/index.js');
+const { RouteNotFoundErrorMiddleware } = require('./src/middleware/index.js');
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+
+connectDB();
+
+
 app.use('/api/payments', paymentRoutes);
 
+app.use(RouteNotFoundErrorMiddleware);
 
-const PORT = process.env.PAYMENT_PORT;
-const HOST = process.env.HOST;
-const MONGO_URI = process.env.PAYMENT_MONGO_URI;
 
-mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, HOST, () => {
-      console.log(`Payment Service running on http://${HOST}:${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error);
-  });
+app.listen(config.PORT, config.HOST, () => {
+  console.log(`Payment Service running on http://${config.HOST}:${config.PORT}`);
+});
