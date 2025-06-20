@@ -1,8 +1,14 @@
 const User = require("../models/user.model.js");
 const bcrypt = require('bcrypt');
 const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError } = require('../errors');
-const jwt = require('jsonwebtoken');
+
 const jwtManager = require('../lib/jwtmanager.js');
+const randomatic = require('randomatic');
+
+function generateAccountNumber() {
+  return `${randomatic('0', 3)}-${randomatic('0', 4)}-${randomatic('0', 3)}-${randomatic('0', 4)}`;
+}
+
 class UserService {
   constructor() {
     this.registerUser = this.registerUser.bind(this);
@@ -13,17 +19,18 @@ class UserService {
 
   async registerUser(userData) {
     try {
-      const { fullName, email, password, accountNumber, address, dateOfBirth, withdrawalMethods } = userData;
+      let { fullName, email, password, address, dateOfBirth, withdrawalMethods } = userData;
       console.log(userData)
       const existingUser = await User.findOne({ email });
       if (existingUser) throw new DuplicateUserEmailError('Email already exists');
       const hashedPassword = await bcrypt.hash(password, 10);
+      const randomAccountNumber = generateAccountNumber();
 
       const user = new User({
         fullName,
         email,
         password: hashedPassword,
-        accountNumber,
+        accountNumber: randomAccountNumber,
         address,
         dateOfBirth,
         withdrawalMethods
