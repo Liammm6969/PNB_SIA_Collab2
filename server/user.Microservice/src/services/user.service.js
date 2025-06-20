@@ -1,6 +1,8 @@
 const User = require("../models/user.model.js");
 const bcrypt = require('bcrypt');
 const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError } = require('../errors');
+const jwt = require('jsonwebtoken');
+const jwtManager = require('../lib/jwtmanager.js');
 class UserService {
   constructor() {
     this.registerUser = this.registerUser.bind(this);
@@ -11,22 +13,24 @@ class UserService {
 
   async registerUser(userData) {
     try {
-      const { fullName, email, password, address, gender, dateOfBirth, withdrawalMethods } = userData;
+      const { fullName, email, password, accountNumber, address, dateOfBirth, withdrawalMethods } = userData;
       console.log(userData)
       const existingUser = await User.findOne({ email });
       if (existingUser) throw new DuplicateUserEmailError('Email already exists');
       const hashedPassword = await bcrypt.hash(password, 10);
+
       const user = new User({
         fullName,
         email,
         password: hashedPassword,
+        accountNumber,
         address,
-        gender,
         dateOfBirth,
         withdrawalMethods
       });
+    
       await user.save();
-      return { message: 'User registered', userId: user._id };
+      return { message: 'User registered', userId: user._id, accessToken };
     } catch (err) {
       throw new Error(err.message);
     }
@@ -42,7 +46,12 @@ class UserService {
 
       if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
 
-      return { message: 'Login successful', user: user.toObject() };
+      const accessToken = jwtManager({
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+      });
+      return { message: 'Login successful', user: user.toObject(), accessToken };
     } catch (err) {
       throw new Error(err.message);
     }
