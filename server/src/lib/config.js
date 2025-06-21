@@ -3,10 +3,10 @@ dotenv.config({ path: "./.env" });
 
 module.exports = {
   JWT_SECRET: process.env.JWT_SECRET,
-  PORT: process.env.PORT || "4000",
-  HOST: process.env.HOST || "localhost",
+  PORT: "4000",
+  HOST: "localhost",
   mongoDb: {
-    MONGO_URI: process.env.MONGO_URI || "mongodb+srv://hedtjyuzon:Jaffmier0924@bankcluster.cmlw7zw.mongodb.net/PNBDb",
+    MONGO_URI: "mongodb+srv://hedtjyuzon:Jaffmier0924@bankcluster.cmlw7zw.mongodb.net/PNBDb",
     options: {
       minPoolSize: Number(process.env.OPTIONS_DB_MINIMUMPOOLSIZE || 5),
       maxPoolSize: Number(process.env.OPTIONS_DB_MAXIMUMPOOLSIZE || 30),
