@@ -1,5 +1,5 @@
-const {Transaction} = require("../models/index.js");
-const {  TransactionNotFoundError } = require("../errors/index.js");
+const { Transaction, User } = require("../models/index.js");
+const { TransactionNotFoundError } = require("../errors/index.js");
 class TransactionService {
   constructor() {
     this.createTransaction = this.createTransaction.bind(this);
@@ -11,8 +11,23 @@ class TransactionService {
 
   async createTransaction(transactionData) {
     try {
+      const user = await User.findById(transactionData.userId);
+      if (!user) throw new TransactionNotFoundError('User not found');
+      const addAmountToUser = await User.findByIdAndUpdate(
+        transactionData.userId,
+        { $inc: { balance: transactionData.amount } },
+        { new: true }
+      );
 
-      const transaction = new Transaction(transactionData);
+
+      const transaction = new Transaction({
+        userId: transactionData.userId,
+        company: transactionData.company,
+        paymentDetails: transactionData.paymentDetails,
+        amount: addAmountToUser.balance,
+        status: 'Pending',
+       
+      });
       await transaction.save();
       return transaction;
     } catch (err) {
