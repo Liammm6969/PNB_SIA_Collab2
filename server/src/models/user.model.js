@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose');
+const { type } = require('../schema/add-payment.schema');
 
 const userSchema = new mongoose.Schema({
   fullName: {
@@ -11,16 +12,15 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   accountNumber: { type: String, required: true },
-  role: { type: String, enum: ['Admin', 'Finance', 'User'], default: 'User' },
+  role: { type: String, enum: ['Admin', 'Finance', 'BusinessOwner', 'User'], default: 'User' },
   address: String,
   dateOfBirth: { type: Date, max: '2025-12-31', required: function () { return this.accountType === 'personal' } },
   balance: { type: Number, default: 0 },
-  withdrawalMethods: [
-    {
-      type: { type: String, default: 'Bank Transfer' },
-      cardNumber: String,
-    }
-  ],
+  withdrawalMethods: {
+    type: String,
+    enum: ['Bank Transfer', 'PayPal', 'Credit Card', 'Crypto Currency'],
+    default: 'Bank Transfer',
+  },
   accountType: {
     type: String,
     enum: ['personal', 'business'],
