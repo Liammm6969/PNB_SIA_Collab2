@@ -47,23 +47,23 @@ export default function Login() {
   };
   const handleClick = async () => {
     setError('');
-    
+
     if (!validateForm()) return;
-    
+
     setLoading(true);
-    
+
     // Remember email if checked
     if (rememberMe) {
       localStorage.setItem('pnb-remembered-email', email);
     } else {
       localStorage.removeItem('pnb-remembered-email');
     }
-      try {
+    try {
       const response = await loginUser(email, password);
-      
+
       // Store user data in localStorage for persistence across sessions
       localStorage.setItem('pnb-user', JSON.stringify(response.user));
-      
+
       setLoading(false);
       navigate('/home');
     } catch (error) {
@@ -92,13 +92,16 @@ export default function Login() {
 
         {/* Right Side - Login Form */}
         <div className="pnb-login-card">          {/* PNB Logo */}          <div className="pnb-logo-section">
-            <div className="pnb-logo-text">
-             <img src="/src/assets/pnb.png" alt="PNB Logo" />
-            </div>
+          <div className="pnb-logo-text">
+            <img src="/src/assets/pnb.png" alt="PNB Logo" />
           </div>
+        </div>
 
-          <h2 className="pnb-login-title">Login</h2>
-          
+
+
+          <h2 className="pnb-login-title">Welcome Back</h2>
+
+
           {error && (
             <div className="pnb-error-message">
               <AlertCircle size={18} />
@@ -118,6 +121,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   className="pnb-input"
+                  style={{ color: 'black' }}
                 />
               </div>
             </div>            {/* Password Field */}
@@ -132,6 +136,7 @@ export default function Login() {
                   placeholder="Enter your password"
                   className="pnb-input"
                   onKeyPress={(e) => e.key === 'Enter' && handleClick()}
+                  style={{ color: 'black' }}
                 />
                 <button
                   type="button"
@@ -142,7 +147,7 @@ export default function Login() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              
+
               <div className="pnb-password-options">
                 <div className="pnb-remember-me">
                   <input
@@ -165,7 +170,7 @@ export default function Login() {
             >
               {loading ? (
                 <>
-                  <Loader className="pnb-loader" size={20} /> 
+                  <Loader className="pnb-loader" size={20} />
                   Logging in...
                 </>
               ) : (
@@ -186,8 +191,8 @@ export default function Login() {
               </div>
             </div>
 
-          
-            
+
+
           </div>
         </div>
       </div>
