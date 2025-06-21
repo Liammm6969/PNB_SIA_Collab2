@@ -1,5 +1,4 @@
-const {Payment} = require("../models/index.js");
-const UserModel = require("../models/index.js");
+const {Payment, User} = require("../models/index.js");
 const mongoose = require('mongoose');
 class TransferService {
   constructor() {
@@ -13,8 +12,8 @@ class TransferService {
       const { fromUser, toUser, amount, details } = transferData;
 
       // Find sender and receiver within the session
-      const sender = await UserModel.findById(fromUser).session(session);
-      const receiver = await UserModel.findById(toUser).session(session);
+      const sender = await User.findById(fromUser).session(session);
+      const receiver = await User.findById(toUser).session(session);
 
       if (!sender || !receiver) {
         throw new Error('Sender or receiver not found');

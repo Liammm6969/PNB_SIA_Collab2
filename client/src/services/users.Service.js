@@ -1,9 +1,10 @@
 // const HOST_BASE = '192.168.9.23:4001';
-const HOST_BASE = 'localhost:4001';
+const HOST_BASE = 'localhost:4000';
+const API_PREFIX = '/api/Philippine-National-Bank';
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await fetch(`http://${HOST_BASE}/api/users/login`, {
+    const response = await fetch(`http://localhost:4000/api/Philippine-National-Bank/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -24,7 +25,7 @@ export const loginUser = async (email, password) => {
 
 export const getUsers = async () => {
   try {
-    const response = await fetch(`http://${HOST_BASE}/api/users`, {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ export const getUsers = async () => {
 
 export const createUser = async (userData) => {
   try {
-    const response = await fetch(`http://${HOST_BASE}/users`, {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +63,7 @@ export const createUser = async (userData) => {
 
 export const updateUser = async (userId, userData) => {
   try {
-    const response = await fetch(`http://${HOST_BASE}/users/${userId}`, {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +82,7 @@ export const updateUser = async (userId, userData) => {
 
 export const deleteUser = async (userId) => {
   try {
-    const response = await fetch(`http://${HOST_BASE}/users/${userId}`, {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/${userId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
