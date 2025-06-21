@@ -3,7 +3,7 @@ const TransactionModel = require('./transaction.model');
 const UserModel = require('./user.model');
 
 module.exports = {
-  PaymentModel,
-  TransactionModel,
-  UserModel
+ Payment: PaymentModel,
+  Transaction: TransactionModel,
+  User: UserModel
 };

@@ -1,4 +1,4 @@
-const PaymentModel = require("../models/index.js");
+const {Payment} = require("../models/index.js");
 const UserModel = require("../models/index.js");
 const mongoose = require('mongoose');
 class TransferService {
@@ -29,7 +29,7 @@ class TransferService {
       receiver.balance += amount;
       await sender.save({ session });
       await receiver.save({ session });
-      const payment = new PaymentModel({
+      const payment = new Payment({
         fromUser,
         toUser,
         amount,

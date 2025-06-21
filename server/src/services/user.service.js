@@ -1,4 +1,4 @@
-const User = require("../models/index.js");
+const { User } = require("../models/index.js");
 const bcrypt = require('bcrypt');
 const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError } = require('../errors');
 

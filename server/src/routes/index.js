@@ -10,9 +10,9 @@ router.get('/', (req, res) => {
   res.status(StatusCodes.OK).json({
     message: 'Welcome to the PNB Microservice API',
     routes: {
-      payments: '/api/Philippine-National-Bank/payments',
-      transactions: '/api/Philippine-National-Bank/transactions',
-      users: '/api/Philippine-National-Bank/users'
+      payments: 'http://localhost:4000/api/Philippine-National-Bank/payments',
+      transactions: 'http://localhost:4000/api/Philippine-National-Bank/transactions',
+      users: 'http://localhost:4000/api/Philippine-National-Bank/users',
     }
   });
 });

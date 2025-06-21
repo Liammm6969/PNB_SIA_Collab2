@@ -1,7 +1,7 @@
 const ValidateRequestBodyMiddleware = (joiInstance) => {
   return async (req, res, next) => {
     try {
-      await joiInstance.validateAsync(req.body);
+      await joiInstance.validate(req.body);
 
       return next();
     } catch (err) {

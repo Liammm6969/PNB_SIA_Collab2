@@ -1,4 +1,4 @@
-const TransactionModel = require("../models/index.js");
+const {Transaction} = require("../models/index.js");
 const {  TransactionNotFoundError } = require("../errors/index.js");
 class TransactionService {
   constructor() {
@@ -12,7 +12,7 @@ class TransactionService {
   async createTransaction(transactionData) {
     try {
 
-      const transaction = new TransactionModel(transactionData);
+      const transaction = new Transaction(transactionData);
       await transaction.save();
       return transaction;
     } catch (err) {
@@ -22,7 +22,7 @@ class TransactionService {
 
   async getTransactionsByUser(userId) {
     try {
-      const transactions = await TransactionModel.find({ userId }).sort({ createdAt: -1 });
+      const transactions = await Transaction.find({ userId }).sort({ createdAt: -1 });
       if (!transactions) throw new TransactionNotFoundError('No transactions found');
       return transactions;
     } catch (err) {
@@ -32,7 +32,7 @@ class TransactionService {
 
   async getTransactionById(id) {
     try {
-      const transaction = await TransactionModel.findById(id);
+      const transaction = await Transaction.findById(id);
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {
@@ -42,7 +42,7 @@ class TransactionService {
 
   async updateTransactionStatus(id, status) {
     try {
-      const transaction = await TransactionModel.findByIdAndUpdate(id, { status }, { new: true });
+      const transaction = await Transaction.findByIdAndUpdate(id, { status }, { new: true });
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {
@@ -52,7 +52,7 @@ class TransactionService {
 
   async deleteTransaction(id) {
     try {
-      const transaction = await TransactionModel.findByIdAndDelete(id);
+      const transaction = await Transaction.findByIdAndDelete(id);
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return { message: 'Transaction deleted' };
     } catch (err) {
