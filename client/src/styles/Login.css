@@ -156,7 +156,7 @@
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 1rem;
-  color: #374151;
+  background-color: white !important;
   outline: none;
   transition: all 0.2s;
   box-sizing: border-box;
@@ -175,14 +175,15 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #9ca3af;
+  color: #6b7280;
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.25rem;
 }
 
 .pnb-eye-button:hover {
-  color: #6b7280;
+  color: #000000;
+  border: none;
 }
 
 .pnb-forgot-password {
@@ -221,6 +222,7 @@
 
 .pnb-signup-section {
   text-align: center;
+  
   font-size: 0.875rem;
   color: #6b7280;
 }
