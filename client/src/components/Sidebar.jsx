@@ -1,6 +1,7 @@
 import React from 'react';
 import { Grid3X3, User, CreditCard, Settings } from 'lucide-react';
 import '../styles/Sidebar.css';
+import { NavLink } from 'react-router-dom';
 
 export default function Sidebar() {
   return (
@@ -14,18 +15,18 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <div className="navigation">
-        <div className="nav-item-active">
+        <NavLink to="/home" className={({ isActive }) => isActive ? "nav-item-active" : "nav-item"}>
           <Grid3X3 size={24} className="nav-icon" />
           <span className="nav-text">Dashboard</span>
-        </div>
-        <div className="nav-item">
+        </NavLink>
+        <NavLink to="/my-account" className={({ isActive }) => isActive ? "nav-item-active" : "nav-item"}>
           <User size={24} className="nav-icon" />
           <span className="nav-text">My Account</span>
-        </div>
-        <div className="nav-item">
+        </NavLink>
+        <NavLink to="/transactions" className={({ isActive }) => isActive ? "nav-item-active" : "nav-item"}>
           <CreditCard size={24} className="nav-icon" />
           <span className="nav-text">Transactions</span>
-        </div>
+        </NavLink>
       </div>
 
       {/* Settings */}

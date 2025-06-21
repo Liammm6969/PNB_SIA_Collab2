@@ -61,8 +61,9 @@ export default function Login() {
     try {
       const response = await loginUser(email, password);
 
-      // Store user data in localStorage for persistence across sessions
+      // Store user data and token in localStorage for persistence across sessions
       localStorage.setItem('pnb-user', JSON.stringify(response.user));
+      localStorage.setItem('pnb-token', response.token);
 
       setLoading(false);
       navigate('/home');

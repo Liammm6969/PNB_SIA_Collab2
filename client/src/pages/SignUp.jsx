@@ -108,7 +108,8 @@ export default function SignUp() {
   return (
     <div className="pnb-container">
       <div className="pnb-main-wrapper">
-        {/* Form Side */}        <div className="pnb-signup-card">
+        {/* Form Side */}        
+        <div className="pnb-signup-card">
           {/* PNB Logo */}
           <div className="pnb-logo-section">
             <div className="pnb-logo-text">
