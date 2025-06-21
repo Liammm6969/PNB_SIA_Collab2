@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader } from 'lucide-react';
 import '../styles/Login.css';
+import '../styles/AccountTypeModal.css';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/users.Service';
+import AccountTypeModal from '../components/AccountTypeModal';
 
-export default function PNBLogin() {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const navigate = useNavigate();
+  const [showAccountTypeModal, setShowAccountTypeModal] = useState(false);
+  const [accountType, setAccountType] = useState('');
+  const navigate = useNavigate();  const handleSignUp = () => {
+    setShowAccountTypeModal(true);
+  }
+  
+  const handleSelectAccountType = (type) => {
+    setAccountType(type);
+    setShowAccountTypeModal(false);
+    navigate('/signup', { state: { accountType: type } });
+  }
 
   useEffect(() => {
     // Check for stored email in local storage
@@ -85,7 +97,10 @@ export default function PNBLogin() {
           </div>
         </div>
 
+
+
           <h2 className="pnb-login-title">Welcome Back</h2>
+
 
           {error && (
             <div className="pnb-error-message">
@@ -166,7 +181,7 @@ export default function PNBLogin() {
             {/* Sign Up Link */}
             <div className="pnb-signup-section">
               Don't have an account?{' '}
-              <button className="pnb-signup-link">Sign up</button>
+              <button className="pnb-signup-link" onClick={handleSignUp}>Sign up</button>
             </div>
 
             {/* Divider */}
@@ -181,6 +196,14 @@ export default function PNBLogin() {
           </div>
         </div>
       </div>
+      
+      {/* Account Type Selection Modal */}
+      <AccountTypeModal 
+        isOpen={showAccountTypeModal} 
+        onClose={() => setShowAccountTypeModal(false)} 
+        onSelectAccountType={handleSelectAccountType}
+      />
     </div>
   );
 }
+
