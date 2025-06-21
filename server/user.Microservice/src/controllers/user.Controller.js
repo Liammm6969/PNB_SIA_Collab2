@@ -16,7 +16,7 @@ exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
     const user = await UserService.loginUser(email, password);
     if (!user) return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email or password' });
-
+    console.log(user)
     res.status(StatusCodes.OK).json(user);
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
