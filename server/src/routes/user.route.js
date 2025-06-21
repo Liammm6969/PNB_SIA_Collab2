@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require("../controllers/user.controller.js");
 const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, verifyAccessToken, LoginLimiter, PermissionMiddleware } = require('../middleware/index.js');
-
+const Roles = require('../lib/roles.js');
 const { registerUserSchema,
   loginUserSchema,
   validateIdSchema } = require('../schema/index.js');
@@ -18,9 +18,9 @@ router.use(verifyAccessToken);
 
 
 // Get user profile by ID
-router.get('/:id', ValidateRequestRouteParameterMiddleware(validateIdSchema), PermissionMiddleware('read', 'user', req => req.params.id), userController.getUserProfile);
+router.get('/:id', ValidateRequestRouteParameterMiddleware(validateIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), userController.getUserProfile);
 
 // List all users
-router.get('/', PermissionMiddleware('read', 'user'), userController.listUsers);
+router.get('/', PermissionMiddleware(Roles.ADMIN, Roles.FINANCE), userController.listUsers);
 
 module.exports = router;
