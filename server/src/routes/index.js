@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 
 router.get('/health', (req, res) => {
   res.status(StatusCodes.OK).json({
-    status: 'UP',
+    status: `UP:${StatusCodes.OK}`,
     message: 'PNB Microservice is running'
   });
 });
