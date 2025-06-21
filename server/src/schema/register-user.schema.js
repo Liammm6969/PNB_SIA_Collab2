@@ -11,6 +11,11 @@ const registerUserSchema = joi.object({
       'string.max': 'Full name must not exceed 30 characters',
       'any.required': 'Full name is required'
     }),
+  companyName: joi.string().alphanum().optional().messages({
+    'string.base': 'Company name must be a string',
+    'string.empty': 'Company name cannot be empty',
+    'any.required': 'Company name is required'
+  }),
   email: joi.string().email().required().messages({
     'string.base': 'Email must be a string',
     'string.empty': 'Email cannot be empty',
@@ -28,16 +33,29 @@ const registerUserSchema = joi.object({
     'string.empty': 'Account number cannot be empty',
     'string.pattern.base': 'Account number must be in the format XXX-XXXX-XXX-XXXX',
   }),
-  role: joi.string().valid('Admin', 'Finance', 'User').default('User'),
+  role: joi.string().valid('Admin', 'Finance', 'User').default('User').messages({
+    'string.base': 'Role must be a string',
+    'any.only': 'Role must be either personal or business',
+    'any.default': 'Role is set to personal by default'
+  }),
   address: joi.string().optional(),
   dateOfBirth: joi.date().max('12-31-2025').optional(),
+  balance: joi.number().default(0).messages({
+    'number.base': 'Balance must be a number',
+    'any.default': 'Balance is set to 0 by default'
+  }).optional(),
   withdrawalMethods: joi.array().items(
     joi.object({
       type: joi.string().required(),
       cardNumber: joi.string().required(),
-      local: joi.boolean().required()
     })
-  ).optional()
+  ).optional(),
+  accountType: joi.string().valid('personal', 'business').required().messages({
+    'string.base': 'Account type must be a string',
+    'any.only': 'Account type must be either personal or business',
+    'any.required': 'Account type is required'
+  })
+
 });
 
 module.exports = registerUserSchema;
