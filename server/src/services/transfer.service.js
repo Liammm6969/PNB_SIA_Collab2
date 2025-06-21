@@ -1,5 +1,5 @@
-const { Payment } = require("../models/index.js");
-const { User } = require("../models/index.js");
+
+const {Payment, User} = require("../models/index.js");
 const mongoose = require('mongoose');
 class TransferService {
   constructor() {
@@ -11,7 +11,6 @@ class TransferService {
     session.startTransaction();
     try {
       const { fromUser, toUser, amount, details } = transferData;
-
      
       const senderDoc = await User.findById(fromUser).session(session);
       const receiverDoc = await User.findById(toUser).session(session);
@@ -37,6 +36,7 @@ class TransferService {
         { $inc: { balance: amount } },
         { new: true, session }
       );
+
 
 
 

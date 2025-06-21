@@ -16,6 +16,7 @@ ConnectToDb();
 
 // Routes
 app.use('/api/Philippine-National-Bank', PNBRoutes);
+// Also support legacy client routes for compatibility
 
 app.use(RouteNotFoundErrorMiddleware);
 
