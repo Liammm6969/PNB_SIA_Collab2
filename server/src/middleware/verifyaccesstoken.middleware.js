@@ -12,9 +12,9 @@ const verifyAccessToken = (req, res, next) => {
     req.user = {
       _id: jwtPayload._id,
       fullName: jwtPayload.fullName,
-      email: jwtPayload.email
+      email: jwtPayload.email,
+      role: jwtPayload.role
     };
-    req.user = jwtPayload;
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Invalid access token' });

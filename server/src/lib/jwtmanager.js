@@ -5,7 +5,8 @@ module.exports = jwtManager = (user) => {
     {
       id: user._id,
       fullName: user.fullName,
-      email: user.email
+      email: user.email,
+      role: user.role
     },
     config.JWT_SECRET,
     { expiresIn: '1h' }

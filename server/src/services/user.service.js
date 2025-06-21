@@ -55,11 +55,12 @@ class UserService {
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
-
+      
       const accessToken = jwtManager({
         _id: user._id,
         fullName: user.fullName,
         email: user.email,
+        role: user.role,
       });
       return { message: 'Login successful', user: user.toObject(), accessToken };
     } catch (err) {

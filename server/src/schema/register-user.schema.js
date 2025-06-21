@@ -33,7 +33,7 @@ const registerUserSchema = joi.object({
     'string.empty': 'Account number cannot be empty',
     'string.pattern.base': 'Account number must be in the format XXX-XXXX-XXX-XXXX',
   }),
-  role: joi.string().valid('Admin', 'Finance', 'User').default('User').messages({
+  role: joi.string().valid('Admin', 'Finance', 'BusinessOwner', 'User').default('User').messages({
     'string.base': 'Role must be a string',
     'any.only': 'Role must be either personal or business',
     'any.default': 'Role is set to personal by default'
@@ -44,11 +44,11 @@ const registerUserSchema = joi.object({
     'number.base': 'Balance must be a number',
     'any.default': 'Balance is set to 0 by default'
   }).optional(),
-  withdrawalMethods: joi.array().items(
-    joi.object({
-      type: joi.string().required(),
-      cardNumber: joi.string().required(),
-    })
+  withdrawalMethods:joi.string().valid('Bank Transfer', 'PayPal', 'Credit Card', 'Crypto Currency').default('Bank Transfer').messages({
+    'string.base': 'Withdrawal method must be a string',
+    'any.only': 'Withdrawal method must be one of Bank Transfer, PayPal, Credit Card, or Crypto Currency',
+    'any.default': 'Withdrawal method is set to Bank Transfer by default'
+  }
   ).optional(),
   accountType: joi.string().valid('personal', 'business').required().messages({
     'string.base': 'Account type must be a string',
