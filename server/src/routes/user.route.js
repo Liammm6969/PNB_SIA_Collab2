@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const userController = require("../controllers/user.controller.js");
-const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, verifyAccessToken } = require('../middleware/index.js');
+const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, verifyAccessToken,LoginLimiter } = require('../middleware/index.js');
+
 const { registerUserSchema,
   loginUserSchema,
   validateIdSchema } = require('../schema/index.js');
@@ -11,7 +12,7 @@ const { registerUserSchema,
 router.post('/register', ValidateRequestBodyMiddleware(registerUserSchema), userController.registerUser);
 
 // Login user
-router.post('/login', ValidateRequestBodyMiddleware(loginUserSchema), userController.loginUser);
+router.post('/login', ValidateRequestBodyMiddleware(loginUserSchema), LoginLimiter, userController.loginUser);
 
 router.use(verifyAccessToken);
 

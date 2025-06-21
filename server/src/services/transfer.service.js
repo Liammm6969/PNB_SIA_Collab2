@@ -1,3 +1,4 @@
+
 const {Payment, User} = require("../models/index.js");
 const mongoose = require('mongoose');
 class TransferService {
@@ -10,24 +11,35 @@ class TransferService {
     session.startTransaction();
     try {
       const { fromUser, toUser, amount, details } = transferData;
+     
+      const senderDoc = await User.findById(fromUser).session(session);
+      const receiverDoc = await User.findById(toUser).session(session);
+      if (!receiverDoc) throw new Error('Receiver not found');
+      
+      if (!senderDoc) throw new Error('Sender not found');
+      
+      if (senderDoc.balance < amount) throw new Error('Sender does not have enough balance');
+      
 
-      // Find sender and receiver within the session
-      const sender = await User.findById(fromUser).session(session);
-      const receiver = await User.findById(toUser).session(session);
+      const sender = await User.findOneAndUpdate({
+        _id: fromUser,
+        balance: { $gte: amount }
+      }, {
+        $inc: { balance: -amount }
+      }, {
+        new: true,
+        session
+      });
 
-      if (!sender || !receiver) {
-        throw new Error('Sender or receiver not found');
-      }
+      await User.findByIdAndUpdate(
+        toUser,
+        { $inc: { balance: amount } },
+        { new: true, session }
+      );
 
-      // Check for sufficient balance
-      if (sender.balance < amount) {
-        throw new Error('Insufficient balance');
-      }
 
-      sender.balance -= amount;
-      receiver.balance += amount;
-      await sender.save({ session });
-      await receiver.save({ session });
+
+
       const payment = new Payment({
         fromUser,
         toUser,
