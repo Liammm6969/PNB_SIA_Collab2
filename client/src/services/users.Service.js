@@ -98,3 +98,22 @@ export const deleteUser = async (userId) => {
   }
 }
 
+export const getUserById = async (userId) => {
+  try {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${localStorage.getItem('pnb-token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    throw error;
+  }
+}
+

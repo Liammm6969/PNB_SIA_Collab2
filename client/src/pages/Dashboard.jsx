@@ -1,26 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Search,
-  Bell,
   CreditCard,
-  User,
-  Grid3X3,
-  Settings,
+  TrendingUp,
+  ArrowDown,
+  ArrowUp,
   MoreHorizontal
 } from 'lucide-react';
 import '../styles/Dashboard.css';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
+import PaymentModal from '../components/PaymentModal';
 
 export default function PNBDashboard() {
   const [userData, setUserData] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
   const navigate = useNavigate();
   
+  const handleOpenModal = (payment) => {
+    setSelectedPayment(payment);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPayment(null);
+    setIsModalOpen(false);
+  };
+
   useEffect(() => {
-    // Check if user is logged in
     const storedUser = localStorage.getItem('pnb-user');
     if (!storedUser) {
-      // Redirect to login if no user data found
       navigate('/');
       return;
     }
@@ -36,147 +46,154 @@ export default function PNBDashboard() {
   }, [navigate]);
 
   const transactions = [
-    { id: 132, date: '09/09/09:00', company: 'Jollibee', details: 'Payment for food', amount: '₱1322.79', status: 'Pending' },
-    { id: 133, date: '09/09/09:00', company: 'Jollibee', details: 'Payment for food', amount: '₱1322.79', status: 'Completed' },
-    { id: 134, date: '09/09/09:00', company: 'Jollibee', details: 'Payment for food', amount: '₱1322.79', status: 'Pending' },
-    { id: 135, date: '09/09/09:00', company: 'Jollibee', details: 'Payment for food', amount: '₱1322.79', status: 'Pending' },
-    { id: 136, date: '09/09/09:00', company: 'Jollibee', details: 'Payment for food', amount: '₱1322.79', status: 'Pending' }
+    { id: 132, date: 'Sep 9, 2024', company: 'Jollibee', details: 'Food & Drinks', amount: -1322.79, status: 'Pending' },
+    { id: 133, date: 'Sep 8, 2024', company: 'SM Supermarket', details: 'Groceries', amount: -2540.50, status: 'Completed' },
+    { id: 134, date: 'Sep 8, 2024', company: 'Salary Deposit', details: 'Monthly Salary', amount: 50000.00, status: 'Completed' },
+    { id: 135, date: 'Sep 7, 2024', company: 'Grab Car', details: 'Transport', amount: -450.00, status: 'Completed' },
+    { id: 136, date: 'Sep 6, 2024', company: 'Meralco', details: 'Utilities', amount: -3500.00, status: 'Pending' }
   ];
 
   const upcomingPayments = [
-    { name: 'Dr. Manzano dental clinic', amount: '896.31 Pesos', date: '06/06/06:00' },
-    { name: 'Dr. Manzano dental clinic', amount: '896.31 Pesos', date: '06/06/06:00' },
-    { name: 'Dr. Manzano dental clinic', amount: '896.31 Pesos', date: '06/06/06:00' },
-    { name: 'Dr. Manzano dental clinic', amount: '896.31 Pesos', date: '06/06/06:00' }
+    { name: 'Netflix Subscription', amount: '549.00', date: 'Sep 15' },
+    { name: 'Globe Postpaid', amount: '999.00', date: 'Sep 25' },
+    { name: 'Water Bill', amount: '780.50', date: 'Sep 28' },
+    { name: 'Condo Dues', amount: '2500.00', date: 'Sep 30' }
   ];
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount);
+  }
 
   return (
     <div className="dashboard-container">
       <Sidebar />
       <div className="main-content">
-        <div className="header">
-          <div className="search-container">
-            <Search size={16} className="search-icon" />
-            <input type="text" placeholder="Search for..." className="search-input" />
-          </div>          <div className="header-right">
-            <span className="greeting">
-              Hello, {userData ? userData.fullName || userData.email.split('@')[0] : 'User'}!
-            </span>
-            <Bell size={20} className="bell-icon" />
-            <div className="avatar">
-              {userData ? (userData.fullName ? userData.fullName.charAt(0) : userData.email.charAt(0).toUpperCase()) : 'U'}
-            </div>
-          </div>
-        </div>        <div className="content">
-          <div className="balance-section">
-            <h2 className="balance-label">My Balance</h2>
-            <h1 className="balance-amount">
-              {userData && userData.balance ? `${userData.balance} Pesos` : '896.31 Pesos'}
+        <Header userData={userData} />
+
+        <main className="content-area">
+          <div className="content-header">
+            <h1 className="welcome-message">
+              Welcome back, {userData ? userData.fullName.split(' ')[0] : 'User'}!
             </h1>
-            <p className="available-balance">
-              Available Balance: {userData && userData.balance ? userData.balance : '896.31'}
-            </p>
-          </div>
-
-          <div className="overview-section">
-            <h3 className="section-title">Overview</h3>
-            <div className="overview-grid">
-              <div className="overview-card">
-                <div className="card-indicator"></div>
-                <div className="card-value">6969.69</div>
-                <div className="card-label">Latest Transaction</div>
-              </div>
-              <div className="overview-card">
-                <div className="card-indicator"></div>
-                <div className="card-value">-</div>
-                <div className="card-label">Biggest Transaction</div>
-              </div>
-              <div className="overview-card">
-                <div className="card-indicator"></div>
-                <div className="card-value">-</div>
-                <div className="card-label">Total Transactions (7 days)</div>
-              </div>
+            <div className="header-buttons">
+              <button className="action-button">Send Money</button>
+              <button className="action-button primary">Add Money</button>
             </div>
           </div>
-
-          <div className="main-grid">
-            <div className="transactions-section">
-              <div className="transactions-card">
-                <div className="transactions-header">
-                  <div className="transactions-top">
-                    <h3 className="transactions-title">My Transactions</h3>
-                    <div className="transactions-tabs">
-                      <button className="tab-active">All</button>
-                      <button className="tab">Pending</button>
-                      <button className="tab">Cancelled</button>
-                      <button className="tab">Paid</button>
-                    </div>
+          
+          <div className="cards-grid">
+            <div className="balance-card">
+              <div className="balance-header">
+                <span className="balance-title">Total Balance</span>
+                <MoreHorizontal size={20} className="more-icon" />
+              </div>
+              <p className="balance-amount">
+                {userData && userData.balance ? formatCurrency(userData.balance) : formatCurrency(89631.50)}
+              </p>
+              <div className="balance-stats">
+                <div className="stat">
+                  <ArrowUp size={16} className="stat-icon income" />
+                  <div>
+                    <p className="stat-label">Income</p>
+                    <p className="stat-value">{formatCurrency(50000)}</p>
                   </div>
                 </div>
-                <div className="table-container">
-                  <table className="table">
-                    <thead className="table-head">
-                      <tr>
-                        <th className="table-header">ID</th>
-                        <th className="table-header">Date</th>
-                        <th className="table-header">Company</th>
-                        <th className="table-header">Payment Details</th>
-                        <th className="table-header">Amount</th>
-                        <th className="table-header">Status</th>
-                        <th className="table-header"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transactions.map((transaction, index) => (
-                        <tr key={index} className="table-row">
-                          <td className="table-cell">
-                            <input type="checkbox" className="checkbox" />
-                            <span className="transaction-id">{transaction.id}</span>
-                          </td>
-                          <td className="table-cell">{transaction.date}</td>
-                          <td className="table-cell">{transaction.company}</td>
-                          <td className="table-cell">{transaction.details}</td>
-                          <td className="table-cell">{transaction.amount}</td>
-                          <td className="table-cell">
-                            <span className={`status-badge status-${transaction.status.toLowerCase()}`}>
-                              {transaction.status}
-                            </span>
-                          </td>
-                          <td className="table-cell">
-                            <MoreHorizontal size={16} className="more-icon" />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="stat">
+                  <ArrowDown size={16} className="stat-icon expense" />
+                  <div>
+                    <p className="stat-label">Expenses</p>
+                    <p className="stat-value">{formatCurrency(7813.29)}</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="payments-section">
-              <div className="payments-card">
-                <div className="payments-header">
-                  <h3 className="payments-title">Upcoming Payments</h3>
-                </div>
-                <div className="payments-content">
-                  {upcomingPayments.map((payment, index) => (
-                    <div key={index} className="payment-item">
-                      <div className="payment-left">
-                        <div className="payment-name">{payment.name}</div>
-                        <div className="payment-amount">{payment.amount}</div>
-                      </div>
-                      <div className="payment-right">
-                        <div className="payment-date">{payment.date}</div>
-                        <button className="view-info-button">View Info</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div className="overview-card">
+              <div className="overview-header">
+                <h3 className="overview-title">Quick Actions</h3>
+              </div>
+              <div className="quick-actions-grid">
+                <button className="action-item">
+                  <CreditCard size={24} />
+                  <span>Pay Bills</span>
+                </button>
+                <button className="action-item">
+                  <TrendingUp size={24} />
+                  <span>Invest</span>
+                </button>
+                <button className="action-item">
+                  <CreditCard size={24} />
+                  <span>Loans</span>
+                </button>
+                 <button className="action-item">
+                  <MoreHorizontal size={24} />
+                  <span>More</span>
+                </button>
               </div>
             </div>
           </div>
-        </div>
+
+          <div className="transactions-section">
+            <div className="transactions-header">
+              <h3 className="section-title">Recent Transactions</h3>
+              <a href="#" className="view-all-link">View All</a>
+            </div>
+            <div className="transactions-list">
+              {transactions.map((transaction) => (
+                <div key={transaction.id} className="transaction-item">
+                  <div className="transaction-details">
+                    <div className={`transaction-icon ${transaction.amount > 0 ? 'income' : 'expense'}`}>
+                      {transaction.amount > 0 ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
+                    </div>
+                    <div>
+                      <p className="transaction-company">{transaction.company}</p>
+                      <p className="transaction-description">{transaction.details}</p>
+                    </div>
+                  </div>
+                  <div className="transaction-info">
+                     <p className="transaction-date">{transaction.date}</p>
+                     <p className={`transaction-amount ${transaction.amount > 0 ? 'income' : 'expense'}`}>
+                      {formatCurrency(transaction.amount)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="payments-section">
+            <div className="payments-header">
+              <h3 className="section-title">Upcoming Payments</h3>
+              <a href="#" className="view-all-link">View All</a>
+            </div>
+            <div className="payments-list">
+              {upcomingPayments.map((payment, index) => (
+                <div key={index} className="payment-item">
+                  <div className="payment-details">
+                    <div className="payment-icon">
+                      <CreditCard size={20} />
+                    </div>
+                    <div>
+                      <p className="payment-name">{payment.name}</p>
+                      <p className="payment-amount">₱{payment.amount}</p>
+                    </div>
+                  </div>
+                  <div className="payment-info">
+                    <p className="payment-date">{payment.date}</p>
+                    <button className="view-info-button" onClick={() => handleOpenModal(payment)}>View Info</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
       </div>
+       <PaymentModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        payment={selectedPayment}
+        userData={userData}
+      />
     </div>
   );
 }

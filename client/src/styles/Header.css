@@ -1,0 +1,93 @@
+/* client/src/styles/Header.css */
+.header {
+  background-color: #ffffff;
+  padding: 1rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eef0f4;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  color: #9da7b8;
+}
+
+.search-input {
+  background-color: #f7f8fa;
+  border: 1px solid #eef0f4;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  width: 350px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2c3e50;
+  transition: all 0.2s ease-in-out;
+}
+
+.search-input::placeholder {
+  color: #9da7b8;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-button {
+  background: none;
+  border: none;
+  color: #5a6a85;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+.header-button:hover {
+  background-color: #f0f2f5;
+}
+
+.user-info {
+  text-align: right;
+}
+
+.user-name {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.user-role {
+  display: block;
+  font-size: 0.8rem;
+  color: #7f8c9b;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  font-weight: bold;
+} 
