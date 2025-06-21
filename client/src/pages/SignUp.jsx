@@ -291,7 +291,7 @@ export default function SignUp() {
                   <span>Processing...</span>
                 </>
               ) : (
-                'Log in'
+                'Create Account'
               )}
             </button>
             
