@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-
+const cookieparser = require('cookie-parser');
 const config = require("./src/lib/config.js");
 
 const ConnectToDb = require("./src/db/index.js");
@@ -11,6 +11,8 @@ const { RouteNotFoundErrorMiddleware } = require('./src/middleware/index.js');
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(cookieparser());
+
 // Connect to MongoDB
 ConnectToDb();
 

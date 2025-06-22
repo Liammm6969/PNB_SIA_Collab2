@@ -1,6 +1,8 @@
 const jsonwebtoken = require("jsonwebtoken");
 const config = require("../lib/config.js");
-module.exports = jwtManager = (user) => {
+
+
+function generateAccessToken(user) {
   return jsonwebtoken.sign(
     {
       id: user._id,
@@ -11,4 +13,27 @@ module.exports = jwtManager = (user) => {
     config.JWT_SECRET,
     { expiresIn: '1h' }
   );
+}
+
+function generateRefreshToken(user) {
+  return jsonwebtoken.sign(
+    {
+      id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role
+    },
+    config.JWT_REFRESH_SECRET,
+    { expiresIn: '7d' }
+  );
+}
+
+
+
+
+
+module.exports = {
+  generateAccessToken,
+  generateRefreshToken,
+  
 };
