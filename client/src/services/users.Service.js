@@ -1,4 +1,3 @@
-
 const HOST_BASE = 'localhost:4000';
 const API_PREFIX = '/api/Philippine-National-Bank';
 
@@ -26,6 +25,10 @@ export const loginUser = async (email, password) => {
 export const verifyOTP = async (email, otp) => {
   try {
     const url = `http://${HOST_BASE}${API_PREFIX}/users/verify-otp`;
+    console.log('Attempting to verify OTP for:', email);
+    console.log('Calling URL:', url);
+    console.log('HOST_BASE:', HOST_BASE);
+    console.log('API_PREFIX:', API_PREFIX);
    
     const response = await fetch(url, {
       method: 'POST',
@@ -35,11 +38,26 @@ export const verifyOTP = async (email, otp) => {
       body: JSON.stringify({ email, otp }),
     });
 
- 
+    console.log('Response status:', response.status);
+    console.log('Response status text:', response.statusText);
+    console.log('Response headers:', response.headers);
+    console.log('Response URL:', response.url);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OTP verification error response:', errorData);
-      throw new Error(errorData.error || 'OTP verification failed');
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      console.log('Content-Type:', contentType);
+      
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        console.error('OTP verification error response:', errorData);
+        throw new Error(errorData.error || 'OTP verification failed');
+      } else {
+        // Handle non-JSON responses (HTML error pages)
+        const textResponse = await response.text();
+        console.error('Non-JSON error response (first 500 chars):', textResponse.substring(0, 500));
+        throw new Error(`Server error (${response.status}): ${response.statusText}`);
+      }
     }
     
     const result = await response.json();
@@ -168,6 +186,63 @@ export const getUserById = async (userId) => {
     return await response.json();
   } catch (error) {
     console.error('Error fetching user by ID:', error);
+    throw error;
+  }
+}
+
+export const getDashboardData = async (userId) => {
+  try {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/${userId}/dashboard`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${localStorage.getItem('pnb-token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    throw error;
+  }
+}
+
+export const getTransactionsByUser = async (userId) => {
+  try {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/transactions/user/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${localStorage.getItem('pnb-token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    throw error;
+  }
+}
+
+export const getPaymentStatistics = async (userId) => {
+  try {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/payments/statistics/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${localStorage.getItem('pnb-token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching payment statistics:', error);
     throw error;
   }
 }

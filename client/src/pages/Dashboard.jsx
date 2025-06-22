@@ -11,9 +11,13 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import PaymentModal from '../components/PaymentModal';
+import { getUserById, getTransactionsByUser } from '../services/users.Service';
 
 export default function PNBDashboard() {
   const [userData, setUserData] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const navigate = useNavigate();
@@ -29,29 +33,44 @@ export default function PNBDashboard() {
   };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('pnb-user');
-    if (!storedUser) {
-      navigate('/');
-      return;
-    }
-    
-    try {
-      const parsedUser = JSON.parse(storedUser);
-      setUserData(parsedUser);
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-      localStorage.removeItem('pnb-user');
-      navigate('/');
-    }
-  }, [navigate]);
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const storedUser = localStorage.getItem('pnb-user');
+        if (!storedUser) {
+          navigate('/');
+          return;
+        }
+        
+        const parsedUser = JSON.parse(storedUser);
+        setUserData(parsedUser);
 
-  const transactions = [
-    { id: 132, date: 'Sep 9, 2024', company: 'Jollibee', details: 'Food & Drinks', amount: -1322.79, status: 'Pending' },
-    { id: 133, date: 'Sep 8, 2024', company: 'SM Supermarket', details: 'Groceries', amount: -2540.50, status: 'Completed' },
-    { id: 134, date: 'Sep 8, 2024', company: 'Salary Deposit', details: 'Monthly Salary', amount: 50000.00, status: 'Completed' },
-    { id: 135, date: 'Sep 7, 2024', company: 'Grab Car', details: 'Transport', amount: -450.00, status: 'Completed' },
-    { id: 136, date: 'Sep 6, 2024', company: 'Meralco', details: 'Utilities', amount: -3500.00, status: 'Pending' }
-  ];
+        // Fetch updated user data (including balance)
+        const updatedUserData = await getUserById(parsedUser._id);
+        setUserData(updatedUserData);
+
+        // Fetch user transactions
+        const transactionsData = await getTransactionsByUser(parsedUser._id);
+        setTransactions(transactionsData);
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        setError('Failed to load dashboard data');
+        // Fallback to static data if API fails
+        setTransactions([
+          { id: 132, date: 'Sep 9, 2024', company: 'Jollibee', details: 'Food & Drinks', amount: -1322.79, status: 'Pending' },
+          { id: 133, date: 'Sep 8, 2024', company: 'SM Supermarket', details: 'Groceries', amount: -2540.50, status: 'Completed' },
+          { id: 134, date: 'Sep 8, 2024', company: 'Salary Deposit', details: 'Monthly Salary', amount: 50000.00, status: 'Completed' },
+          { id: 135, date: 'Sep 7, 2024', company: 'Grab Car', details: 'Transport', amount: -450.00, status: 'Completed' },
+          { id: 136, date: 'Sep 6, 2024', company: 'Meralco', details: 'Utilities', amount: -3500.00, status: 'Pending' }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [navigate]);
 
   const upcomingPayments = [
     { name: 'Netflix Subscription', amount: '549.00', date: 'Sep 15' },
@@ -62,6 +81,65 @@ export default function PNBDashboard() {
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount);
+  }
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
+
+  // Calculate income and expenses from transactions
+  const calculateStats = () => {
+    if (!transactions || transactions.length === 0) {
+      return { income: 0, expenses: 0 };
+    }
+
+    const income = transactions
+      .filter(t => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const expenses = transactions
+      .filter(t => t.amount < 0)
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    return { income, expenses };
+  };
+
+  const stats = calculateStats();
+
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <Sidebar />
+        <div className="main-content">
+          <Header userData={userData} />
+          <main className="content-area">
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', fontSize: '18px', color: '#6b7280' }}>
+              Loading dashboard data...
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-container">
+        <Sidebar />
+        <div className="main-content">
+          <Header userData={userData} />
+          <main className="content-area">
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', fontSize: '18px', color: '#dc2626' }}>
+              {error}
+            </div>
+          </main>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -88,21 +166,21 @@ export default function PNBDashboard() {
                 <MoreHorizontal size={20} className="more-icon" />
               </div>
               <p className="balance-amount">
-                {userData && userData.balance ? formatCurrency(userData.balance) : formatCurrency(89631.50)}
+                {userData && userData.balance ? formatCurrency(userData.balance) : formatCurrency(0)}
               </p>
               <div className="balance-stats">
                 <div className="stat">
                   <ArrowUp size={16} className="stat-icon income" />
                   <div>
                     <p className="stat-label">Income</p>
-                    <p className="stat-value">{formatCurrency(50000)}</p>
+                    <p className="stat-value">{formatCurrency(stats.income)}</p>
                   </div>
                 </div>
                 <div className="stat">
                   <ArrowDown size={16} className="stat-icon expense" />
                   <div>
                     <p className="stat-label">Expenses</p>
-                    <p className="stat-value">{formatCurrency(7813.29)}</p>
+                    <p className="stat-value">{formatCurrency(stats.expenses)}</p>
                   </div>
                 </div>
               </div>
@@ -139,25 +217,31 @@ export default function PNBDashboard() {
               <a href="#" className="view-all-link">View All</a>
             </div>
             <div className="transactions-list">
-              {transactions.map((transaction) => (
-                <div key={transaction.id} className="transaction-item">
-                  <div className="transaction-details">
-                    <div className={`transaction-icon ${transaction.amount > 0 ? 'income' : 'expense'}`}>
-                      {transaction.amount > 0 ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
+              {transactions && transactions.length > 0 ? (
+                transactions.slice(0, 5).map((transaction) => (
+                  <div key={transaction._id || transaction.id} className="transaction-item">
+                    <div className="transaction-details">
+                      <div className={`transaction-icon ${transaction.amount > 0 ? 'income' : 'expense'}`}>
+                        {transaction.amount > 0 ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
+                      </div>
+                      <div>
+                        <p className="transaction-company">{transaction.company}</p>
+                        <p className="transaction-description">{transaction.paymentDetails || transaction.details}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="transaction-company">{transaction.company}</p>
-                      <p className="transaction-description">{transaction.details}</p>
+                    <div className="transaction-info">
+                       <p className="transaction-date">{formatDate(transaction.date)}</p>
+                       <p className={`transaction-amount ${transaction.amount > 0 ? 'income' : 'expense'}`}>
+                        {formatCurrency(transaction.amount)}
+                      </p>
                     </div>
                   </div>
-                  <div className="transaction-info">
-                     <p className="transaction-date">{transaction.date}</p>
-                     <p className={`transaction-amount ${transaction.amount > 0 ? 'income' : 'expense'}`}>
-                      {formatCurrency(transaction.amount)}
-                    </p>
-                  </div>
+                ))
+              ) : (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px', color: '#6b7280', fontStyle: 'italic' }}>
+                  No transactions found
                 </div>
-              ))}
+              )}
             </div>
           </div>
 

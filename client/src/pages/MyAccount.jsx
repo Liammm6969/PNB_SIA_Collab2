@@ -205,7 +205,7 @@ export default function MyAccount() {
                     <span>Add Method</span>
                   </button>
                 </div>
-                <div className="methods-list">
+                {/* <div className="methods-list">
                   {userData?.withdrawalMethods && userData.withdrawalMethods.length > 0 ? (
                     userData.withdrawalMethods.map((method, index) => (
                       <div className="method-item" key={index}>
@@ -219,7 +219,7 @@ export default function MyAccount() {
                   ) : (
                     <p>No saved withdrawal methods found.</p>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
 
