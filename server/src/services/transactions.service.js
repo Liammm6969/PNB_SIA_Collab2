@@ -51,7 +51,7 @@ class TransactionService {
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -61,7 +61,7 @@ class TransactionService {
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -71,7 +71,7 @@ class TransactionService {
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return { message: 'Transaction deleted' };
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 }
