@@ -2,7 +2,8 @@ const { User } = require("../models/index.js");
 const bcrypt = require('bcrypt');
 const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError } = require('../errors');
 
-const jwtManager = require('../lib/jwtmanager.js');
+const { generateAccessToken,
+  generateRefreshToken } = require('../lib/jwtmanager.js');
 const randomatic = require('randomatic');
 
 function generateAccountNumber() {
@@ -55,14 +56,22 @@ class UserService {
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
-      
-      const accessToken = jwtManager({
+
+      const accessToken = generateAccessToken({
         _id: user._id,
         fullName: user.fullName,
         email: user.email,
         role: user.role,
       });
-      return { message: 'Login successful', user: user.toObject(), accessToken };
+      const refreshToken = generateRefreshToken({
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+      });
+
+      
+      return { message: 'Login successful', user: user.toObject(), accessToken, refreshToken };
     } catch (err) {
       throw new Error(err.message);
     }

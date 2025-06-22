@@ -14,10 +14,17 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await UserService.loginUser(email, password);
+    const { message, user, accessToken, refreshToken } = await UserService.loginUser(email, password);
     if (!user) return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email or password' });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
     console.log(user)
-    res.status(StatusCodes.OK).json(user);
+    res.status(StatusCodes.OK).json({ message, user, accessToken });
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
   }
