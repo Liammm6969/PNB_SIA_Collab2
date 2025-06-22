@@ -4,6 +4,7 @@ const ValidateRequestRouteParameterMiddleware = require('./validaterequestroutep
 const verifyAccessToken = require('./verifyaccesstoken.middleware.js');
 const LoginLimiter = require('./loginlimiter.middleware.js');
 const PermissionMiddleware = require('./permission.middleware.js');
+const ApiLimiterMiddleware = require('./apilimiter.middleware.js');
 
 module.exports = {
   RouteNotFoundErrorMiddleware,
@@ -11,5 +12,6 @@ module.exports = {
   ValidateRequestRouteParameterMiddleware,
   verifyAccessToken,
   LoginLimiter,
-  PermissionMiddleware
+  PermissionMiddleware,
+  ApiLimiterMiddleware
 };

@@ -13,7 +13,7 @@ router.post('/register', ValidateRequestBodyMiddleware(registerUserSchema), user
 
 // Login user
 router.post('/login', ValidateRequestBodyMiddleware(loginUserSchema), LoginLimiter, userController.loginUser);
-
+router.post('/verify-otp', userController.verifyOTP);
 router.use(verifyAccessToken);
 
 
@@ -22,5 +22,8 @@ router.get('/:id', ValidateRequestRouteParameterMiddleware(validateIdSchema), Pe
 
 // List all users
 router.get('/', PermissionMiddleware(Roles.ADMIN, Roles.FINANCE), userController.listUsers);
+
+
+
 
 module.exports = router;

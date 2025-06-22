@@ -6,6 +6,9 @@ module.exports = {
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
   PORT: "4000",
   HOST: "localhost",
+  EMAIL_SERVICE: process.env.EMAIL_SERVICE,
+  EMAIL_USER: process.env.EMAIL_USER,
+  EMAIL_PASS: process.env.EMAIL_PASS,
   mongoDb: {
     MONGO_URI: "mongodb+srv://hedtjyuzon:Jaffmier0924@bankcluster.cmlw7zw.mongodb.net/PNBDb",
     options: {

@@ -14,17 +14,8 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { message, user, accessToken, refreshToken } = await UserService.loginUser(email, password);
-    if (!user) return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email or password' });
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-    console.log(user)
-    res.status(StatusCodes.OK).json({ message, user, accessToken });
+    const { message, userId } = await UserService.loginUser(email, password);
+    res.status(StatusCodes.OK).json({ message, userId });
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
   }
@@ -49,5 +40,22 @@ exports.listUsers = async (req, res) => {
     res.status(StatusCodes.OK).json(users);
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+  }
+};
+
+
+exports.verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const { message, user, accessToken, refreshToken } = await UserService.verifyOTP(email, otp);
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+    res.status(200).json({ message, user, accessToken });
+  } catch (err) {
+    res.status(401).json({ error: err.message });
   }
 };
