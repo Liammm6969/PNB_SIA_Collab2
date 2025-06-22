@@ -31,7 +31,7 @@ class TransactionService {
       await transaction.save();
       return transaction;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -41,7 +41,7 @@ class TransactionService {
       if (!transactions) throw new TransactionNotFoundError('No transactions found');
       return transactions;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
