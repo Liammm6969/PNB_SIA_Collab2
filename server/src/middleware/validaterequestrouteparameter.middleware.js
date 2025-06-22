@@ -5,7 +5,7 @@ const ValidateRequestRouteParameterMiddleware = (joiInstance) => {
 
       return next();
     } catch (err) {
-      return next(err);
+      return res.status(400).json({ error: err.details ? err.details[0].message : err.message });
     }
   };
 };

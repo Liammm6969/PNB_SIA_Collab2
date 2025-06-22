@@ -3,8 +3,7 @@ const joi = require('joi');
 const registerUserSchema = joi.object({
   fullName: joi.string().alphanum()
     .min(5)
-    .max(30)
-    .required().messages({
+    .max(30).messages({
       'string.base': 'Full name must be a string',
       'string.empty': 'Full name cannot be empty',
       'string.min': 'Full name must be at least 5 characters long',
@@ -18,7 +17,7 @@ const registerUserSchema = joi.object({
   }),
   email: joi.string().email({
     minDomainSegments: 2,
-    tlds: { allow: ['com', 'net', 'org', 'edu'] }
+    tlds: { allow: false }
   }).required().messages({
     'string.base': 'Email must be a string',
     'string.email': 'Email must be a valid email address',
