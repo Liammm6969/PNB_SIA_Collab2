@@ -1,6 +1,4 @@
-
 const mongoose = require('mongoose');
-const { type } = require('../schema/add-payment.schema');
 
 const userSchema = new mongoose.Schema({
   fullName: {
@@ -25,7 +23,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['personal', 'business'],
     required: true,
-  }
+  },
+  otp: { type: String },
+  otpExpires: { type: Date },
 },
   { timestamps: true });
 

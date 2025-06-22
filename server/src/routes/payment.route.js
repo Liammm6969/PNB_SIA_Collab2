@@ -17,26 +17,27 @@ const {
 
 const {
   ValidateRequestBodyMiddleware,
-  ValidateRequestRouteParameterMiddleware, verifyAccessToken, PermissionMiddleware
+  ValidateRequestRouteParameterMiddleware, verifyAccessToken, PermissionMiddleware, ApiLimiterMiddleware
 } = require('../middleware/index.js');
 const Roles = require('../lib/roles.js');
 const express = require('express');
+
 
 
 const router = express.Router();
 
 router.use(verifyAccessToken);
 // Create a new payment
-router.post('/', ValidateRequestBodyMiddleware(addPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), createPayment);
+router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), createPayment);
 // Get all payments
 router.get('/user-payments/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPayments);
 // Get a payment by ID
 router.get('/:id', ValidateRequestRouteParameterMiddleware(validateIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPaymentById);
 // Update a payment by ID
-router.put('/:id', ValidateRequestRouteParameterMiddleware(validateIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER),  transferPayment);
+router.put('/:id', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validateIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transferPayment);
 // Delete a payment by ID
-router.delete('/:id', ValidateRequestRouteParameterMiddleware(validateIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER),  deletePayment);
+router.delete('/:id', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validateIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), deletePayment);
 // Transfer money between users
-router.post('/transfer', ValidateRequestBodyMiddleware(transferPaymentSchema),  PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transferController.transferMoney);
+router.post('/transfer', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(transferPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transferController.transferMoney);
 
 module.exports = router;
