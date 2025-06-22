@@ -1,10 +1,10 @@
-// const HOST_BASE = '192.168.9.23:4001';
+
 const HOST_BASE = 'localhost:4000';
 const API_PREFIX = '/api/Philippine-National-Bank';
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await fetch(`http://localhost:4000/api/Philippine-National-Bank/users/login`, {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -19,6 +19,61 @@ export const loginUser = async (email, password) => {
     return await response.json();
   } catch (error) {
     console.error('Login error:', error);
+    throw error;
+  }
+}
+
+export const verifyOTP = async (email, otp) => {
+  try {
+    const url = `http://${HOST_BASE}${API_PREFIX}/users/verify-otp`;
+   
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, otp }),
+    });
+
+ 
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OTP verification error response:', errorData);
+      throw new Error(errorData.error || 'OTP verification failed');
+    }
+    
+    const result = await response.json();
+    console.log('OTP verification successful:', result);
+    return result;
+  } catch (error) {
+    console.error('OTP verification error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      url: `http://${HOST_BASE}${API_PREFIX}/users/verify-otp`
+    });
+    throw error;
+  }
+}
+
+export const resendOTP = async (email, password) => {
+  try {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to resend OTP');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Resend OTP error:', error);
     throw error;
   }
 }
