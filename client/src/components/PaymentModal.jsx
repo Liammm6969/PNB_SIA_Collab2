@@ -39,7 +39,7 @@ export default function PaymentModal({ isOpen, onClose, payment, userData }) {
       amountPaid: amountToPay,
       details: paymentDetails,
     });
-    onClose(); // Close modal after submission
+    onClose(); 
   };
 
   const formatCurrency = (amount) => {

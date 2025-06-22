@@ -3,8 +3,9 @@ import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader } from 'lucide-react';
 import '../styles/Login.css';
 import '../styles/AccountTypeModal.css';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/users.Service';
+import { loginUser, verifyOTP, resendOTP } from '../services/users.Service';
 import AccountTypeModal from '../components/AccountTypeModal';
+import OTPModal from '../components/OTPModal';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -14,8 +15,11 @@ export default function Login() {
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showAccountTypeModal, setShowAccountTypeModal] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
   const [accountType, setAccountType] = useState('');
-  const navigate = useNavigate();  const handleSignUp = () => {
+  const navigate = useNavigate();
+
+  const handleSignUp = () => {
     setShowAccountTypeModal(true);
   }
   
@@ -45,6 +49,7 @@ export default function Login() {
     }
     return true;
   };
+
   const handleClick = async () => {
     setError('');
 
@@ -58,20 +63,49 @@ export default function Login() {
     } else {
       localStorage.removeItem('pnb-remembered-email');
     }
+
     try {
       const response = await loginUser(email, password);
-
-      // Store user data and token in localStorage for persistence across sessions
-      localStorage.setItem('pnb-user', JSON.stringify(response.user));
-      localStorage.setItem('pnb-token', response.token);
-
-      setLoading(false);
-      navigate('/home');
+      
+     
+      if (response.message && response.message.includes('OTP sent')) {
+        setShowOTPModal(true);
+        setLoading(false);
+      } else {
+        localStorage.setItem('pnb-user', JSON.stringify(response.user));
+        localStorage.setItem('pnb-token', response.accessToken);
+        setLoading(false);
+        navigate('/home');
+      }
     } catch (error) {
       setLoading(false);
       setError(error.message || 'Invalid email or password');
     }
   };
+
+  const handleVerifyOTP = async (email, otp) => {
+    try {
+      const response = await verifyOTP(email, otp);
+      
+     
+      localStorage.setItem('pnb-user', JSON.stringify(response.user));
+      localStorage.setItem('pnb-token', response.accessToken);
+      
+      setShowOTPModal(false);
+      navigate('/home');
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleResendOTP = async (email) => {
+    try {
+      await resendOTP(email, password);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
     <div className="pnb-container">
       <div className="pnb-main-wrapper">
@@ -92,16 +126,15 @@ export default function Login() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="pnb-login-card">          {/* PNB Logo */}          <div className="pnb-logo-section">
-          <div className="pnb-logo-text">
-            <img src="/src/assets/pnb.png" alt="PNB Logo" />
+        <div className="pnb-login-card">
+          {/* PNB Logo */}
+          <div className="pnb-logo-section">
+            <div className="pnb-logo-text">
+              <img src="/src/assets/pnb.png" alt="PNB Logo" />
+            </div>
           </div>
-        </div>
-
-
 
           <h2 className="pnb-login-title">Welcome Back</h2>
-
 
           {error && (
             <div className="pnb-error-message">
@@ -125,7 +158,9 @@ export default function Login() {
                   style={{ color: 'black' }}
                 />
               </div>
-            </div>            {/* Password Field */}
+            </div>
+
+            {/* Password Field */}
             <div className="pnb-field-group">
               <label className="pnb-label">Password</label>
               <div className="pnb-input-wrapper">
@@ -163,7 +198,9 @@ export default function Login() {
                   <button type="button" className="pnb-forgot-link">Forgot password?</button>
                 </div>
               </div>
-            </div>            {/* Login Button */}
+            </div>
+
+            {/* Login Button */}
             <button
               onClick={handleClick}
               disabled={loading}
@@ -191,9 +228,6 @@ export default function Login() {
                 <div className="pnb-divider-border"></div>
               </div>
             </div>
-
-
-
           </div>
         </div>
       </div>
@@ -203,6 +237,15 @@ export default function Login() {
         isOpen={showAccountTypeModal} 
         onClose={() => setShowAccountTypeModal(false)} 
         onSelectAccountType={handleSelectAccountType}
+      />
+
+      {/* OTP Verification Modal */}
+      <OTPModal
+        isOpen={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        email={email}
+        onVerifyOTP={handleVerifyOTP}
+        onResendOTP={handleResendOTP}
       />
     </div>
   );
