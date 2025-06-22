@@ -18,11 +18,11 @@ ConnectToDb();
 
 // Routes
 app.use('/api/Philippine-National-Bank', PNBRoutes);
-// Also support legacy client routes for compatibility
+
 
 app.use(RouteNotFoundErrorMiddleware);
 
 
 app.listen(config.PORT, config.HOST, () => {
-  console.log(`PNB Microservice running at http://${config.HOST}:${config.PORT}`);
+  console.log(`PNB running at http://${config.HOST}:${config.PORT}`);
 });
