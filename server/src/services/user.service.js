@@ -1,6 +1,6 @@
 const { User } = require("../models/index.js");
 const bcrypt = require('bcrypt');
-const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError } = require('../errors');
+const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError,OTPError } = require('../errors');
 const { sendOTPEmail } = require('../lib/mail');
 
 const { generateAccessToken,
@@ -92,9 +92,9 @@ class UserService {
   async verifyOTP(email, otp) {
     try {
       const user = await User.findOne({ email });
-      if (!user || !user.otp || !user.otpExpires) throw new Error('OTP not found. Please login again.');
+      if (!user || !user.otp || !user.otpExpires) throw new OTPError('OTP not found. Please login again.');
       if (user.otp !== otp) throw new Error('Invalid OTP.');
-      if (user.otpExpires < new Date()) throw new Error('OTP expired. Please login again.');
+      if (user.otpExpires < new Date()) throw new OTPError('OTP expired. Please login again.');
       user.otp = undefined;
       user.otpExpires = undefined;
       await user.save();
