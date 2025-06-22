@@ -15,7 +15,7 @@ class PaymentService {
       await payment.save();
       return payment;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -25,7 +25,7 @@ class PaymentService {
       if (!payments) throw new Error('No payments found');
       return payments;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -35,7 +35,7 @@ class PaymentService {
       if (!payment) throw new Error('Payment not found');
       return payment;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -45,7 +45,7 @@ class PaymentService {
       if (!payment) throw new Error('Payment not found');
       return payment;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -55,7 +55,7 @@ class PaymentService {
       if (!payment) throw new Error('Payment not found');
       return { message: 'Payment deleted' };
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 }

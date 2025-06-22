@@ -16,10 +16,13 @@ const registerUserSchema = joi.object({
     'string.empty': 'Company name cannot be empty',
     'any.required': 'Company name is required'
   }),
-  email: joi.string().email().required().messages({
+  email: joi.string().email({
+    minDomainSegments: 2,
+    tlds: { allow: ['com', 'net', 'org', 'edu'] }
+  }).required().messages({
     'string.base': 'Email must be a string',
-    'string.empty': 'Email cannot be empty',
     'string.email': 'Email must be a valid email address',
+    'string.empty': 'Email cannot be empty',
     'any.required': 'Email is required'
   }),
   password: joi.string().pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};:\'",.<>?]{3,30}$')).required().messages({
@@ -44,7 +47,7 @@ const registerUserSchema = joi.object({
     'number.base': 'Balance must be a number',
     'any.default': 'Balance is set to 0 by default'
   }).optional(),
-  withdrawalMethods:joi.string().valid('Bank Transfer', 'PayPal', 'Credit Card', 'Crypto Currency').default('Bank Transfer').messages({
+  withdrawalMethods: joi.string().valid('Bank Transfer', 'PayPal', 'Credit Card', 'Crypto Currency').default('Bank Transfer').messages({
     'string.base': 'Withdrawal method must be a string',
     'any.only': 'Withdrawal method must be one of Bank Transfer, PayPal, Credit Card, or Crypto Currency',
     'any.default': 'Withdrawal method is set to Bank Transfer by default'

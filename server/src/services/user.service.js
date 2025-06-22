@@ -1,6 +1,6 @@
 const { User } = require("../models/index.js");
 const bcrypt = require('bcrypt');
-const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError,OTPError } = require('../errors');
+const { DuplicateUserEmailError, UserNotFoundError, InvalidPasswordError, OTPError, DuplicateCompanyNameError, DuplicateUserFullNameError } = require('../errors');
 const { sendOTPEmail } = require('../lib/mail');
 
 const { generateAccessToken,
@@ -28,11 +28,23 @@ class UserService {
     try {
       let { fullName, companyName, email, password, role, address, accountType, dateOfBirth, withdrawalMethods } = userData;
       console.log(userData)
-      const existingUser = await User.findOne({ email });
-      if (existingUser) throw new DuplicateUserEmailError('Email already exists');
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const randomAccountNumber = generateAccountNumber();
+      const existingEmail = await User.findOne({ email });
+      const existingFullName = await User.findOne({ fullName });
+      const existingCompanyName = await User.findOne({ companyName });
 
+
+      if (existingFullName) throw new DuplicateUserFullNameError('Name already exists');
+      if (existingCompanyName) throw new DuplicateCompanyNameError('Company name already exists');
+      if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      let randomAccountNumber;
+      let ifAccountNumberExists;
+      do {
+        randomAccountNumber = generateAccountNumber();
+        ifAccountNumberExists = await User.findOne({ accountNumber: randomAccountNumber });
+      } while (ifAccountNumberExists);
       const user = new User({
         fullName,
         companyName,
@@ -49,7 +61,7 @@ class UserService {
       await user.save();
       return { message: 'User registered', userId: user._id };
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -60,14 +72,14 @@ class UserService {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
       const otp = generateOTP();
-      const otpExpires = new Date(Date.now() + 5 * 60 * 1000); 
+      const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
       user.otp = otp;
       user.otpExpires = otpExpires;
       await user.save();
       await sendOTPEmail(user.email, otp);
       return { message: 'OTP sent to email. Please verify to complete login.', userId: user._id };
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -77,7 +89,7 @@ class UserService {
       if (!user) throw new UserNotFoundError('User not found');
       return user;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
   async listUsers() {
@@ -85,7 +97,7 @@ class UserService {
       const users = await User.find().select('-password');
       return users;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -112,7 +124,7 @@ class UserService {
       });
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 }
