@@ -1,6 +1,6 @@
 const HOST_BASE = 'localhost:4000';
 const API_PREFIX = '/api/Philippine-National-Bank';
-import axios from 'axios';
+
 export const loginUser = async (email, password) => {
   try {
     const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/login`, {
@@ -117,29 +117,22 @@ export const getUsers = async () => {
 
 export const createUser = async (userData) => {
   try {
-    const response = await axios.post(`http://${HOST_BASE}${API_PREFIX}/users/register`, userData, {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/register`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(userData),
     });
-
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      // Server responded with a non-2xx status code
-      console.error('Server error:', error.response.status, error.response.data);
-      throw new Error(error.response.data.message || 'Server error');
-    } else if (error.request) {
-      // Request was made but no response received
-      console.error('No response received:', error.request);
-      throw new Error('No response from server');
-    } else {
-      // Other errors
-      console.error('Axios error:', error.message);
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
   }
-};
+}
 
 export const updateUser = async (userId, userData) => {
   try {
