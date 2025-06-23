@@ -7,6 +7,7 @@ import {
 import '../styles/Admin.css';
 import AdminSidebar from '../components/AdminSidebar';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 
 export default function AdminDashboard() {
   const [balance, setBalance] = useState('896.31');
@@ -104,18 +105,7 @@ export default function AdminDashboard() {
     <div className="admin-container">
       <AdminSidebar />
       <div className="admin-main-content">
-        <div className="admin-header">
-          <div className="search-container">
-            <Search size={16} className="search-icon" />
-            <input type="text" placeholder="Search for..." className="search-input" />
-          </div>
-          <div className="user-menu">
-            <span>Hello, Admin!</span>
-            <Bell size={18} className="notification-icon" />
-            <span className="notification-count">1</span>
-          </div>
-        </div>
-
+        <Header />
         <main className="admin-content">
           <div className="balance-section">
             <div className="balance-info">
