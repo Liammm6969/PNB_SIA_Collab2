@@ -11,31 +11,32 @@ class TransferService {
     session.startTransaction();
     try {
       const { fromUser, toUser, amount, details } = transferData;
-
-      const senderDoc = await User.find(fromUser).session(session);
-      const receiverDoc = await User.find(toUser).session(session);
+      console.log(transferData);
+      const senderDoc = await User.findOne({userId:fromUser}).session(session);
+      const receiverDoc = await User.findOne({userId:toUser}).session(session);
       if (!receiverDoc) throw new Error('Receiver not found');
 
       if (!senderDoc) throw new Error('Sender not found');
 
       if (senderDoc.balance < amount) throw new Error('Sender does not have enough balance');
 
+   
+        const sender = await User.findOneAndUpdate({
+          userId: fromUser,
+          balance: { $gte: amount }
+        }, {
+          $inc: { balance: -amount }
+        }, {
+          new: true,
+          session
+        });
 
-      const sender = await User.findOneAndUpdate({
-       fromUser,
-        balance: { $gte: amount }
-      }, {
-        $inc: { balance: -amount }
-      }, {
-        new: true,
-        session
-      });
+        await User.findOneAndUpdate(
+          { userId: toUser },
+          { $inc: { balance: amount } },
+          { new: true, session }
+        );
 
-      await User.findByIdAndUpdate(
-        toUser,
-        { $inc: { balance: amount } },
-        { new: true, session }
-      );
 
       const payment = new Payment({
         fromUser,
