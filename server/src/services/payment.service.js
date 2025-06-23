@@ -29,9 +29,9 @@ class PaymentService {
     }
   }
 
-  async getPaymentById(id) {
+  async getPaymentById(paymentId) {
     try {
-      const payment = await Payment.find({ paymentId: id });
+      const payment = await Payment.find({ paymentId });
       if (!payment) throw new Error('Payment not found');
       return payment;
     } catch (err) {
@@ -39,9 +39,9 @@ class PaymentService {
     }
   }
 
-  async updatePaymentStatus(id, status) {
+  async updatePaymentStatus(paymentId, status) {
     try {
-      const payment = await Payment.findOneAndUpdate({ paymentId: id }, { status }, { new: true });
+      const payment = await Payment.findOneAndUpdate({ paymentId }, { status }, { new: true });
       if (!payment) throw new Error('Payment not found');
       return payment;
     } catch (err) {
@@ -49,9 +49,9 @@ class PaymentService {
     }
   }
 
-  async deletePayment(id) {
+  async deletePayment(paymentId) {
     try {
-      const payment = await Payment.findOneAndDelete({ paymentId: id });
+      const payment = await Payment.findOneAndDelete({ paymentId });
       if (!payment) throw new Error('Payment not found');
       return { message: 'Payment deleted' };
     } catch (err) {

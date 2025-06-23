@@ -19,7 +19,7 @@ exports.getPayments = async (req, res) => {
 }
 exports.getPaymentById = async (req, res) => {
   try {
-    const paymentId = req.params.id;
+    const { paymentId } = req.params;
     const payment = await PaymentService.getPaymentById(paymentId);
 
     res.status(StatusCodes.OK).json(payment);
@@ -29,7 +29,7 @@ exports.getPaymentById = async (req, res) => {
 }
 exports.transferPayment = async (req, res) => {
   try {
-    const paymentId = req.params.id;
+    const { paymentId } = req.params;
     const updatedData = req.body;
     const payment = await PaymentService.updatePayment(paymentId, updatedData);
 
@@ -40,7 +40,7 @@ exports.transferPayment = async (req, res) => {
 }
 exports.deletePayment = async (req, res) => {
   try {
-    const paymentId = req.params.id;
+    const { paymentId } = req.params;
     const payment = await PaymentService.deletePayment(paymentId);
 
     res.status(StatusCodes.NO_CONTENT).json(payment);

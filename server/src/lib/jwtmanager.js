@@ -5,7 +5,7 @@ const config = require("../lib/config.js");
 function generateAccessToken(user) {
   return jsonwebtoken.sign(
     {
-      id: user._id,
+      id: user.userId,
       fullName: user.fullName,
       email: user.email,
       role: user.role
@@ -18,7 +18,7 @@ function generateAccessToken(user) {
 function generateRefreshToken(user) {
   return jsonwebtoken.sign(
     {
-      id: user._id,
+      id: user.userId,
       fullName: user.fullName,
       email: user.email,
       role: user.role

@@ -24,9 +24,8 @@ exports.loginUser = async (req, res) => {
 // Get user profile by ID
 exports.getUserProfile = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user = await UserService.getUserProfile(id);
-    if (!user) return res.status(StatusCodes.NOT_FOUND).json({ error: 'User not found' });
+    const { userId } = req.params;
+    const user = await UserService.getUserProfile(userId);
     res.status(StatusCodes.OK).json(user);
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
