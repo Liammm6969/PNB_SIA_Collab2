@@ -21,7 +21,14 @@ class PaymentService {
 
   async getPaymentsByUser(userId) {
     try {
-      const payments = await Payment.find({ userId }).sort({ createdAt: -1 });
+      // Ensure userId is a number for matching
+      const numericUserId = Number(userId);
+      const payments = await Payment.find({
+        $or: [
+          { fromUser: numericUserId },
+          { toUser: numericUserId }
+        ]
+      }).sort({ createdAt: -1 });
       if (!payments) throw new Error('No payments found');
       return payments;
     } catch (err) {

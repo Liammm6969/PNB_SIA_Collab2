@@ -11,14 +11,15 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import PaymentModal from '../components/PaymentModal';
-import { getUserById, getTransactionsByUser } from '../services/users.Service';
+import { getUserById, getTransactionsByUser as getPaymentsByUser } from '../services/users.Service';
 
 export default function PNBDashboard() {
   const [userData, setUserData] = useState(null);
-  const [transactions, setTransactions] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const navigate = useNavigate();
   
   const handleOpenModal = (payment) => {
@@ -29,6 +30,14 @@ export default function PNBDashboard() {
   const handleCloseModal = () => {
     setSelectedPayment(null);
     setIsModalOpen(false);
+  };
+
+  const handleOpenTransferModal = () => {
+    setIsTransferModalOpen(true);
+  };
+
+  const handleCloseTransferModal = () => {
+    setIsTransferModalOpen(false);
   };
 
   useEffect(() => {
@@ -63,19 +72,19 @@ export default function PNBDashboard() {
       }
     };
 
-    const fetchTransactions = async () => {
+    const fetchPayments = async () => {
       try {
-        let transactionsData = await getTransactionsByUser(userId);
-        if (!Array.isArray(transactionsData)) transactionsData = [];
-        setTransactions(transactionsData);
+        let paymentsData = await getPaymentsByUser(userId);
+        if (!Array.isArray(paymentsData)) paymentsData = [];
+        setPayments(paymentsData);
       } catch (txError) {
-        setTransactions([]);
+        setPayments([]);
       }
     };
 
     if (userId) {
       fetchUser();
-      fetchTransactions();
+      fetchPayments();
     }
     setLoading(false);
   }, [navigate]);
@@ -99,17 +108,17 @@ export default function PNBDashboard() {
     });
   }
 
-  // Calculate income and expenses from transactions
+  // Calculate income and expenses from payments
   const calculateStats = () => {
-    if (!transactions || transactions.length === 0) {
+    if (!payments || payments.length === 0) {
       return { income: 0, expenses: 0 };
     }
 
-    const income = transactions
+    const income = payments
       .filter(t => t.amount > 0)
       .reduce((sum, t) => sum + t.amount, 0);
 
-    const expenses = transactions
+    const expenses = payments
       .filter(t => t.amount < 0)
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
@@ -150,7 +159,7 @@ export default function PNBDashboard() {
               )}
             </h1>
             <div className="header-buttons">
-              <button className="action-button">Send Money</button>
+              <button className="action-button" onClick={handleOpenTransferModal}>Send Money</button>
               <button className="action-button primary">Add Money</button>
             </div>
           </div>
@@ -209,35 +218,11 @@ export default function PNBDashboard() {
 
           <div className="transactions-section">
             <div className="transactions-header">
-              <h3 className="section-title">Recent Transactions</h3>
+              <h3 className="section-title">Recent Payments</h3>
               <a href="#" className="view-all-link">View All</a>
             </div>
             <div className="transactions-list">
-              {Array.isArray(transactions) && transactions.length > 0 ? (
-                transactions.slice(0, 5).map((transaction) => (
-                  <div key={transaction._id || transaction.id} className="transaction-item">
-                    <div className="transaction-details">
-                      <div className={`transaction-icon ${transaction.amount > 0 ? 'income' : 'expense'}`}> 
-                        {transaction.amount > 0 ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
-                      </div>
-                      <div>
-                        <p className="transaction-company">{transaction.company || 'N/A'}</p>
-                        <p className="transaction-description">{transaction.paymentDetails || transaction.details || 'No details'}</p>
-                      </div>
-                    </div>
-                    <div className="transaction-info">
-                      <p className="transaction-date">{transaction.date ? formatDate(transaction.date) : 'Unknown date'}</p>
-                      <p className={`transaction-amount ${transaction.amount > 0 ? 'income' : 'expense'}`}>
-                        {typeof transaction.amount === 'number' ? formatCurrency(transaction.amount) : formatCurrency(0)}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px', color: '#6b7280', fontStyle: 'italic' }}>
-                  No transactions
-                </div>
-              )}
+              
             </div>
           </div>
 
@@ -247,23 +232,7 @@ export default function PNBDashboard() {
               <a href="#" className="view-all-link">View All</a>
             </div>
             <div className="payments-list">
-              {upcomingPayments.map((payment, index) => (
-                <div key={index} className="payment-item">
-                  <div className="payment-details">
-                    <div className="payment-icon">
-                      <CreditCard size={20} />
-                    </div>
-                    <div>
-                      <p className="payment-name">{payment.name}</p>
-                      <p className="payment-amount">₱{payment.amount}</p>
-                    </div>
-                  </div>
-                  <div className="payment-info">
-                    <p className="payment-date">{payment.date}</p>
-                    <button className="view-info-button" onClick={() => handleOpenModal(payment)}>View Info</button>
-                  </div>
-                </div>
-              ))}
+              
             </div>
           </div>
         </main>
@@ -273,6 +242,12 @@ export default function PNBDashboard() {
         onClose={handleCloseModal}
         payment={selectedPayment}
         userData={userData}
+      />
+      <PaymentModal
+        isOpen={isTransferModalOpen}
+        onClose={handleCloseTransferModal}
+        userData={userData}
+        mode="transfer"
       />
     </div>
   );

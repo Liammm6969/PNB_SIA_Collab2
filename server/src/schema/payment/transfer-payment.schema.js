@@ -18,7 +18,12 @@ const transferPaymentSchema = joi.object({
   }),
   details: joi.string().optional().messages({
     'string.base': 'Details must be a string'
-  })
+  }),
+  recipientType: joi.string().valid('User', 'Business').required().messages({
+    'string.base': 'Recipient type must be a string',
+    'any.only': 'Recipient type must be User or Business',
+    'any.required': 'Recipient type is required'
+  }),
 });
 
 module.exports = transferPaymentSchema;
