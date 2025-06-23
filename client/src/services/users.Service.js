@@ -29,7 +29,7 @@ export const verifyOTP = async (email, otp) => {
     console.log('Calling URL:', url);
     console.log('HOST_BASE:', HOST_BASE);
     console.log('API_PREFIX:', API_PREFIX);
-   
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -47,7 +47,7 @@ export const verifyOTP = async (email, otp) => {
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       console.log('Content-Type:', contentType);
-      
+
       if (contentType && contentType.includes('application/json')) {
         const errorData = await response.json();
         console.error('OTP verification error response:', errorData);
@@ -59,7 +59,7 @@ export const verifyOTP = async (email, otp) => {
         throw new Error(`Server error (${response.status}): ${response.statusText}`);
       }
     }
-    
+
     const result = await response.json();
     console.log('OTP verification successful:', result);
     return result;
@@ -127,6 +127,7 @@ export const createUser = async (userData) => {
     });
     
     if (!response.ok) {
+
       // Try to get detailed error message
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
@@ -138,6 +139,7 @@ export const createUser = async (userData) => {
         const textResponse = await response.text();
         console.error('Registration error (non-JSON):', textResponse.substring(0, 500));
         throw new Error(`Registration failed with status: ${response.status}`);
+
       }
     }
     return await response.json();

@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const transactionSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  transactionId: { type: Number, unique: true },
+  userId: { type: Number, ref: 'User', required: true },
   company: String,
   paymentDetails: String,
   amount: Number,
@@ -13,4 +15,5 @@ const transactionSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now }
 }, { timestamps: true });
 
+transactionSchema.plugin(AutoIncrement, { inc_field: 'transactionId', start_seq: 100, increment_by: 1 });
 module.exports = mongoose.model('Transaction', transactionSchema);

@@ -11,9 +11,9 @@ class TransactionService {
 
   async createTransaction(transactionData) {
     try {
-      const user = await User.findById(transactionData.userId);
+      const user = await User.find(transactionData.userId);
       if (!user) throw new TransactionNotFoundError('User not found');
-      const addAmountToUser = await User.findByIdAndUpdate(
+      const addAmountToUser = await User.findOneAndUpdate(
         transactionData.userId,
         { $inc: { balance: transactionData.amount } },
         { new: true }
@@ -26,12 +26,12 @@ class TransactionService {
         paymentDetails: transactionData.paymentDetails,
         amount: addAmountToUser.balance,
         status: 'Pending',
-       
+
       });
       await transaction.save();
       return transaction;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
@@ -41,13 +41,13 @@ class TransactionService {
       if (!transactions) throw new TransactionNotFoundError('No transactions found');
       return transactions;
     } catch (err) {
-      throw new Error(err.message);
+      throw err;
     }
   }
 
   async getTransactionById(id) {
     try {
-      const transaction = await Transaction.findById(id);
+      const transaction = await Transaction.find({ transactionId: id });
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {
@@ -57,7 +57,7 @@ class TransactionService {
 
   async updateTransactionStatus(id, status) {
     try {
-      const transaction = await Transaction.findByIdAndUpdate(id, { status }, { new: true });
+      const transaction = await Transaction.findOneAndUpdate({ transactionId: id }, { status }, { new: true });
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {
@@ -67,7 +67,7 @@ class TransactionService {
 
   async deleteTransaction(id) {
     try {
-      const transaction = await Transaction.findByIdAndDelete(id);
+      const transaction = await Transaction.findOneAndDelete({ transactionId: id });
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return { message: 'Transaction deleted' };
     } catch (err) {
