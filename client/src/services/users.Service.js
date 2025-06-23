@@ -98,11 +98,24 @@ export const resendOTP = async (email, password) => {
 
 export const getUsers = async () => {
   try {
+    // Try to get token from 'pnb-token', 'token', or from 'pnb-user' in localStorage
+    let token = localStorage.getItem('pnb-token') || localStorage.getItem('token');
+    if (!token) {
+      const userStr = localStorage.getItem('pnb-user');
+      if (userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          token = userObj.token || userObj.accessToken || '';
+        } catch (e) {
+          token = '';
+        }
+      }
+    }
     const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': `Bearer ${localStorage.getItem('token')}`,
+        'authorization': `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -258,6 +271,23 @@ export const getPaymentStatistics = async (userId) => {
     return await response.json();
   } catch (error) {
     console.error('Error fetching payment statistics:', error);
+    throw error;
+  }
+}
+
+export const getBusinessAccounts = async () => {
+  try {
+    const response = await fetch('http://localhost:4000/api/Philippine-National-Bank/business-accounts', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${localStorage.getItem('pnb-token')}`,
+      },
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching business accounts:', error);
     throw error;
   }
 }

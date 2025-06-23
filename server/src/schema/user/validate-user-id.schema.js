@@ -1,11 +1,10 @@
 const joi = require('joi');
 
 const validateUserIdSchema = joi.object({
-  userId: joi.string().pattern(new RegExp(/^[a-fA-F0-9]{24}$/)).required().messages({
-    'string.base': 'ID must be a string',
-    'string.empty': 'ID cannot be empty',
-    'string.pattern.base': 'ID must be a valid MongoDB ObjectId',
-    'any.required': 'ID is required'
+  userId: joi.number().required().messages({
+    'number.base': 'User ID must be a number',
+    'number.empty': 'User ID cannot be empty',
+    'any.required': 'User ID is required'
   })
 });
 

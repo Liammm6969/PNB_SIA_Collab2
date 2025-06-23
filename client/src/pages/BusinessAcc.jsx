@@ -18,6 +18,7 @@ import {
 import '../styles/BusinessAcc.css';
 import AdminSidebar from '../components/AdminSidebar';
 import { useNavigate } from 'react-router-dom';
+import { getUsers } from '../services/users.Service';
 
 export default function BusinessAccounts() {
   const [accounts, setAccounts] = useState([]);
@@ -30,7 +31,7 @@ export default function BusinessAccounts() {
   const [editedAccount, setEditedAccount] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
-    const fetchBusinessAccounts = async () => {
+    const fetchBusinessAccountsData = async () => {
       try {
         setLoading(true);
         const storedUser = localStorage.getItem('pnb-user');
@@ -38,102 +39,32 @@ export default function BusinessAccounts() {
           navigate('/');
           return;
         }
-        
         const parsedUser = JSON.parse(storedUser);
-        // Check if user has admin privileges
         if (parsedUser.role !== 'Admin') {
           navigate('/home');
           return;
         }
-
-        // Mock business accounts data
-        setAccounts([
-          { 
-            id: 'BA-122',
-            date: '06/06/2025',
-            company: 'Jollibee Foods Corp.',
-            accountNumber: '333 4444 333 4444',
-            balance: '1022.79',
-            address: '10/F Jollibee Plaza Building, Emerald Ave., Ortigas Center, Pasig City',
-            contactPerson: 'Juan Dela Cruz',
-            contactNumber: '+63 (2) 8634-1111',
-            email: 'corporate@jollibee.com.ph',
-            accountType: 'Corporate',
-            dateOpened: '15/03/2019',
-            lastActivity: '02/07/2023',
-            status: 'Active'
-          },
-          { 
-            id: 'BA-256',
-            date: '12/08/2024',
-            company: 'SM Investments Corp.',
-            accountNumber: '111 2222 333 4444',
-            balance: '2576.50',
-            address: '10th Floor, One E-Com Center, Harbor Drive, Mall of Asia Complex, Pasay City',
-            contactPerson: 'Maria Santos',
-            contactNumber: '+63 (2) 8857-0100',
-            email: 'info@sminvestments.com',
-            accountType: 'Corporate Premium',
-            dateOpened: '23/06/2018',
-            lastActivity: '15/07/2023',
-            status: 'Active'
-          },
-          { 
-            id: 'BA-375',
-            date: '18/11/2024',
-            company: 'Ayala Corporation',
-            accountNumber: '408 6712 012 1345',
-            balance: '3347.25',
-            address: '32F Tower One and Exchange Plaza, Ayala Triangle, Ayala Avenue, Makati City',
-            contactPerson: 'Robert Tan',
-            contactNumber: '+63 (2) 7908-3000',
-            email: 'corporate@ayala.com.ph',
-            accountType: 'Corporate Premium',
-            dateOpened: '07/09/2017',
-            lastActivity: '22/06/2023',
-            status: 'Active'
-          },
-          { 
-            id: 'BA-418',
-            date: '24/02/2025',
-            company: 'Globe Telecom, Inc.',
-            accountNumber: '129 3457 234 1902',
-            balance: '1863.90',
-            address: 'The Globe Tower, 32nd Street corner 7th Avenue, Bonifacio Global City, Taguig',
-            contactPerson: 'Patricia Reyes',
-            contactNumber: '+63 (2) 7730-1000',
-            email: 'business@globe.com.ph',
-            accountType: 'Corporate',
-            dateOpened: '12/05/2019',
-            lastActivity: '05/07/2023',
-            status: 'Active'
-          },
-          { 
-            id: 'BA-527',
-            date: '30/04/2025',
-            company: 'San Miguel Corporation',
-            accountNumber: '234 5893 203 2392',
-            balance: '4215.65',
-            address: '40 San Miguel Avenue, Mandaluyong City',
-            contactPerson: 'Eduardo Garcia',
-            contactNumber: '+63 (2) 8632-3000',
-            email: 'corporate@sanmiguel.com.ph',
-            accountType: 'Corporate Elite',
-            dateOpened: '19/11/2016',
-            lastActivity: '28/06/2023',
-            status: 'Active'
-          },
-        ]);
-
+        // Fetch all users and filter for business accounts
+        const users = await getUsers();
+        const businessAccounts = users
+          .filter(u => u.accountType === 'business')
+          .map(u => ({
+            id: u.userId || u._id || '', // Use userId for display and as key
+            userId: u.userId || '', // Ensure userId is available for table
+            date: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '',
+            company: u.companyName,
+            accountNumber: u.accountNumber,
+            balance: u.balance,
+            // add other fields as needed
+          }));
+        setAccounts(businessAccounts);
       } catch (error) {
-        console.error('Error fetching business accounts:', error);
         setError('Failed to load business accounts data');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchBusinessAccounts();
+    fetchBusinessAccountsData();
   }, [navigate]);
 
   const filteredAccounts = accounts.filter(account => {
@@ -244,7 +175,7 @@ export default function BusinessAccounts() {
                       <td>
                         <input type="checkbox" />
                       </td>
-                      <td>{account.id}</td>
+                      <td>{account.userId}</td>
                       <td>{account.date}</td>
                       <td>{account.company}</td>
                       <td>{account.accountNumber}</td>

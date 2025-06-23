@@ -63,7 +63,7 @@ class UserService {
       });
 
       await user.save();
-      return { message: 'User registered', userId: user._id };
+      return { message: 'User registered', userId: user.userId };
     } catch (err) {
       throw err;
     }
@@ -87,9 +87,9 @@ class UserService {
     }
   }
 
-  async getUserProfile(id) {
+  async getUserProfile(userId) {
     try {
-      const user = await User.find({ userId: id }).select('-password');
+      const user = await User.find({ userId }).select('-password');
       if (!user) throw new UserNotFoundError('User not found');
       return user;
     } catch (err) {
@@ -115,13 +115,13 @@ class UserService {
       user.otpExpires = undefined;
       await user.save();
       const accessToken = generateAccessToken({
-        _id: user._id,
+        id: user.userId,
         fullName: user.fullName,
         email: user.email,
         role: user.role,
       });
       const refreshToken = generateRefreshToken({
-        _id: user._id,
+        id: user.userId,
         fullName: user.fullName,
         email: user.email,
         role: user.role,

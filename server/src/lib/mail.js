@@ -1,19 +1,19 @@
-const nodemailer = require('nodemailer');
-const config = require('./config');
+const nodemailer = require("nodemailer");
+const config = require("./config");
 
 const transporter = nodemailer.createTransport({
   service: config.EMAIL_SERVICE,
   auth: {
     user: config.EMAIL_USER,
-    pass: config.EMAIL_PASS
-  }
+    pass: config.EMAIL_PASS,
+  },
 });
 
 async function sendOTPEmail(to, otp) {
   const mailOptions = {
     from: "Philippine National Bank <noreply@gmail.com>",
     to,
-    subject: 'Your One-Time Password (OTP)',
+    subject: "Your One-Time Password (OTP)",
     text: `Dear Valued Client,
 
 Your One-Time Password (OTP) is: ${otp}
@@ -46,7 +46,7 @@ PNB Digital Services Team`,
           </div>
         </div>
       </div>
-    `
+    `,
   };
 
   await transporter.sendMail(mailOptions);
