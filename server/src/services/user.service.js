@@ -28,8 +28,6 @@ class UserService {
     try {
       let { fullName, companyName, email, password, role, address, accountType, dateOfBirth, withdrawalMethods } = userData;
       console.log(userData)
-
-pes
       const existingEmail = await User.findOne({ email });
       if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
 

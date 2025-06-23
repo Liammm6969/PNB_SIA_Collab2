@@ -78,7 +78,7 @@ export default function SignUp() {
       
       if (accountType === 'personal') {
         userData = {
-          fullName: `${firstName} ${lastName}`.trim(),
+          fullName: `${firstName}${lastName}`.trim(),
           email,
           password,
           address,
