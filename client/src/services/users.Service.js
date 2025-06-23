@@ -1,6 +1,6 @@
 const HOST_BASE = 'localhost:4000';
 const API_PREFIX = '/api/Philippine-National-Bank';
-
+import axios from 'axios';
 export const loginUser = async (email, password) => {
   try {
     const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/login`, {
@@ -29,7 +29,7 @@ export const verifyOTP = async (email, otp) => {
     console.log('Calling URL:', url);
     console.log('HOST_BASE:', HOST_BASE);
     console.log('API_PREFIX:', API_PREFIX);
-   
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -47,7 +47,7 @@ export const verifyOTP = async (email, otp) => {
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       console.log('Content-Type:', contentType);
-      
+
       if (contentType && contentType.includes('application/json')) {
         const errorData = await response.json();
         console.error('OTP verification error response:', errorData);
@@ -59,7 +59,7 @@ export const verifyOTP = async (email, otp) => {
         throw new Error(`Server error (${response.status}): ${response.statusText}`);
       }
     }
-    
+
     const result = await response.json();
     console.log('OTP verification successful:', result);
     return result;
@@ -117,22 +117,29 @@ export const getUsers = async () => {
 
 export const createUser = async (userData) => {
   try {
-    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/register`, {
-      method: 'POST',
+    const response = await axios.post(`http://${HOST_BASE}${API_PREFIX}/users/register`, userData, {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(userData),
     });
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return await response.json();
+
+    return response.data;
   } catch (error) {
-    console.error('Error creating user:', error);
-    throw error;
+    if (error.response) {
+      // Server responded with a non-2xx status code
+      console.error('Server error:', error.response.status, error.response.data);
+      throw new Error(error.response.data.message || 'Server error');
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('No response received:', error.request);
+      throw new Error('No response from server');
+    } else {
+      // Other errors
+      console.error('Axios error:', error.message);
+      throw new Error(error.message);
+    }
   }
-}
+};
 
 export const updateUser = async (userId, userData) => {
   try {
