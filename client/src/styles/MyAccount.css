@@ -1,4 +1,3 @@
-
 .account-page-container {
   display: flex;
   min-height: 100vh;
@@ -442,6 +441,28 @@
 }
 .enlarged-bank-card .bank-card-name {
     font-size: 1.5rem;
+}
+
+.enlarged-bank-card .card-spotlight {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.enlarged-bank-card.has-spotlight .card-spotlight {
+  opacity: 1;
+  background: radial-gradient(
+    350px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    rgba(255,255,255,0.35) 0%,
+    rgba(255,255,255,0.10) 40%,
+    rgba(255,255,255,0.00) 80%
+  );
 }
 
 .success-notification {
