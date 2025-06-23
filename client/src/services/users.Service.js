@@ -117,6 +117,7 @@ export const getUsers = async () => {
 
 export const createUser = async (userData) => {
   try {
+    console.log('Creating user with data:', userData);
     const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/users/register`, {
       method: 'POST',
       headers: {
@@ -124,15 +125,21 @@ export const createUser = async (userData) => {
       },
       body: JSON.stringify(userData),
     });
+    
     if (!response.ok) {
-      // Try to extract error message from server response
+
+      // Try to get detailed error message
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create user');
+        console.error('Registration error details:', errorData);
+        throw new Error(errorData.error || errorData.message || `Registration failed with status: ${response.status}`);
       } else {
+        // If no JSON response, get text response
         const textResponse = await response.text();
-        throw new Error(`Server error (${response.status}): ${response.statusText}`);
+        console.error('Registration error (non-JSON):', textResponse.substring(0, 500));
+        throw new Error(`Registration failed with status: ${response.status}`);
+
       }
     }
     return await response.json();
@@ -254,4 +261,3 @@ export const getPaymentStatistics = async (userId) => {
     throw error;
   }
 }
-
