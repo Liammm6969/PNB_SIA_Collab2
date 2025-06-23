@@ -28,15 +28,21 @@ class UserService {
     try {
       let { fullName, companyName, email, password, role, address, accountType, dateOfBirth, withdrawalMethods } = userData;
       console.log(userData)
+
+pes
       const existingEmail = await User.findOne({ email });
-      const existingFullName = await User.findOne({ fullName });
-      const existingCompanyName = await User.findOne({ companyName });
-
-
-      if (existingFullName) throw new DuplicateUserFullNameError('Name already exists');
-      if (existingCompanyName) throw new DuplicateCompanyNameError('Company name already exists');
       if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
 
+
+      if (accountType === 'personal') {
+        const existingFullName = await User.findOne({ fullName });
+        if (existingFullName) throw new DuplicateUserFullNameError('Name already exists');
+      }
+
+      if (accountType === 'business') {
+        const existingCompanyName = await User.findOne({ companyName });
+        if (existingCompanyName) throw new DuplicateCompanyNameError('Company name already exists');
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
 
       let randomAccountNumber;

@@ -29,7 +29,7 @@ export const verifyOTP = async (email, otp) => {
     console.log('Calling URL:', url);
     console.log('HOST_BASE:', HOST_BASE);
     console.log('API_PREFIX:', API_PREFIX);
-   
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -47,7 +47,7 @@ export const verifyOTP = async (email, otp) => {
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       console.log('Content-Type:', contentType);
-      
+
       if (contentType && contentType.includes('application/json')) {
         const errorData = await response.json();
         console.error('OTP verification error response:', errorData);
@@ -59,7 +59,7 @@ export const verifyOTP = async (email, otp) => {
         throw new Error(`Server error (${response.status}): ${response.statusText}`);
       }
     }
-    
+
     const result = await response.json();
     console.log('OTP verification successful:', result);
     return result;
