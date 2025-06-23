@@ -1,0 +1,86 @@
+.admin-sidebar {
+  width: 160px;
+  background: linear-gradient(to bottom, #4C95FD, #0F3DCE);
+  box-shadow: 7px 4px 53.4px rgba(0, 0, 0, 0.1);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 0 116px 0 0;
+  z-index: 100;
+}
+
+.admin-sidebar .logo {
+  padding: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.admin-sidebar .logo-icon {
+  width: 75px;
+  height: 38px;
+  border-radius: 4px;
+  margin-top: 45%;
+  margin-left: 20px;
+  padding-bottom: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.admin-sidebar .logo-icon img {
+  width: 70px;
+  height: 32px;
+  margin-right: 4px;
+}
+
+.admin-sidebar .logo-text {
+  color: #333333;
+  font-weight: bold;
+  font-size: 16px;
+  margin-left: 4px;
+}
+
+.admin-sidebar .navigation {
+  flex: 1;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.admin-sidebar .nav-item,
+.admin-sidebar .nav-item-active {
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
+.admin-sidebar .nav-item-active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-sidebar .nav-icon {
+  margin-bottom: 6px;
+  width: 20px;
+  height: 20px;
+}
+
+.admin-sidebar .nav-text {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.admin-sidebar .settings-container {
+  padding: 16px;
+  margin-bottom: 30px;
+}

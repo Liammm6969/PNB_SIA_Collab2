@@ -67,22 +67,26 @@ export default function Login() {
     try {
       const response = await loginUser(email, password);
       
-     
-      if (response.message && response.message.includes('OTP sent')) {
+       if (response.message && response.message.includes('OTP sent')) {
         setShowOTPModal(true);
         setLoading(false);
       } else {
         localStorage.setItem('pnb-user', JSON.stringify(response.user));
         localStorage.setItem('pnb-token', response.accessToken);
         setLoading(false);
-        navigate('/home');
+        
+        // Redirect based on user role
+        if (response.user.role === 'Admin') {
+          navigate('/admin');
+        } else {
+          navigate('/home');
+        }
       }
     } catch (error) {
       setLoading(false);
       setError(error.message || 'Invalid email or password');
     }
   };
-
   const handleVerifyOTP = async (email, otp) => {
     try {
       const response = await verifyOTP(email, otp);
@@ -92,7 +96,13 @@ export default function Login() {
       localStorage.setItem('pnb-token', response.accessToken);
       
       setShowOTPModal(false);
-      navigate('/home');
+      
+      // Redirect based on user role
+      if (response.user.role === 'Admin') {
+        navigate('/admin');
+      } else {
+        navigate('/home');
+      }
     } catch (error) {
       throw error;
     }
