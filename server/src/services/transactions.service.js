@@ -45,9 +45,9 @@ class TransactionService {
     }
   }
 
-  async getTransactionById(id) {
+  async getTransactionById(transactionId) {
     try {
-      const transaction = await Transaction.find({ transactionId: id });
+      const transaction = await Transaction.find({ transactionId });
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {
@@ -55,9 +55,9 @@ class TransactionService {
     }
   }
 
-  async updateTransactionStatus(id, status) {
+  async updateTransactionStatus(transactionId, status) {
     try {
-      const transaction = await Transaction.findOneAndUpdate({ transactionId: id }, { status }, { new: true });
+      const transaction = await Transaction.findOneAndUpdate({ transactionId }, { status }, { new: true });
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {
@@ -65,9 +65,9 @@ class TransactionService {
     }
   }
 
-  async deleteTransaction(id) {
+  async deleteTransaction(transactionId) {
     try {
-      const transaction = await Transaction.findOneAndDelete({ transactionId: id });
+      const transaction = await Transaction.findOneAndDelete({ transactionId });
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return { message: 'Transaction deleted' };
     } catch (err) {
