@@ -85,7 +85,7 @@ class UserService {
 
   async getUserProfile(id) {
     try {
-      const user = await User.findById(id).select('-password');
+      const user = await User.find({ userId: id }).select('-password');
       if (!user) throw new UserNotFoundError('User not found');
       return user;
     } catch (err) {

@@ -1,11 +1,13 @@
 const jwt = require('jsonwebtoken');
 const config = require("../lib/config.js")
+const { StatusCodes } = require("http-status-codes")
+
 const verifyAccessToken = (req, res, next) => {
   try {
     const accessToken = req.headers.authorization.replace("Bearer ", "");
 
     if (!accessToken) {
-      return res.status(401).json({ message: 'Access token is required' });
+      return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Access token is required' });
     }
 
     const jwtPayload = jwt.verify(accessToken, config.JWT_SECRET);
@@ -17,7 +19,7 @@ const verifyAccessToken = (req, res, next) => {
     };
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Invalid access token' });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid access token' });
   }
 
 };

@@ -1,3 +1,5 @@
+const { StatusCodes } = require("http-status-codes")
+
 const ValidateRequestRouteParameterMiddleware = (joiInstance) => {
   return async (req, res, next) => {
     try {
@@ -5,7 +7,7 @@ const ValidateRequestRouteParameterMiddleware = (joiInstance) => {
 
       return next();
     } catch (err) {
-      return res.status(400).json({ error: err.details ? err.details[0].message : err.message });
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: err.details ? err.details[0].message : err.message });
     }
   };
 };

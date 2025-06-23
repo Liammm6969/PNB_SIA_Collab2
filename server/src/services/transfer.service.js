@@ -12,8 +12,8 @@ class TransferService {
     try {
       const { fromUser, toUser, amount, details } = transferData;
 
-      const senderDoc = await User.findById(fromUser).session(session);
-      const receiverDoc = await User.findById(toUser).session(session);
+      const senderDoc = await User.find(fromUser).session(session);
+      const receiverDoc = await User.find(toUser).session(session);
       if (!receiverDoc) throw new Error('Receiver not found');
 
       if (!senderDoc) throw new Error('Sender not found');
@@ -22,7 +22,7 @@ class TransferService {
 
 
       const sender = await User.findOneAndUpdate({
-        _id: fromUser,
+       fromUser,
         balance: { $gte: amount }
       }, {
         $inc: { balance: -amount }
