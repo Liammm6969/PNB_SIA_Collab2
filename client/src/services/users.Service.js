@@ -125,7 +125,15 @@ export const createUser = async (userData) => {
       body: JSON.stringify(userData),
     });
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      // Try to extract error message from server response
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create user');
+      } else {
+        const textResponse = await response.text();
+        throw new Error(`Server error (${response.status}): ${response.statusText}`);
+      }
     }
     return await response.json();
   } catch (error) {
