@@ -43,6 +43,6 @@ router.put('/:id', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware
 router.delete('/:id', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), deletePayment);
 
 // Transfer money between users
-router.post('/transfer', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(transferPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transferController.transferMoney);
+router.post('/transfer', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(transferPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER,Roles.USER), transferController.transferMoney);
 
 module.exports = router;
