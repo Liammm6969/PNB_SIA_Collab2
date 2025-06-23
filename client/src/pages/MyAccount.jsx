@@ -289,10 +289,30 @@ export default function MyAccount() {
         <div
           className="card-modal-overlay"
           onClick={() => setIsCardEnlarged(false)}
-          onMouseMove={handleCardMouseMove}
-          onMouseLeave={handleCardMouseLeave}
+          onMouseMove={(e) => {
+            handleCardMouseMove(e);
+            // Spotlight effect
+            const card = enlargedCardRef.current;
+            if (!card) return;
+            const { left, top, width, height } = card.getBoundingClientRect();
+            const x = e.clientX - left;
+            const y = e.clientY - top;
+            const percentX = (x / width) * 100;
+            const percentY = (y / height) * 100;
+            card.classList.add('has-spotlight');
+            card.style.setProperty('--spotlight-x', `${percentX}%`);
+            card.style.setProperty('--spotlight-y', `${percentY}%`);
+          }}
+          onMouseLeave={(e) => {
+            handleCardMouseLeave(e);
+            const card = enlargedCardRef.current;
+            if (card) {
+              card.classList.remove('has-spotlight');
+            }
+          }}
         >
           <div className="enlarged-bank-card" ref={enlargedCardRef} onClick={(e) => e.stopPropagation()}>
+            <div className="card-spotlight" />
             <div className="bank-card-header">
               <img src={'/src/assets/pnb.png'} alt="PNB" className="bank-card-logo" />
               <div className="bank-card-currency">
