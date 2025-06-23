@@ -6,6 +6,10 @@ import SignUp from './pages/SignUp.jsx'
 import MyAccount from './pages/MyAccount.jsx';
 import AdminDashboard from './pages/Admin.jsx';
 import BusinessAccounts from './pages/BusinessAcc.jsx';
+import ManageUsers from './pages/ManageUsers.jsx';
+import React from 'react';
+import ManageTransactions from './pages/ManageTransactions.jsx';
+import ManageAccounts from './pages/ManageAccounts.jsx';
 
 function App() {
 
@@ -17,6 +21,9 @@ function App() {
       <Route path="/my-account" element={<MyAccount />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/business-accounts" element={<BusinessAccounts />} />
+      <Route path="/manage-users" element={<ManageUsers />} />  
+      <Route path='/transactions' element={<ManageTransactions/>} />
+      <Route path="/manage-accounts" element={<ManageAccounts />} />
     </Routes>
     </>
   )
