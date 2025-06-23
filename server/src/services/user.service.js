@@ -81,7 +81,7 @@ class UserService {
       user.otpExpires = otpExpires;
       await user.save();
       await sendOTPEmail(user.email, otp);
-      return { message: 'OTP sent to email. Please verify to complete login.', userId: user._id };
+      return { message: 'OTP sent to email. Please verify to complete login.', userId: user.userId };
     } catch (err) {
       throw err;
     }

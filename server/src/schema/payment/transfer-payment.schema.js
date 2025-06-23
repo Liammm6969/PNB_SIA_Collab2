@@ -1,16 +1,14 @@
 const joi = require('joi');
 
 const transferPaymentSchema = joi.object({
-  fromUser: joi.string().required().messages({
-    'string.base': 'From User must be a string',
-    'string.empty': 'From User cannot be empty',
-    'any.required': 'From User is required'
+  fromUser:joi.number().required().messages({
+     'number.base': 'From User must be a number',
+     'any.required': 'From User is required'
   }),
-  toUser: joi.string().required().messages({
-    'string.base': 'To User must be a string',
-    'string.empty': 'To User cannot be empty',
-    'any.required': 'To User is required'
-  }),
+   toUser: joi.number().required().messages({
+     'number.base': 'To User must be a number',
+     'any.required': 'To User is required'
+   }),
   amount: joi.number().min(0).required().messages({
     'number.base': 'Amount must be a number',
     'number.min': 'Amount must be at least 0',

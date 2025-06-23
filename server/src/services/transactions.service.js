@@ -11,10 +11,10 @@ class TransactionService {
 
   async createTransaction(transactionData) {
     try {
-      const user = await User.find(transactionData.userId);
+      const user = await User.findOne({ userId: transactionData.userId });
       if (!user) throw new TransactionNotFoundError('User not found');
       const addAmountToUser = await User.findOneAndUpdate(
-        transactionData.userId,
+        { userId: transactionData.userId },
         { $inc: { balance: transactionData.amount } },
         { new: true }
       );
@@ -37,7 +37,7 @@ class TransactionService {
 
   async getTransactionsByUser(userId) {
     try {
-      const transactions = await Transaction.find({ userId }).sort({ createdAt: -1 });
+      const transactions = await Transaction.findOne({ userId }).sort({ createdAt: -1 });
       if (!transactions) throw new TransactionNotFoundError('No transactions found');
       return transactions;
     } catch (err) {
@@ -47,7 +47,7 @@ class TransactionService {
 
   async getTransactionById(transactionId) {
     try {
-      const transaction = await Transaction.find({ transactionId });
+      const transaction = await Transaction.findOne({ transactionId });
       if (!transaction) throw new TransactionNotFoundError('Transaction not found');
       return transaction;
     } catch (err) {

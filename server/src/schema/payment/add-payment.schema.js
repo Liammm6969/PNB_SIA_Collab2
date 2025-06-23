@@ -1,14 +1,12 @@
 const joi = require('joi');
 
 const addPaymentSchema = joi.object({
-  fromUser: joi.string().required().messages({
-    'string.base': 'From User must be a string',
-    'string.empty': 'From User cannot be empty',
+ fromUser:joi.number().required().messages({
+    'number.base': 'From User must be a number',
     'any.required': 'From User is required'
-  }),
-  toUser: joi.string().required().messages({
-    'string.base': 'To User must be a string',
-    'string.empty': 'To User cannot be empty',
+ }),
+  toUser: joi.number().required().messages({
+    'number.base': 'To User must be a number',
     'any.required': 'To User is required'
   }),
   amount: joi.number().min(0).required().messages({
@@ -18,7 +16,12 @@ const addPaymentSchema = joi.object({
   }),
   details: joi.string().optional().messages({
     'string.base': 'Details must be a string'
-  })
+  }),
+  recipientType: joi.string().valid('User', 'Business').required().messages({
+    'string.base': 'Recipient type must be a string',
+    'any.only': 'Recipient type must be User or Business',
+    'any.required': 'Recipient type is required'
+  }),
 });
 
 module.exports = addPaymentSchema;
