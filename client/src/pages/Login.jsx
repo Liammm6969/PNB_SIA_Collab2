@@ -71,7 +71,8 @@ export default function Login() {
         setShowOTPModal(true);
         setLoading(false);
       } else {
-        localStorage.setItem('pnb-user', JSON.stringify(response.user));
+        // Save both user and token in localStorage for later API use
+        localStorage.setItem('pnb-user', JSON.stringify({ ...response.user, token: response.accessToken }));
         localStorage.setItem('pnb-token', response.accessToken);
         setLoading(false);
         
@@ -92,7 +93,7 @@ export default function Login() {
       const response = await verifyOTP(email, otp);
       
      
-      localStorage.setItem('pnb-user', JSON.stringify(response.user));
+      localStorage.setItem('pnb-user', JSON.stringify({ ...response.user, token: response.accessToken }));
       localStorage.setItem('pnb-token', response.accessToken);
       
       setShowOTPModal(false);
