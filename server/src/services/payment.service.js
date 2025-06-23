@@ -1,4 +1,4 @@
-const {Payment}= require("../models/index.js");
+const { Payment } = require("../models/index.js");
 
 class PaymentService {
   constructor() {
@@ -31,7 +31,7 @@ class PaymentService {
 
   async getPaymentById(id) {
     try {
-      const payment = await Payment.findById(id);
+      const payment = await Payment.find({ paymentId: id });
       if (!payment) throw new Error('Payment not found');
       return payment;
     } catch (err) {
@@ -41,7 +41,7 @@ class PaymentService {
 
   async updatePaymentStatus(id, status) {
     try {
-      const payment = await Payment.findByIdAndUpdate(id, { status }, { new: true });
+      const payment = await Payment.findOneAndUpdate({ paymentId: id }, { status }, { new: true });
       if (!payment) throw new Error('Payment not found');
       return payment;
     } catch (err) {
@@ -51,7 +51,7 @@ class PaymentService {
 
   async deletePayment(id) {
     try {
-      const payment = await Payment.findByIdAndDelete(id);
+      const payment = await Payment.findOneAndDelete({ paymentId: id });
       if (!payment) throw new Error('Payment not found');
       return { message: 'Payment deleted' };
     } catch (err) {

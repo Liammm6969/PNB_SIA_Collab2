@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const userSchema = new mongoose.Schema({
+  userId: { type: Number, unique: true },
   fullName: {
     type: String,
     required: function () { return this.accountType === 'personal'; },
@@ -28,5 +30,7 @@ const userSchema = new mongoose.Schema({
   otpExpires: { type: Date },
 },
   { timestamps: true });
+
+userSchema.plugin(AutoIncrement, { inc_field: 'userId', start_seq: 100, increment_by: 1 });
 
 module.exports = mongoose.model('User', userSchema);
