@@ -1,4 +1,4 @@
-const HOST_BASE = 'localhost:4000';
+const HOST_BASE = '192.168.9.23:4000';
 const API_PREFIX = '/api/Philippine-National-Bank';
 
 export const loginUser = async (email, password) => {

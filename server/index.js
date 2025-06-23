@@ -24,5 +24,5 @@ app.use(RouteNotFoundErrorMiddleware);
 
 
 app.listen(config.PORT, config.HOST, () => {
-  console.log(`PNB running at http://${config.HOST}:${config.PORT}`);
+  console.log(`PNB running at http://${config.HOST}:${config.PORT}/api/Philippine-National-Bank`);
 });
