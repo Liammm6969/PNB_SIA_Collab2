@@ -3,15 +3,11 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const transactionSchema = new mongoose.Schema({
   transactionId: { type: Number, unique: true },
-  userId: { type: Number, ref: 'User', required: true },
-  company: String,
-  paymentDetails: String,
+  fromUser: { type: Number, ref: 'User', required: true },
+  toUser: { type: Number, ref: 'User', required: true },
   amount: Number,
-  status: {
-    type: String,
-    enum: ['Pending', 'Cancelled', 'Paid'],
-    default: 'Pending'
-  },
+  details: String,
+  balanceAfterPayment: Number,
   date: { type: Date, default: Date.now }
 }, { timestamps: true });
 
