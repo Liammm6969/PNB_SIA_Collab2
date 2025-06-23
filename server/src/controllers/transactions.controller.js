@@ -4,7 +4,14 @@ const TransactionService = require("../services/transactions.service");
 // Create a new transaction
 exports.createTransaction = async (req, res) => {
   try {
-    const transaction = await TransactionService.createTransaction(req.body);
+    const { fromUser, toUser, amount, details, balanceAfterPayment } = req.body;
+    const transaction = await TransactionService.createTransaction({
+      fromUser,
+      toUser,
+      amount,
+      details,
+      balanceAfterPayment,
+    });
     res.status(StatusCodes.CREATED).json(transaction);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
@@ -18,15 +25,15 @@ exports.getTransactionsByUser = async (req, res) => {
     const transactions = await TransactionService.getTransactionsByUser(userId);
     res.status(StatusCodes.OK).json(transactions);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message })
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
   }
 };
 
 // Get a single transaction by ID
 exports.getTransactionById = async (req, res) => {
   try {
-    const { transactionId } = req.params;
-    const transaction = await TransactionService.getTransactionById(transactionId);
+    const { id } = req.params;
+    const transaction = await TransactionService.getTransactionById(id);
     res.status(StatusCodes.OK).json(transaction);
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
@@ -36,9 +43,9 @@ exports.getTransactionById = async (req, res) => {
 // Update transaction status
 exports.updateTransactionStatus = async (req, res) => {
   try {
-    const { transactionId } = req.params;
+    const { id } = req.params;
     const { status } = req.body;
-    const transaction = await TransactionService.updateTransactionStatus(transactionId, status);
+    const transaction = await TransactionService.updateTransactionStatus(id, status);
     res.status(StatusCodes.OK).json(transaction);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
@@ -48,8 +55,8 @@ exports.updateTransactionStatus = async (req, res) => {
 // Delete a transaction
 exports.deleteTransaction = async (req, res) => {
   try {
-    const { transactionId } = req.params;
-    const transaction = await TransactionService.deleteTransaction(transactionId);
+    const { id } = req.params;
+    const transaction = await TransactionService.deleteTransaction(id);
     res.status(StatusCodes.OK).json(transaction);
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });

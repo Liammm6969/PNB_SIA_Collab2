@@ -1,28 +1,31 @@
 const joi = require('joi');
 
 const updateTransactionSchema = joi.object({
-  userId: joi.string().required().messages({
-    'string.empty': 'User ID cannot be empty',
-    'any.required': 'User ID is required'
+  fromUser: joi.number().required().messages({
+    'number.base': 'From User must be a number',
+    'any.required': 'From User is required'
+  }),
+  toUser: joi.number().required().messages({
+    'number.base': 'To User must be a number',
+    'any.required': 'To User is required'
   }),
   amount: joi.number().greater(0).required().messages({
     'number.base': 'Amount must be a number',
     'number.greater': 'Amount must be greater than 0',
     'any.required': 'Amount is required'
   }),
-  company: joi.string().required().messages({
-    'string.empty': 'Company cannot be empty',
-    'any.required': 'Company is required'
+  details: joi.string().required().messages({
+    'string.empty': 'Details cannot be empty',
+    'any.required': 'Details are required'
   }),
-  paymentDetails: joi.string().required().messages({
-    'string.empty': 'Payment details cannot be empty',
-    'any.required': 'Payment details are required'
+  balanceAfterPayment: joi.number().required().messages({
+    'number.base': 'Balance After Payment must be a number',
+    'any.required': 'Balance After Payment is required'
   }),
   status: joi.string().valid('Pending', 'Cancelled', 'Paid').default('Pending').messages({
     'string.base': 'Status must be a string',
-    'any.only': 'Status must be one of Pending, Cancelled, or Paid',
-    'any.required': 'Status is required'
+    'any.only': 'Status must be one of Pending, Cancelled, or Paid'
   })
-})
+});
 
 module.exports = updateTransactionSchema;

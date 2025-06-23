@@ -18,7 +18,7 @@ router.get('/user/:userId', ValidateRequestRouteParameterMiddleware(validateUser
 // Get a single transaction by ID
 router.get('/transaction/:id', ValidateRequestRouteParameterMiddleware(validateTransactionIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), transactionsController.getTransactionById);
 
-// Update transaction status
+// Update the status of a transaction
 router.patch('/:id/status', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validateTransactionIdSchema), ValidateRequestBodyMiddleware(updateTransactionSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transactionsController.updateTransactionStatus);
 
 // Delete a transaction
