@@ -13,15 +13,19 @@ exports.transferMoney = async (req, res) => {
     }
 
     let identifierType;
-    if (identifier.includes('@')) {
-      identifierType = 'Email';
-    } else if (/^\d+$/.test(identifier)) {
-      identifierType = 'AccountNumber';
-    } else {
-      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid identifier format. Must be a valid email or account number.' });
+    if (identifier !== undefined && identifier !== null) {
+      if (identifier.includes('@')) {
+        identifierType = 'Email';
+      } else if (/^\d+$/.test(identifier)) {
+        identifierType = 'AccountNumber';
+      } else {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid identifier format. Must be a valid email or account number.' });
+      }
     }
 
-    const transferData = { fromUser, toUser, amount, details, recipientType, identifierType, identifier };
+    const transferData = { fromUser, toUser, amount, details, recipientType };
+    if (identifierType) transferData.identifierType = identifierType;
+    if (identifier) transferData.identifier = identifier;
     const result = await TransferService.transferMoney(transferData);
 
     return res.status(StatusCodes.OK).json(result);

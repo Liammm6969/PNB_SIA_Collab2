@@ -239,7 +239,7 @@ export const getDashboardData = async (userId) => {
 
 export const getTransactionsByUser = async (userId) => {
   try {
-    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/transactions/user/${userId}`, {
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/user-payments/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -255,6 +255,9 @@ export const getTransactionsByUser = async (userId) => {
     throw error;
   }
 }
+
+// Alias for clarity in components that fetch payments
+export const getPaymentsByUser = getTransactionsByUser;
 
 export const getPaymentStatistics = async (userId) => {
   try {
@@ -288,6 +291,60 @@ export const getBusinessAccounts = async () => {
     return await response.json();
   } catch (error) {
     console.error('Error fetching business accounts:', error);
+    throw error;
+  }
+}
+
+export const transferMoney = async ({ fromUser, toUser, amount, details, recipientType }) => {
+  try {
+    // Always include recipientType in the body if provided
+    const body = { fromUser, toUser, amount, details };
+    if (recipientType !== undefined) body.recipientType = recipientType;
+    const response = await fetch(`http://${HOST_BASE}${API_PREFIX}/payments/transfer`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${localStorage.getItem('pnb-token')}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch {
+        throw new Error('Transfer failed');
+      }
+      // If backend returns structured error, surface it
+      const error = new Error(errorData.message || errorData.error || 'Transfer failed');
+      if (errorData.name) error.name = errorData.name;
+      if (errorData.errorCode) error.errorCode = errorData.errorCode;
+      if (errorData.details) error.details = errorData.details;
+      throw error;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error transferring money:', error);
+    throw error;
+  }
+}
+
+export const findUserByEmailOrAccount = async (identifier) => {
+  try {
+    const users = await getUsers();
+    if (!users || !Array.isArray(users)) throw new Error('No users found');
+    let user;
+    if (identifier.includes('@')) {
+      user = users.find(u => u.email === identifier);
+    } else {
+      user = users.find(u => u.accountNumber === identifier);
+    }
+    if (!user) throw new Error('Recipient not found');
+    return user;
+  } catch (error) {
+    if (error.message === 'Access denied') {
+      throw new Error('You do not have permission to look up users. Please contact support.');
+    }
     throw error;
   }
 }
