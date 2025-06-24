@@ -1,12 +1,15 @@
 import React, { useState } from 'react'
 import { Container, Row, Col, Form, Button, Alert, InputGroup, Card } from 'react-bootstrap'
-import { Eye, EyeSlash, Person, Lock, Bank, Envelope, Phone, Building } from 'react-bootstrap-icons'
+import { Eye, EyeSlash, Person, Bank, Building } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
+import UserService from '../services/user.Service.js'
 
 const Register = () => {  
   const navigate = useNavigate()
-  const [formData, setFormData] = useState({
-    accountType: 'personal', // Default to personal account
+  
+  // Initial form state helper
+  const getInitialFormState = () => ({
+    accountType: 'personal',
     firstName: '',
     lastName: '',
     email: '',
@@ -14,72 +17,93 @@ const Register = () => {
     password: '',
     confirmPassword: ''
   })
+  
+  const [formData, setFormData] = useState(getInitialFormState())
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [showAlert, setShowAlert] = useState({ show: false, message: '', variant: '' })
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
+  
+  // Common styles to avoid repetition
+  const styles = {
+    input: { fontSize: '13px', height: '30px' },
+    label: { fontSize: '12px' },
+    feedback: { fontSize: '11px' },
+    eyeToggle: { 
+      cursor: 'pointer',
+      height: '30px',
+      display: 'flex',
+      alignItems: 'center'
     }
   }
+
+  // Clear specific error when user starts typing
+  const clearError = (fieldName) => {
+    if (errors[fieldName]) {
+      setErrors(prev => ({ ...prev, [fieldName]: '' }))
+    }
+  }
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    clearError(name)
+  }
+
   const handleAccountTypeChange = (accountType) => {
     setFormData(prev => ({
       ...prev,
       accountType,
-      // Clear business name when switching to personal account
+      firstName: accountType === 'business' ? '' : prev.firstName,
+      lastName: accountType === 'business' ? '' : prev.lastName,
       businessName: accountType === 'personal' ? '' : prev.businessName
     }))
-    // Clear business name error when switching account types
-    if (errors.businessName) {
-      setErrors(prev => ({
-        ...prev,
-        businessName: ''
-      }))
+    
+    // Clear errors for fields that are no longer relevant
+    const newErrors = { ...errors }
+    if (accountType === 'business') {
+      delete newErrors.firstName
+      delete newErrors.lastName
+    } else {
+      delete newErrors.businessName
     }
+    setErrors(newErrors)
   }
+
+  // Simplified password validation
+  const validatePassword = (password) => {
+    if (!password) return 'Password is required'
+    if (password.length < 8) return 'Password must be at least 8 characters'
+    if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter'
+    if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter'
+    if (!/\d/.test(password)) return 'Password must contain at least one number'
+    return ''
+  }
+  
   const validateForm = () => {
     const newErrors = {}
     
-    // First name is only required for personal accounts
-    if (formData.accountType === 'personal' && !formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required'
+    // Validate based on account type
+    if (formData.accountType === 'personal') {
+      if (!formData.firstName.trim()) newErrors.firstName = 'First name is required'
+      if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required'
+    } else {
+      if (!formData.businessName.trim()) newErrors.businessName = 'Business name is required'
     }
     
-    // Last name is only required for personal accounts
-    if (formData.accountType === 'personal' && !formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required'
-    }
-    
+    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required'
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address'
     }
     
-    // Business name is only required for business accounts
-    if (formData.accountType === 'business' && !formData.businessName.trim()) {
-      newErrors.businessName = 'Business name is required for business accounts'
-    }
+    // Password validation
+    const passwordError = validatePassword(formData.password)
+    if (passwordError) newErrors.password = passwordError
     
-    if (!formData.password) {
-      newErrors.password = 'Password is required'
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain uppercase, lowercase, and number'
-    }
-    
+    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password'
     } else if (formData.password !== formData.confirmPassword) {
@@ -93,43 +117,97 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm()) return
 
     setIsLoading(true)
     
     try {
-      // TODO: Replace with actual API call
-      console.log('Registration attempt:', formData)
+      // Prepare user data based on account type
+      const userData = formData.accountType === 'personal'
+        ? UserService.createPersonalAccountData(
+            formData.firstName,
+            formData.lastName,
+            formData.email,
+            formData.password
+          )
+        : UserService.createBusinessAccountData(
+            formData.businessName,
+            formData.email,
+            formData.password
+          )
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-        setShowAlert({
+      await UserService.registerUser(userData)
+      
+      setShowAlert({
         show: true,
-        message: 'Registration successful! Please check your email for verification.',
+        message: 'Registration successful! Redirecting to login...',
         variant: 'success'
       })
       
-      // Redirect to login
-      setTimeout(() => {
-        navigate('/login')
-      }, 2000)
+      setFormData(getInitialFormState())
+      setTimeout(() => navigate('/login'), 2000)
       
     } catch (error) {
+      console.error('Registration error:', error)
       setShowAlert({
         show: true,
-        message: 'Registration failed. Please try again.',
+        message: error.message || 'Registration failed. Please try again.',
         variant: 'danger'
       })
     } finally {
       setIsLoading(false)
     }
   }
+
+  // Reusable form field component
+  const FormField = ({ label, name, type = 'text', placeholder, size = 'sm' }) => (
+    <Form.Group className="mb-2">
+      <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
+      <Form.Control
+        size={size}
+        type={type}
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        placeholder={placeholder}
+        isInvalid={!!errors[name]}
+        style={styles.input}
+      />
+      <Form.Control.Feedback type="invalid" style={styles.feedback}>
+        {errors[name]}
+      </Form.Control.Feedback>
+    </Form.Group>
+  )
+
+  // Reusable password field component
+  const PasswordField = ({ label, name, placeholder, showPassword, toggleShow }) => (
+    <Form.Group className="mb-2">
+      <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
+      <InputGroup size="sm">
+        <Form.Control
+          type={showPassword ? 'text' : 'password'}
+          name={name}
+          value={formData[name]}
+          onChange={handleChange}
+          placeholder={placeholder}
+          isInvalid={!!errors[name]}
+          style={styles.input}
+        />
+        <InputGroup.Text style={styles.eyeToggle} onClick={toggleShow}>
+          {showPassword ? <EyeSlash className="text-muted" size={14} /> : <Eye className="text-muted" size={14} />}
+        </InputGroup.Text>
+      </InputGroup>
+      <Form.Control.Feedback type="invalid" style={styles.feedback}>
+        {errors[name]}
+      </Form.Control.Feedback>
+    </Form.Group>
+  )
+
   return (
     <div className="register-page" style={{ height: '100vh', overflow: 'hidden' }}>
-      <Container fluid className="h-100">        <Row className="h-100">
-          {/* Banner Section - Left Side (Desktop) / Top (Mobile) */}
+      <Container fluid className="h-100">
+        <Row className="h-100">
+          {/* Banner Section */}
           <Col lg={5} className="d-none d-lg-flex align-items-center justify-content-center p-0" style={{ maxWidth: '40%' }}>
             <div 
               className="banner-section w-100 h-100 d-flex align-items-center justify-content-center position-relative"
@@ -175,14 +253,16 @@ const Register = () => {
             </div>
           </Col>
 
-          {/* Register Form Section - Right Side */}
+          {/* Register Form Section */}
           <Col lg={7} className="d-flex align-items-center justify-content-center p-3" style={{ height: '100vh', overflow: 'auto', minWidth: '60%' }}>
             <div className="w-100" style={{ maxWidth: '600px' }}>
               {/* Header */}
               <div className="text-center mb-2">
                 <h2 className="fw-bold text-dark mb-1" style={{ fontSize: '24px' }}>Create Account</h2>
                 <p className="text-muted mb-0" style={{ fontSize: '14px' }}>Join our banking platform</p>
-              </div>              {/* Alert */}
+              </div>
+
+              {/* Alert */}
               {showAlert.show && (
                 <Alert 
                   variant={showAlert.variant} 
@@ -197,7 +277,7 @@ const Register = () => {
 
               {/* Account Type Selection */}
               <div className="mb-2">
-                <Form.Label className="fw-semibold mb-1 d-block" style={{ fontSize: '13px' }}>Choose Account Type</Form.Label>
+                <Form.Label className="fw-semibold mb-1 d-block" style={styles.label}>Choose Account Type</Form.Label>
                 <Row className="g-2">
                   <Col xs={6}>
                     <Card 
@@ -232,144 +312,53 @@ const Register = () => {
 
               {/* Register Form */}
               <Form onSubmit={handleSubmit}>
-                <Row className="g-2">
-                  <Col xs={6}>
-                    <Form.Group className="mb-2">
-                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>First Name</Form.Label>
-                      <Form.Control
-                        size="sm"
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        placeholder="First name"
-                        isInvalid={!!errors.firstName}
-                        style={{ fontSize: '13px', height: '30px' }}
-                      />
-                      <Form.Control.Feedback type="invalid" style={{ fontSize: '11px' }}>
-                        {errors.firstName}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
-                  <Col xs={6}>
-                    <Form.Group className="mb-2">
-                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Last Name</Form.Label>
-                      <Form.Control
-                        size="sm"
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        placeholder="Last name"
-                        isInvalid={!!errors.lastName}
-                        style={{ fontSize: '13px', height: '30px' }}
-                      />
-                      <Form.Control.Feedback type="invalid" style={{ fontSize: '11px' }}>
-                        {errors.lastName}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
-                </Row>                <Row className="g-2">
-                  <Col xs={12}>
-                    <Form.Group className="mb-2">
-                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Email Address</Form.Label>
-                      <Form.Control
-                        size="sm"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="Enter your email"
-                        isInvalid={!!errors.email}
-                        style={{ fontSize: '13px', height: '30px' }}
-                      />
-                      <Form.Control.Feedback type="invalid" style={{ fontSize: '11px' }}>
-                        {errors.email}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
-                </Row>                {/* Business Name - Fixed height container to prevent layout shift */}
-                <div style={{ minHeight: '55px', marginBottom: '8px' }}>
-                  {formData.accountType === 'business' && (
-                    <Form.Group className="mb-2">
-                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Business Name</Form.Label>
-                      <Form.Control
-                        size="sm"
-                        type="text"
-                        name="businessName"
-                        value={formData.businessName}
-                        onChange={handleChange}
-                        placeholder="Enter business name"
-                        isInvalid={!!errors.businessName}
-                        style={{ fontSize: '13px', height: '30px' }}
-                      />
-                      <Form.Control.Feedback type="invalid" style={{ fontSize: '11px' }}>
-                        {errors.businessName}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                  )}
-                </div>
+                {/* Personal Account Fields */}
+                {formData.accountType === 'personal' && (
+                  <Row className="g-2">
+                    <Col xs={6}>
+                      <FormField label="First Name" name="firstName" placeholder="First name" />
+                    </Col>
+                    <Col xs={6}>
+                      <FormField label="Last Name" name="lastName" placeholder="Last name" />
+                    </Col>
+                  </Row>
+                )}
 
+                {/* Business Account Fields */}
+                {formData.accountType === 'business' && (
+                  <Row className="g-2">
+                    <Col xs={12}>
+                      <FormField label="Business Name" name="businessName" placeholder="Enter business name" />
+                    </Col>
+                  </Row>
+                )}
+
+                {/* Email Field */}
+                <Row className="g-2">
+                  <Col xs={12}>
+                    <FormField label="Email Address" name="email" type="email" placeholder="Enter your email" />
+                  </Col>
+                </Row>
+
+                {/* Password Fields */}
                 <Row className="g-2">
                   <Col xs={6}>
-                    <Form.Group className="mb-2">
-                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Password</Form.Label>
-                      <InputGroup size="sm">
-                        <Form.Control
-                          type={showPassword ? 'text' : 'password'}
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          placeholder="Create password"
-                          isInvalid={!!errors.password}
-                          style={{ fontSize: '13px', height: '30px' }}
-                        />
-                        <InputGroup.Text 
-                          style={{ 
-                            cursor: 'pointer',
-                            height: '30px',
-                            display: 'flex',
-                            alignItems: 'center'
-                          }}
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeSlash className="text-muted" size={14} /> : <Eye className="text-muted" size={14} />}
-                        </InputGroup.Text>
-                      </InputGroup>
-                      <Form.Control.Feedback type="invalid" style={{ fontSize: '11px' }}>
-                        {errors.password}
-                      </Form.Control.Feedback>
-                    </Form.Group>
+                    <PasswordField 
+                      label="Password" 
+                      name="password" 
+                      placeholder="Create password"
+                      showPassword={showPassword}
+                      toggleShow={() => setShowPassword(!showPassword)}
+                    />
                   </Col>
                   <Col xs={6}>
-                    <Form.Group className="mb-2">
-                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Confirm Password</Form.Label>
-                      <InputGroup size="sm">
-                        <Form.Control
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleChange}
-                          placeholder="Confirm password"
-                          isInvalid={!!errors.confirmPassword}
-                          style={{ fontSize: '13px', height: '30px' }}
-                        />
-                        <InputGroup.Text 
-                          style={{ 
-                            cursor: 'pointer',
-                            height: '30px',
-                            display: 'flex',
-                            alignItems: 'center'
-                          }}
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                          {showConfirmPassword ? <EyeSlash className="text-muted" size={14} /> : <Eye className="text-muted" size={14} />}
-                        </InputGroup.Text>
-                      </InputGroup>
-                      <Form.Control.Feedback type="invalid" style={{ fontSize: '11px' }}>
-                        {errors.confirmPassword}
-                      </Form.Control.Feedback>
-                    </Form.Group>
+                    <PasswordField 
+                      label="Confirm Password" 
+                      name="confirmPassword" 
+                      placeholder="Confirm password"
+                      showPassword={showConfirmPassword}
+                      toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
+                    />
                   </Col>
                 </Row>
 
