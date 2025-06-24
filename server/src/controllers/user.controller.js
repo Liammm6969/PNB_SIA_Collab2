@@ -1,4 +1,4 @@
-const UserService = require('../services/user.service.js');
+const { UserService } = require('../services/index.js');
 const { StatusCodes } = require("http-status-codes");
 // Register a new user
 exports.registerUser = async (req, res) => {

@@ -11,5 +11,5 @@ const transactionSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-transactionSchema.plugin(AutoIncrement, { inc_field: 'transactionId', start_seq: 100, increment_by: 1 });
+transactionSchema.plugin(AutoIncrement, { inc_field: 'transactionId', start_seq: 2000, increment_by: 1 });
 module.exports = mongoose.model('Transaction', transactionSchema);

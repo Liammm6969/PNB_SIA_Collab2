@@ -3,17 +3,17 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const userSchema = new mongoose.Schema({
   userId: { type: Number, unique: true },
-  firstName: { 
-    type: String, 
-    required: function() { return this.accountType === 'personal'; }
+  firstName: {
+    type: String,
+    required: function () { return this.accountType === 'personal'; }
   },
-  lastName: { 
-    type: String, 
-    required: function() { return this.accountType === 'personal'; }
+  lastName: {
+    type: String,
+    required: function () { return this.accountType === 'personal'; }
   },
-  businessName: { 
-    type: String, 
-    required: function() { return this.accountType === 'business'; }
+  businessName: {
+    type: String,
+    required: function () { return this.accountType === 'business'; }
   },
   role: { type: String, enum: ['Admin', 'User'], default: 'User' },
   accountType: { type: String, enum: ['personal', 'business'], required: true },
@@ -27,9 +27,13 @@ const userSchema = new mongoose.Schema({
   { timestamps: true });
 
 // Virtual property to get display name based on account type
-userSchema.virtual('displayName').get(function() {
+userSchema.virtual('displayName').get(function () {
   if (this.accountType === 'personal') {
-    return `${this.firstName} ${this.lastName}`;
+    return {
+      firstName: this.firstName,
+      lastName: this.lastName,
+      fullName: `${this.firstName} ${this.lastName}`
+    };
   } else if (this.accountType === 'business') {
     return this.businessName;
   }
@@ -40,6 +44,6 @@ userSchema.virtual('displayName').get(function() {
 userSchema.set('toJSON', { virtuals: true });
 userSchema.set('toObject', { virtuals: true });
 
-userSchema.plugin(AutoIncrement, { inc_field: 'userId', start_seq: 100, increment_by: 1 });
+userSchema.plugin(AutoIncrement, { inc_field: 'userId', start_seq: 1000, increment_by: 1 });
 
 module.exports = mongoose.model('User', userSchema);

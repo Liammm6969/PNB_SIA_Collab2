@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
-const TransactionService = require("../services/transactions.service");
+const {TransactionService} = require("../services/index.js");
 
 // Create a new transaction
 exports.createTransaction = async (req, res) => {

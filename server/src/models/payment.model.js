@@ -10,6 +10,6 @@ const paymentSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-paymentSchema.plugin(AutoIncrement, { inc_field: 'paymentId', start_seq: 100, increment_by: 1 });
+paymentSchema.plugin(AutoIncrement, { inc_field: 'paymentId', start_seq: 4000, increment_by: 1 });
 
 module.exports = mongoose.model('Payment', paymentSchema);

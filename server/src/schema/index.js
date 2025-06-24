@@ -7,7 +7,8 @@ const validatePaymentIdSchema = require('./payment/validate-payment-id.schema');
 const loginUserSchema = require('./user/login-user.schema');
 const registerUserSchema = require('./user/register-user.schema');
 const updateTransactionSchema = require('./transaction/update-transaction.schema');
-
+const addStaffSchema = require('./staff/add-staff.schema');
+const validateStaffIdSchema = require('./staff/validate-staff-id.schema');
 
 
 module.exports = {
@@ -18,6 +19,8 @@ module.exports = {
   loginUserSchema,
   registerUserSchema,
   updateTransactionSchema,
+  addStaffSchema,
+  validateStaffIdSchema,
   validateTransactionIdSchema,
   validatePaymentIdSchema
 };

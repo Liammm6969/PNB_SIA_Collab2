@@ -1,7 +1,7 @@
 const PaymentRoute = require('./payment.route');
 const TransactionRoute = require('./transactions.route');
 const UserRoute = require('./user.route');
-
+const StaffRoute = require('./staff.route');
 const express = require('express');
 const router = express.Router();
 const { StatusCodes } = require("http-status-codes");
@@ -13,6 +13,7 @@ router.get('/', (req, res) => {
       payments: 'http://localhost:4000/api/Philippine-National-Bank/payments',
       transactions: 'http://localhost:4000/api/Philippine-National-Bank/transactions',
       users: 'http://localhost:4000/api/Philippine-National-Bank/users',
+      staff: 'http://localhost:4000/api/Philippine-National-Bank/staff',
     }
   });
 });
@@ -27,5 +28,7 @@ router.get('/health', (req, res) => {
 router.use('/payments', PaymentRoute);
 router.use('/transactions', TransactionRoute);
 router.use('/users', UserRoute);
+router.use('/staff', StaffRoute);
+
 
 module.exports = router;
