@@ -352,10 +352,10 @@ const ManageStaff = () => {
                 <Form.Label className="fw-semibold text-muted small text-uppercase">
                   Search Staff
                 </Form.Label>
-                <InputGroup className="shadow-sm">
-                  <InputGroup.Text className="bg-success text-white border-0">
+                <InputGroup className="shadow-sm">                  <InputGroup.Text className="bg-success text-white border-0">
                     <Search size={16} />
-                  </InputGroup.Text>                  <Form.Control
+                  </InputGroup.Text>
+                  <Form.Control
                     type="text"
                     placeholder="Search by name, email, or staff ID..."
                     value={searchTerm}
@@ -439,9 +439,9 @@ const ManageStaff = () => {
                 <h5 className="text-muted">Loading Staff...</h5>
                 <p className="text-muted mb-0">Please wait while we fetch the staff data</p>
               </div>
-            ) : (
-              <div className="table-responsive">
-                <Table className="mb-0 table-hover">                  <thead style={{ backgroundColor: '#f8f9fa' }}>
+            ) : (              <div className="table-responsive">
+                <Table className="mb-0 table-hover">
+                  <thead style={{ backgroundColor: '#f8f9fa' }}>
                     <tr>
                       <th className="border-0 py-3 px-4 fw-bold text-uppercase small">Staff Profile</th>
                       <th className="border-0 py-3 px-4 fw-bold text-uppercase small">Email</th>
@@ -465,13 +465,13 @@ const ManageStaff = () => {
                             e.currentTarget.style.backgroundColor = '#e8f5e8'
                             e.currentTarget.style.transform = 'scale(1.01)'
                             e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)'
-                          }}
-                          onMouseLeave={(e) => {
+                          }}                          onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#f8f9fa'
                             e.currentTarget.style.transform = 'scale(1)'
                             e.currentTarget.style.boxShadow = 'none'
                           }}
-                        >                          <td className="px-4 py-4">
+                        >
+                          <td className="px-4 py-4">
                             <div className="d-flex align-items-center">
                               <div className="me-3 position-relative">
                                 <div 
@@ -603,9 +603,9 @@ const ManageStaff = () => {
                                 </Button>
                               </OverlayTrigger>
                             </div>
-                          </td>
-                        </tr>
-                      ))                    ) : (
+                          </td>                        </tr>
+                      ))
+                    ) : (
                       <tr>
                         <td colSpan="6" className="text-center py-5">
                           <div className="text-center">
@@ -714,7 +714,8 @@ const ManageStaff = () => {
                                 <div className="fw-semibold font-monospace text-success">
                                   {selectedStaff.staffStringId || `STAFF_${selectedStaff.staffId}`}
                                 </div>
-                              </div>                              <div className="mb-3">
+                              </div>
+                              <div className="mb-3">
                                 <small className="text-muted text-uppercase fw-semibold">Department</small>
                                 <div className="fw-semibold">{selectedStaff.department}</div>
                               </div>
