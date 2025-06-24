@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-bootstrap'
-import { Eye, EyeSlash, Person, Lock, Bank, Shield, Clock, Globe } from 'react-bootstrap-icons'
+import { Eye, EyeSlash, Bank } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service.js'
 
 const Login = () => {
   const navigate = useNavigate()
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -14,45 +15,28 @@ const Login = () => {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [showAlert, setShowAlert] = useState({ show: false, message: '', variant: '' })
-  const [passwordStrength, setPasswordStrength] = useState(0)
 
-  // Auto-hide alerts after 5 seconds
-  useEffect(() => {
-    if (showAlert.show) {
-      const timer = setTimeout(() => {
-        setShowAlert({ show: false, message: '', variant: '' })
-      }, 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [showAlert.show])
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    
-    // Password strength calculation
-    if (name === 'password') {
-      calculatePasswordStrength(value)
-    }
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
+  // Common styles
+  const styles = {
+    input: { fontSize: '16px', height: '48px' },
+    label: { fontSize: '16px' },
+    feedback: { fontSize: '14px' },
+    eyeToggle: { 
+      cursor: 'pointer',
+      height: '48px',
+      display: 'flex',
+      alignItems: 'center'
     }
   }
 
-  const calculatePasswordStrength = (password) => {
-    let strength = 0
-    if (password.length >= 6) strength += 25
-    if (password.length >= 8) strength += 25
-    if (/[A-Z]/.test(password)) strength += 25
-    if (/[0-9]/.test(password)) strength += 25
-    setPasswordStrength(strength)
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
   }
 
   const validateForm = () => {
@@ -73,23 +57,22 @@ const Login = () => {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!validateForm()) {
-      return
-    }    setIsLoading(true)
+    if (!validateForm()) return
+
+    setIsLoading(true)
     
     try {
-      // Login user
-      const loginResponse = await UserService.loginUser(formData.email, formData.password);
+      const loginResponse = await UserService.loginUser(formData.email, formData.password)
       
-      // Store user data if login successful
       if (loginResponse.userId) {
         UserService.setUserData({
           userId: loginResponse.userId,
           email: formData.email
-        });
+        })
       }
       
       setShowAlert({
@@ -98,19 +81,11 @@ const Login = () => {
         variant: 'success'
       })
       
-      // Clear form
-      setFormData({
-        email: '',
-        password: ''
-      });
-      
-      // Redirect to dashboard after showing success message
-      setTimeout(() => {
-        navigate('/dashboard')
-      }, 1500)
+      setFormData({ email: '', password: '' })
+      setTimeout(() => navigate('/dashboard'), 1500)
       
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login error:', error)
       setShowAlert({
         show: true,
         message: error.message || 'Login failed. Please check your credentials.',
@@ -123,8 +98,9 @@ const Login = () => {
 
   return (
     <div className="login-page" style={{ height: '100vh', overflow: 'hidden' }}>
-      <Container fluid className="h-100">        <Row className="h-100">
-          {/* Banner Section - Left Side (Desktop) / Top (Mobile) */}
+      <Container fluid className="h-100">
+        <Row className="h-100">
+          {/* Banner Section */}
           <Col lg={5} className="d-none d-lg-flex align-items-center justify-content-center p-0" style={{ maxWidth: '40%' }}>
             <div 
               className="banner-section w-100 h-100 d-flex align-items-center justify-content-center position-relative"
@@ -170,8 +146,9 @@ const Login = () => {
             </div>
           </Col>
 
-          {/* Login Form Section - Right Side */}
-          <Col lg={7} className="d-flex align-items-center justify-content-center p-4" style={{ height: '100vh', overflow: 'auto', minWidth: '60%' }}>            <div className="w-100" style={{ maxWidth: '600px' }}>
+          {/* Login Form Section */}
+          <Col lg={7} className="d-flex align-items-center justify-content-center p-4" style={{ height: '100vh', overflow: 'auto', minWidth: '60%' }}>
+            <div className="w-100" style={{ maxWidth: '600px' }}>
               {/* Header */}
               <div className="text-center mb-4">
                 <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '32px' }}>Sign In</h2>
@@ -194,7 +171,7 @@ const Login = () => {
               {/* Login Form */}
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-4">
-                  <Form.Label className="fw-semibold" style={{ fontSize: '16px' }}>Email Address</Form.Label>
+                  <Form.Label className="fw-semibold" style={styles.label}>Email Address</Form.Label>
                   <Form.Control
                     type="email"
                     name="email"
@@ -202,15 +179,15 @@ const Login = () => {
                     onChange={handleChange}
                     placeholder="Enter your email"
                     isInvalid={!!errors.email}
-                    style={{ fontSize: '16px', height: '48px' }}
+                    style={styles.input}
                   />
-                  <Form.Control.Feedback type="invalid" style={{ fontSize: '14px' }}>
+                  <Form.Control.Feedback type="invalid" style={styles.feedback}>
                     {errors.email}
                   </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-4">
-                  <Form.Label className="fw-semibold" style={{ fontSize: '16px' }}>Password</Form.Label>
+                  <Form.Label className="fw-semibold" style={styles.label}>Password</Form.Label>
                   <InputGroup>
                     <Form.Control
                       type={showPassword ? 'text' : 'password'}
@@ -219,21 +196,16 @@ const Login = () => {
                       onChange={handleChange}
                       placeholder="Enter your password"
                       isInvalid={!!errors.password}
-                      style={{ fontSize: '16px', height: '48px' }}
+                      style={styles.input}
                     />
                     <InputGroup.Text 
-                      style={{ 
-                        cursor: 'pointer',
-                        height: '48px',
-                        display: 'flex',
-                        alignItems: 'center'
-                      }}
+                      style={styles.eyeToggle}
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeSlash className="text-muted" size={20} /> : <Eye className="text-muted" size={20} />}
                     </InputGroup.Text>
                   </InputGroup>
-                  <Form.Control.Feedback type="invalid" style={{ fontSize: '14px' }}>
+                  <Form.Control.Feedback type="invalid" style={styles.feedback}>
                     {errors.password}
                   </Form.Control.Feedback>
                 </Form.Group>
