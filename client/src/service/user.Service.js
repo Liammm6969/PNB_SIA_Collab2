@@ -130,6 +130,72 @@ class UserService {
     }
   }
 
+  /**
+   * Get all users
+   * @returns {Promise<Array>} List of users
+   */
+  async getAllUsers() {
+    try {
+      const response = await apiRequest(`${USERS_ENDPOINT}`, {
+        method: 'GET',
+      });
+      return response;
+    } catch (error) {
+      throw new Error(`Failed to fetch users: ${error.message}`);
+    }
+  }
+
+  /**
+   * Create a new user (admin)
+   * @param {Object} userData
+   * @returns {Promise<Object>} Created user
+   */
+  async createUser(userData) {
+    try {
+      const response = await apiRequest(`${USERS_ENDPOINT}`, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      });
+      return response;
+    } catch (error) {
+      throw new Error(`Failed to create user: ${error.message}`);
+    }
+  }
+
+  /**
+   * Update a user (admin)
+   * @param {string|number} userId
+   * @param {Object} userData
+   * @returns {Promise<Object>} Updated user
+   */
+  async updateUser(userId, userData) {
+    try {
+      const response = await apiRequest(`${USERS_ENDPOINT}/${userId}`, {
+        method: 'PUT',
+        body: JSON.stringify(userData),
+      });
+      return response;
+    } catch (error) {
+      throw new Error(`Failed to update user: ${error.message}`);
+    }
+  }
+
+  /**
+   * Delete a user (admin)
+   * @param {string|number} userId
+   * @returns {Promise<Object>} Delete response
+   */
+  async deleteUser(userId) {
+    try {
+      const response = await apiRequest(`${USERS_ENDPOINT}/${userId}`, {
+        method: 'DELETE',
+      });
+      return response;
+    } catch (error) {
+      throw new Error(`Failed to delete user: ${error.message}`);
+    }
+  }
+
 }
 
 // Export singleton instance

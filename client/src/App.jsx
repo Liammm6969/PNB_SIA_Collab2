@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
-import _dashboard from './pages/admin/_dashboard';
-import _manageUsers from './pages/admin/_manageUsers';
+import Dashboard from './pages/admin/_dashboard';
+import ManageUsers from './pages/admin/_manageUsers';
 
 import './App.css';
 
@@ -16,14 +16,10 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         {/* Default Route */}
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<_dashboard />} />
-
-
-
+        <Route path="/dashboard" element={<Dashboard />} />
         {/* Admin Routes */}
-        <Route path="/admin/dashboard" element={<_dashboard />} />
-        <Route path="/admin/manage-users" element={<_manageUsers />} />
-
+        <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/manage-users" element={<ManageUsers />} />
         {/* Add more routes as needed */}
       </Routes>
     </Router>
