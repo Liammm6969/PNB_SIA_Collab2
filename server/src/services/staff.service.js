@@ -8,13 +8,9 @@ class StaffService {
     this.getAllStaff = this.getAllStaff.bind(this);    this.updateStaff = this.updateStaff.bind(this);
     this.deleteStaff = this.deleteStaff.bind(this);
     this.getStaffByDepartment = this.getStaffByDepartment.bind(this);
-    this.loginStaff = this.loginStaff.bind(this);
-  }  async createStaff(data) {
-    // Check if email already exists
-    const existingEmailStaff = await Staff.findOne({ email: data.email });
-    if (existingEmailStaff) throw new Error(`Staff with email ${data.email} already exists`);
+  }
 
-    // Create staff with plain password (no hashing)
+  async createStaff(data) {
     const staff = new Staff(data);
 
     const existingStaff = await Staff.findOne({ staffId: staff.staffId });
@@ -37,9 +33,9 @@ class StaffService {
     const existingStaff = await Staff.findOne({ staffId: staffId });
     if (!existingStaff) throw new Error(`Staff with ID ${staffId} not found`);
 
-    await Staff.findOneAndUpdate({ staffId: staffId }, data, { new: true });
+    const updatedStaff = await Staff.findOneAndUpdate({ staffId: staffId }, data, { new: true });
 
-    return { message: `Staff with ID ${staffId} updated successfully`, staffId: staffId };
+    return { message: `Staff with ID ${staffId} updated successfully`, staffId: staffId, updatedStaff };
   }
 
   async deleteStaff(staffId) {

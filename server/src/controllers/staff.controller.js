@@ -13,6 +13,16 @@ exports.loginStaff = async (req, res) => {
 };
 
 // Create a new staff member
+
+exports.loginStaff = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const result = await StaffService.loginStaff(email, password);
+    res.status(StatusCodes.OK).json(result);
+  } catch (err) {
+    res.status(StatusCodes.UNAUTHORIZED).json({ error: err.message });
+  }
+}
 exports.createStaff = async (req, res) => {
   try {
     const staff = await StaffService.createStaff(req.body);
