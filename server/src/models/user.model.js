@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const userSchema = new mongoose.Schema({
-  userId: { type: Number, unique: true },  
+  userId: { type: Number, unique: true },    
   firstName: {
     type: String,
-    required: true
+    required: function () { return this.accountType === 'personal'; }
   },
   lastName: {
     type: String,
-    required: true
+    required: function () { return this.accountType === 'personal'; }
   },
   businessName: {
     type: String,
@@ -34,10 +34,8 @@ userSchema.virtual('displayName').get(function () {
     };
   } else if (this.accountType === 'business') {
     return {
-      firstName: this.firstName,
-      lastName: this.lastName,
-      fullName: `${this.firstName} ${this.lastName}`,
-      businessName: this.businessName
+      businessName: this.businessName,
+      fullName: this.businessName
     };
   }
   return 'Unknown';

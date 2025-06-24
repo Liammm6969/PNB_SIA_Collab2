@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-bootstrap'
 import { Eye, EyeSlash, Person, Lock, Bank, Shield, Clock, Globe } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
+import UserService from '../services/user.Service.js'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -72,37 +73,47 @@ const Login = () => {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     
     if (!validateForm()) {
       return
-    }
-
-    setIsLoading(true)
+    }    setIsLoading(true)
     
     try {
-      // TODO: Replace with actual API call
-      console.log('Login attempt:', formData)
+      // Login user
+      const loginResponse = await UserService.loginUser(formData.email, formData.password);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // Store user data if login successful
+      if (loginResponse.userId) {
+        UserService.setUserData({
+          userId: loginResponse.userId,
+          email: formData.email
+        });
+      }
+      
       setShowAlert({
         show: true,
-        message: 'Login successful! Redirecting...',
+        message: 'Login successful! Redirecting to dashboard...',
         variant: 'success'
       })
       
-      // Redirect to dashboard
+      // Clear form
+      setFormData({
+        email: '',
+        password: ''
+      });
+      
+      // Redirect to dashboard after showing success message
       setTimeout(() => {
         navigate('/dashboard')
-      }, 1000)
+      }, 1500)
       
     } catch (error) {
+      console.error('Login error:', error);
       setShowAlert({
         show: true,
-        message: 'Login failed. Please check your credentials.',
+        message: error.message || 'Login failed. Please check your credentials.',
         variant: 'danger'
       })
     } finally {

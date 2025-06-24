@@ -1,9 +1,59 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Button } from 'react-bootstrap'
 import { Bank, Person, CreditCard, BarChart } from 'react-bootstrap-icons'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import UserService from '../services/user.Service.js'
 
 const Dashboard = () => {
+  const navigate = useNavigate()
+  const [userData, setUserData] = useState(null)
+  const [userProfile, setUserProfile] = useState(null)
+
+  useEffect(() => {
+    // Check if user is authenticated
+    if (!UserService.isAuthenticated()) {
+      navigate('/login')
+      return
+    }
+
+    // Get user data from localStorage
+    const storedUserData = UserService.getUserData()
+    setUserData(storedUserData)
+
+    // Fetch user profile if userId is available
+    if (storedUserData.userId) {
+      fetchUserProfile(storedUserData.userId)
+    }
+  }, [navigate])
+
+  const fetchUserProfile = async (userId) => {
+    try {
+      const profile = await UserService.getUserProfile(userId)
+      setUserProfile(profile)
+    } catch (error) {
+      console.error('Error fetching user profile:', error)
+      // If token is invalid, redirect to login
+      if (error.message.includes('token') || error.message.includes('unauthorized')) {
+        handleLogout()
+      }
+    }
+  }
+
+  const handleLogout = () => {
+    UserService.logout()
+    navigate('/login')
+  }
+
+  const getDisplayName = () => {
+    if (userProfile) {
+      if (userProfile.firstName && userProfile.lastName) {
+        return `${userProfile.firstName} ${userProfile.lastName}`
+      } else if (userProfile.businessName) {
+        return userProfile.businessName
+      }
+    }
+    return userData?.email || 'User'
+  }
   return (
     <div className="dashboard-page" style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
       {/* Navigation Header */}
@@ -14,11 +64,11 @@ const Dashboard = () => {
           <div className="navbar-brand d-flex align-items-center">
             <Bank size={28} className="me-2" />
             <span className="fw-bold">PNB Banking System</span>
-          </div>
-          <div className="navbar-nav ms-auto">
-            <Link to="/login" className="nav-link text-white">
-              <Button variant="outline-light" size="sm">Logout</Button>
-            </Link>
+          </div>          <div className="navbar-nav ms-auto d-flex align-items-center">
+            <span className="text-white me-3">Hello, {getDisplayName()}</span>
+            <Button variant="outline-light" size="sm" onClick={handleLogout}>
+              Logout
+            </Button>
           </div>
         </Container>
       </nav>
@@ -28,8 +78,7 @@ const Dashboard = () => {
         <Row>
           <Col>
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <div>
-                <h1 className="fw-bold text-dark">Welcome to Your Dashboard</h1>
+              <div>                <h1 className="fw-bold text-dark">Welcome, {getDisplayName()}!</h1>
                 <p className="text-muted">Manage your banking operations and account details</p>
               </div>
             </div>
@@ -92,10 +141,11 @@ const Dashboard = () => {
             <Card className="shadow-sm border-0">
               <Card.Body className="p-4">
                 <h5 className="fw-bold mb-4">Quick Statistics</h5>
-                <Row className="text-center">
-                  <Col md={3}>
+                <Row className="text-center">                  <Col md={3}>
                     <div className="p-3">
-                      <h3 className="fw-bold text-primary">$12,500</h3>
+                      <h3 className="fw-bold text-primary">
+                        ${userProfile?.balance ? userProfile.balance.toLocaleString() : '0.00'}
+                      </h3>
                       <p className="text-muted mb-0">Current Balance</p>
                     </div>
                   </Col>
