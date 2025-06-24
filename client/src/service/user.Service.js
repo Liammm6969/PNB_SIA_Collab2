@@ -78,9 +78,6 @@ class UserService {
         email: userData.email,
         password: userData.password,
         accountType: userData.accountType,
-
-
-        withdrawalMethods: 'Bank Transfer' // Default withdrawal method
       };
 
       const response = await apiRequest(`${USERS_ENDPOINT}/register`, {

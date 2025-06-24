@@ -69,9 +69,9 @@ class UserService {
   async loginUser(email, password) {
     try {
       const user = await User.findOne({ email });
-      if (!user) throw new UserNotFoundError('User not found');
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
+      // if (!user) throw new UserNotFoundError('User not found');
+      // const isMatch = await bcrypt.compare(password, user.password);
+      // if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
       // const otp = generateOTP();
       // const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
       // user.otp = otp;
