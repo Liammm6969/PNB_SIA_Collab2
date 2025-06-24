@@ -25,6 +25,13 @@ const validateStaffSchema = joi.object({
     'string.email': 'Email must be a valid email address',
     'any.required': 'Email is required'
   }),
+  password: joi.string().min(6).max(100).required().messages({
+    'string.base': 'Password must be a string',
+    'string.empty': 'Password cannot be empty',
+    'string.min': 'Password must be at least 6 characters long',
+    'string.max': 'Password must be at most 100 characters long',
+    'any.required': 'Password is required'
+  }),
   department: joi.string().valid("Finance", "Admin", "Loan").required().messages({
     'string.base': 'Department must be a string',
     'string.empty': 'Department cannot be empty',

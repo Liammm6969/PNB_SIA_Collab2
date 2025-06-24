@@ -2,12 +2,159 @@
 // Base API URL for all staff-related endpoints
 const BASE_URL = 'http://localhost:4000/api/Philippine-National-Bank/staff';
 
-class StaffService {
+class StaffService {  /**
+   * Login staff member with staffStringId and password
+   * @param {string} staffStringId - Staff string ID (e.g., STAFF_3000)
+   * @param {string} password - Staff password
+   * @returns {Promise<Object>} Login response with staff data and department info
+   */
+  static async loginStaff(staffStringId, password) {
+    try {
+      const response = await fetch(`${BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ staffStringId, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      return {
+        success: true,
+        data: data,
+        message: 'Staff login successful'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Network error occurred during login'
+      };
+    }
+  }
+
+  /**
+   * Logout staff by removing stored tokens
+   */
+  static logout() {
+    localStorage.removeItem('staffId');
+    localStorage.removeItem('staffEmail');
+    localStorage.removeItem('staffDepartment');
+    localStorage.removeItem('staffFirstName');
+    localStorage.removeItem('staffLastName');
+    localStorage.removeItem('staffStringId');
+  }
+
+  /**
+   * Check if staff is authenticated
+   * @returns {boolean} Authentication status
+   */
+  static isAuthenticated() {
+    return !!localStorage.getItem('staffId');
+  }
+
+  /**
+   * Store staff data in localStorage
+   * @param {Object} staffData - Staff data to store
+   */
+  static setStaffData(staffData) {
+    if (staffData.staffId) {
+      localStorage.setItem('staffId', staffData.staffId);
+    }
+    if (staffData.email) {
+      localStorage.setItem('staffEmail', staffData.email);
+    }
+    if (staffData.department) {
+      localStorage.setItem('staffDepartment', staffData.department);
+    }
+    if (staffData.firstName) {
+      localStorage.setItem('staffFirstName', staffData.firstName);
+    }
+    if (staffData.lastName) {
+      localStorage.setItem('staffLastName', staffData.lastName);
+    }
+    if (staffData.staffStringId) {
+      localStorage.setItem('staffStringId', staffData.staffStringId);
+    }
+  }
+
+  /**
+   * Get stored staff data
+   * @returns {Object} Stored staff data
+   */  static getStaffData() {
+    return {
+      staffId: localStorage.getItem('staffId'),
+      staffEmail: localStorage.getItem('staffEmail'),
+      staffDepartment: localStorage.getItem('staffDepartment'),
+      staffFirstName: localStorage.getItem('staffFirstName'),
+      staffLastName: localStorage.getItem('staffLastName'),
+      staffStringId: localStorage.getItem('staffStringId'),
+    };
+  }
+
+  /**
+   * Get department-specific route based on department
+   * @param {string} department - Department name
+   * @returns {string} Route path
+   */
+  static getDepartmentRoute(department) {
+    switch (department) {
+      case 'Admin':
+        return '/admin-dashboard';
+      case 'Finance':
+        return '/finance-dashboard';
+      case 'Loan':
+        return '/loans-dashboard';
+      default:
+        return '/admin-dashboard';
+    }
+  }
+
+  /**
+   * Get department theme colors
+   * @param {string} department - Department name
+   * @returns {Object} Theme colors for the department
+   */
+  static getDepartmentTheme(department) {
+    switch (department) {
+      case 'Admin':
+        return {
+          primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          secondary: '#667eea',
+          badge: 'primary'
+        };
+      case 'Finance':
+        return {
+          primary: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          secondary: '#f093fb',
+          badge: 'danger'
+        };
+      case 'Loan':
+        return {
+          primary: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          secondary: '#4facfe',
+          badge: 'info'
+        };
+      default:
+        return {
+          primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          secondary: '#667eea',
+          badge: 'primary'
+        };
+    }
+  }
+
   /**
    * Create a new staff member
    * @param {Object} staffData - Staff creation data
    * @param {string} staffData.firstName - Staff member's first name
    * @param {string} staffData.lastName - Staff member's last name
+   * @param {string} staffData.email - Staff member's email address
+   * @param {string} staffData.password - Staff member's password
    * @param {string} staffData.department - Department ('Finance', 'Admin', or 'Loan')
    * @returns {Promise<Object>} Creation response
    */

@@ -6,7 +6,8 @@ const StaffSchema = new mongoose.Schema({
   staffStringId: { type: String, unique: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  email: { type: String, required: true, unique: true, },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   department: { type: String, required: true, enum: ["Finance", "Admin", "Loan"] },
 }, { timestamps: true });
 

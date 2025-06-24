@@ -208,11 +208,10 @@ const Register = () => {
       <Container fluid className="h-100">
         <Row className="h-100">
           {/* Banner Section */}
-          <Col lg={5} className="d-none d-lg-flex align-items-center justify-content-center p-0" style={{ maxWidth: '40%' }}>
-            <div 
+          <Col lg={5} className="d-none d-lg-flex align-items-center justify-content-center p-0" style={{ maxWidth: '40%' }}>            <div 
               className="banner-section w-100 h-100 d-flex align-items-center justify-content-center position-relative"
               style={{ 
-                background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                background: 'linear-gradient(135deg, #1e3a8a 0%, #6366f1 100%)',
                 height: '100vh'
               }}
             >
@@ -223,12 +222,20 @@ const Register = () => {
                   backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
                   opacity: 0.3
                 }}
-              />
-              
-              {/* Banner Content */}
+              />              {/* Banner Content */}
               <div className="text-center text-white position-relative z-index-1 px-4">
-                <div className="mb-3">
-                  <Bank size={60} className="text-white mb-3" />
+                <div className="mb-4">
+                  <img 
+                    src="/Logo.png" 
+                    alt="PNB Logo" 
+                    style={{ 
+                      width: '220px', 
+                      height: '220px', 
+                      objectFit: 'contain',
+                      marginBottom: '0'
+                    }}
+                    className="mb-3"
+                  />
                 </div>
                 <h1 className="h2 fw-bold mb-3">Join PNB Today</h1>
                 <h4 className="fw-light mb-3">Banking System</h4>
@@ -255,8 +262,7 @@ const Register = () => {
 
           {/* Register Form Section */}
           <Col lg={7} className="d-flex align-items-center justify-content-center p-3" style={{ height: '100vh', overflow: 'auto', minWidth: '60%' }}>
-            <div className="w-100" style={{ maxWidth: '600px' }}>
-              {/* Header */}
+            <div className="w-100" style={{ maxWidth: '600px' }}>              {/* Header */}
               <div className="text-center mb-2">
                 <h2 className="fw-bold text-dark mb-1" style={{ fontSize: '24px' }}>Create Account</h2>
                 <p className="text-muted mb-0" style={{ fontSize: '14px' }}>Join our banking platform</p>
@@ -279,29 +285,27 @@ const Register = () => {
               <div className="mb-2">
                 <Form.Label className="fw-semibold mb-1 d-block" style={styles.label}>Choose Account Type</Form.Label>
                 <Row className="g-2">
-                  <Col xs={6}>
-                    <Card 
-                      className={`text-center cursor-pointer ${formData.accountType === 'personal' ? 'border-success bg-light' : 'border-secondary'}`}
+                  <Col xs={6}>                    <Card 
+                      className={`text-center cursor-pointer ${formData.accountType === 'personal' ? 'border-primary bg-light' : 'border-secondary'}`}
                       style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
                       onClick={() => handleAccountTypeChange('personal')}
                     >
                       <Card.Body className="py-1">
-                        <Person size={20} className={formData.accountType === 'personal' ? 'text-success' : 'text-muted'} />
-                        <div className={`mt-1 fw-semibold ${formData.accountType === 'personal' ? 'text-success' : 'text-dark'}`} style={{ fontSize: '12px' }}>
+                        <Person size={20} className={formData.accountType === 'personal' ? 'text-primary' : 'text-muted'} style={{ color: formData.accountType === 'personal' ? '#1e3a8a' : undefined }} />
+                        <div className={`mt-1 fw-semibold ${formData.accountType === 'personal' ? 'text-primary' : 'text-dark'}`} style={{ fontSize: '12px', color: formData.accountType === 'personal' ? '#1e3a8a' : undefined }}>
                           Personal
                         </div>
                       </Card.Body>
                     </Card>
                   </Col>
-                  <Col xs={6}>
-                    <Card 
-                      className={`text-center cursor-pointer ${formData.accountType === 'business' ? 'border-success bg-light' : 'border-secondary'}`}
+                  <Col xs={6}>                    <Card 
+                      className={`text-center cursor-pointer ${formData.accountType === 'business' ? 'border-primary bg-light' : 'border-secondary'}`}
                       style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
                       onClick={() => handleAccountTypeChange('business')}
                     >
                       <Card.Body className="py-1">
-                        <Building size={20} className={formData.accountType === 'business' ? 'text-success' : 'text-muted'} />
-                        <div className={`mt-1 fw-semibold ${formData.accountType === 'business' ? 'text-success' : 'text-dark'}`} style={{ fontSize: '12px' }}>
+                        <Building size={20} className={formData.accountType === 'business' ? 'text-primary' : 'text-muted'} style={{ color: formData.accountType === 'business' ? '#1e3a8a' : undefined }} />
+                        <div className={`mt-1 fw-semibold ${formData.accountType === 'business' ? 'text-primary' : 'text-dark'}`} style={{ fontSize: '12px', color: formData.accountType === 'business' ? '#1e3a8a' : undefined }}>
                           Business
                         </div>
                       </Card.Body>
@@ -360,15 +364,13 @@ const Register = () => {
                       toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
                     />
                   </Col>
-                </Row>
-
-                <Button
-                  variant="success"
+                </Row>                <Button
+                  variant="primary"
                   type="submit"
                   className="w-100 fw-semibold mt-2 mb-2"
                   disabled={isLoading}
                   style={{ 
-                    background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                    background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
                     border: 'none',
                     borderRadius: '6px',
                     fontSize: '13px',

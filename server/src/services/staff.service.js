@@ -1,8 +1,7 @@
 const { Staff } = require("../models/index.js");
 const mongoose = require('mongoose');
 
-class StaffService {
-  constructor() {
+class StaffService {  constructor() {
     this.createStaff = this.createStaff.bind(this);
     this.getStaffById = this.getStaffById.bind(this);
     this.getAllStaff = this.getAllStaff.bind(this);
@@ -12,11 +11,6 @@ class StaffService {
     this.loginStaff = this.loginStaff.bind(this);
   }
 
-  async loginStaff(email, password) {
-    const staff = await Staff.findOne({ email: email, password: password });
-    if (!staff) throw new Error(`Staff with email ${email} not found or incorrect password`);
-    return { message: `Staff with email ${email} logged in successfully`, staffId: staff.staffId };
-  }
   async createStaff(data) {
     const staff = new Staff(data);
 
@@ -62,10 +56,30 @@ class StaffService {
   async getAllStaff() {
     return await Staff.find();
   }
-
   async getStaffByDepartment(department) {
     const staff = await Staff.find({ department });
     return staff;
+  }
+  async loginStaff(staffStringId, password) {
+    try {
+      const staff = await Staff.findOne({ staffStringId });
+      if (!staff) throw new Error('Staff not found');
+      
+      // For now, simple password comparison (can be enhanced with bcrypt later)
+      if (staff.password !== password) throw new Error('Invalid password');
+      
+      return { 
+        message: 'Login Successful',
+        staffId: staff.staffId,
+        staffStringId: staff.staffStringId,
+        department: staff.department,
+        firstName: staff.firstName,
+        lastName: staff.lastName,
+        email: staff.email
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 }
 
