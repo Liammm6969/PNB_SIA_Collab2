@@ -173,11 +173,10 @@ const Login = () => {
       <Container fluid className="h-100">
         <Row className="h-100">
           {/* Banner Section */}
-          <Col lg={5} className="d-none d-lg-flex align-items-center justify-content-center p-0" style={{ maxWidth: '40%' }}>
-            <div 
+          <Col lg={5} className="d-none d-lg-flex align-items-center justify-content-center p-0" style={{ maxWidth: '40%' }}>            <div 
               className="banner-section w-100 h-100 d-flex align-items-center justify-content-center position-relative"
               style={{ 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #1e3a8a 0%, #6366f1 100%)',
                 height: '100vh'
               }}
             >
@@ -188,12 +187,20 @@ const Login = () => {
                   backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
                   opacity: 0.3
                 }}
-              />
-              
-              {/* Banner Content */}
+              />              {/* Banner Content */}
               <div className="text-center text-white position-relative z-index-1 px-4">
-                <div className="mb-3">
-                  <Bank size={60} className="text-white mb-3" />
+                <div className="mb-4">
+                  <img 
+                    src="/Logo.png" 
+                    alt="PNB Logo" 
+                    style={{ 
+                      width: '220px', 
+                      height: '220px', 
+                      objectFit: 'contain',
+                      marginBottom: '0'
+                    }}
+                    className="mb-3"
+                  />
                 </div>
                 <h1 className="h2 fw-bold mb-3">Welcome to PNB</h1>
                 <h4 className="fw-light mb-3">Banking System</h4>
@@ -272,10 +279,9 @@ const Login = () => {
                     value={formData.identifier}
                     onChange={handleChange}
                     placeholder="Enter your email address or Staff ID (e.g., user@example.com or STAFF_3000)"
-                    isInvalid={!!errors.identifier}
-                    style={{
+                    isInvalid={!!errors.identifier}                    style={{
                       ...styles.input,
-                      borderColor: detectedType === 'staff' ? '#6f42c1' : detectedType === 'user' ? '#198754' : ''
+                      borderColor: detectedType === 'staff' ? '#6366f1' : detectedType === 'user' ? '#1e3a8a' : ''
                     }}
                   />
                   <Form.Control.Feedback type="invalid" style={styles.feedback}>
@@ -329,9 +335,8 @@ const Login = () => {
                   variant="primary"
                   type="submit"
                   className="w-100 fw-semibold mb-4"
-                  disabled={isLoading}
-                  style={{ 
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  disabled={isLoading}                  style={{ 
+                    background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '16px',
