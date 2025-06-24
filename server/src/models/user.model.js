@@ -30,7 +30,7 @@ userSchema.plugin(AutoIncrement, { inc_field: 'userIdSeq', start_seq: 1000, incr
 
 userSchema.post('save', async function (doc, next) {
   if (!doc.userId && doc.userIdSeq) {
-    let prefix = doc.accountType === 'business' ? 'BUSNS_' : 'PRSNL_';
+    let prefix = doc.accountType === 'business' ? 'BUSNS-' : 'PRSNL-';
     const userId = `${prefix}${doc.userIdSeq}`;
     await doc.model('User').findByIdAndUpdate(doc._id, { userId });
     doc.userId = userId;
