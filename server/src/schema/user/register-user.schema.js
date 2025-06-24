@@ -10,11 +10,7 @@ const registerUserSchema = joi.object({
       'string.max': 'Full name must not exceed 30 characters',
       'any.required': 'Full name is required'
     }),
-  companyName: joi.string().alphanum().optional().messages({
-    'string.base': 'Company name must be a string',
-    'string.empty': 'Company name cannot be empty',
-    'any.required': 'Company name is required'
-  }),
+ 
   email: joi.string().email({
     minDomainSegments: 2,
     tlds: { allow: ['com', 'net', 'org', 'edu'] }
@@ -35,23 +31,13 @@ const registerUserSchema = joi.object({
     'string.empty': 'Account number cannot be empty',
     'string.pattern.base': 'Account number must be in the format XXX-XXXX-XXX-XXXX',
   }),
-  role: joi.string().valid('Admin', 'Finance', 'BusinessOwner', 'User').default('User').messages({
-    'string.base': 'Role must be a string',
-    'any.only': 'Role must be either personal or business',
-    'any.default': 'Role is set to personal by default'
-  }),
-  address: joi.string().optional(),
-  dateOfBirth: joi.date().max('12-31-2025').optional(),
+ 
+ 
   balance: joi.number().default(0).messages({
     'number.base': 'Balance must be a number',
     'any.default': 'Balance is set to 0 by default'
   }).optional(),
-  withdrawalMethods: joi.string().valid('Bank Transfer', 'PayPal', 'Credit Card', 'Crypto Currency').default('Bank Transfer').messages({
-    'string.base': 'Withdrawal method must be a string',
-    'any.only': 'Withdrawal method must be one of Bank Transfer, PayPal, Credit Card, or Crypto Currency',
-    'any.default': 'Withdrawal method is set to Bank Transfer by default'
-  }
-  ).optional(),
+
   accountType: joi.string().valid('personal', 'business').required().messages({
     'string.base': 'Account type must be a string',
     'any.only': 'Account type must be either personal or business',
