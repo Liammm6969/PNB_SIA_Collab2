@@ -103,10 +103,9 @@ class UserService {
       throw err;
     }
   }
-
   async getUserProfile(userId) {
     try {
-      const user = await User.find({ userId }).select('-password');
+      const user = await User.findOne({ userId }).select('-password');
       if (!user) throw new UserNotFoundError('User not found');
       return user;
     } catch (err) {

@@ -34,11 +34,17 @@ class TransactionService {
       throw err;
     }
   }
-
   async getTransactionsByUser(userId) {
     try {
-      const transactions = await Transaction.findOne({ userId }).sort({ createdAt: -1 });
-      if (!transactions) throw new TransactionNotFoundError('No transactions found');
+      const transactions = await Transaction.find({ 
+        $or: [
+          { fromUser: userId },
+          { toUser: userId }
+        ]
+      }).sort({ createdAt: -1 });
+      if (!transactions || transactions.length === 0) {
+        return []; // Return empty array instead of throwing error
+      }
       return transactions;
     } catch (err) {
       throw err;

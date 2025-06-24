@@ -1,4 +1,4 @@
-const { Payment } = require("../models/index.js");
+const { Payment, User } = require("../models/index.js");
 const {PaymentNotFoundError} = require("../errors/index.js");
 class PaymentService {
   constructor() {
@@ -18,18 +18,23 @@ class PaymentService {
       throw err;
     }
   }
-
   async getPaymentsByUser(userId) {
     try {
-      const numericUserId = Number(userId);
+      // First find the user to get their userIdSeq
+      const user = await User.findOne({ userId }).select('userIdSeq');
+      if (!user) {
+        return []; // Return empty array if user not found
+      }
+      
+      const numericUserId = user.userIdSeq;
       const payments = await Payment.find({
         $or: [
           { fromUser: numericUserId },
           { toUser: numericUserId }
         ]
       }).sort({ createdAt: -1 });
-      if (!payments) throw new PaymentNotFoundError('No payments found');
-      return payments;
+      
+      return payments || [];
     } catch (err) {
       throw err;
     }
