@@ -9,8 +9,14 @@ class StaffService {
     this.updateStaff = this.updateStaff.bind(this);
     this.deleteStaff = this.deleteStaff.bind(this);
     this.getStaffByDepartment = this.getStaffByDepartment.bind(this);
+    this.loginStaff = this.loginStaff.bind(this);
   }
 
+  async loginStaff(email, password) {
+    const staff = await Staff.findOne({ email: email, password: password });
+    if (!staff) throw new Error(`Staff with email ${email} not found or incorrect password`);
+    return { message: `Staff with email ${email} logged in successfully`, staffId: staff.staffId };
+  }
   async createStaff(data) {
     const staff = new Staff(data);
 
@@ -34,9 +40,9 @@ class StaffService {
     const existingStaff = await Staff.findOne({ staffId: staffId });
     if (!existingStaff) throw new Error(`Staff with ID ${staffId} not found`);
 
-    await Staff.findOneAndUpdate({ staffId: staffId }, data, { new: true });
+    const updatedStaff = await Staff.findOneAndUpdate({ staffId: staffId }, data, { new: true });
 
-    return { message: `Staff with ID ${staffId} updated successfully`, staffId: staffId };
+    return { message: `Staff with ID ${staffId} updated successfully`, staffId: staffId, updatedStaff };
   }
 
   async deleteStaff(staffId) {
