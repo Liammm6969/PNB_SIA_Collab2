@@ -7,7 +7,9 @@
  */
 
 // API Configuration
-const API_BASE_URL = 'http://192.168.9.23:4000/api/Philippine-National-Bank';
+const HOST = "localhost";
+const PORT = 4000;
+const API_BASE_URL = `http://${HOST}:${PORT}/api/Philippine-National-Bank`;
 const USERS_ENDPOINT = `${API_BASE_URL}/users`;
 
 /**

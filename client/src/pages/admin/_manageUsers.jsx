@@ -79,7 +79,7 @@ const ManageUsers = () => {
   }
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'Account Number', dataIndex: 'accountNumber', key: 'accountNumber' },
     { title: 'Name', dataIndex: 'name', key: 'name', render: (_, r) => r.firstName ? `${r.firstName} ${r.lastName}` : r.businessName },
     { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'Account Type', dataIndex: 'accountType', key: 'accountType', render: (t) => t.charAt(0).toUpperCase() + t.slice(1) },
