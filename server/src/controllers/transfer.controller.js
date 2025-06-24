@@ -1,4 +1,4 @@
-const TransferService = require("../services/transfer.service.js");
+const {TransferService} = require("../services/index.js");
 const { StatusCodes } = require('http-status-codes');
 
 // Transfer money between users

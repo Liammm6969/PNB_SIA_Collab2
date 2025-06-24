@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
-const PaymentService = require("../services/payment.service");
+const { PaymentService } = require("../services/index.js");
 exports.createPayment = async (req, res) => {
   try {
     const paymentData = req.body;
@@ -53,8 +53,8 @@ exports.deletePayment = async (req, res) => {
 
 exports.module = {
   createPayment: exports.createPayment,
-    getPayments: exports.getPayments,
-    getPaymentById: exports.getPaymentById,
-    updatePayment: exports.updatePayment,
-    deletePayment: exports.deletePayment
+  getPayments: exports.getPayments,
+  getPaymentById: exports.getPaymentById,
+  updatePayment: exports.updatePayment,
+  deletePayment: exports.deletePayment
 };

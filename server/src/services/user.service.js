@@ -25,19 +25,19 @@ class UserService {
   }
   async businessRegister(userData) {
     try {
-        let {businessName, email, password,  accountType,  } = userData;
- const existingBusinessName = await User.findOne({ businessName });
-        if (existingBusinessName) throw new DuplicateCompanyNameError('Business name already exists');
+      let { businessName, email, password, accountType, } = userData;
+      const existingBusinessName = await User.findOne({ businessName });
+      if (existingBusinessName) throw new DuplicateCompanyNameError('Business name already exists');
 
 
     } catch (error) {
-      
+
     }
   }
 
   async registerUser(userData) {
     try {
-      let { firstName, lastName, businessName, email, password,  accountType,  } = userData;
+      let { firstName, lastName, businessName, email, password, accountType, } = userData;
       console.log(userData)
       const existingEmail = await User.findOne({ email });
       if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
@@ -127,7 +127,7 @@ class UserService {
       if (user.otpExpires < new Date()) throw new OTPError('OTP expired. Please login again.');
       user.otp = undefined;
       user.otpExpires = undefined
-        const accessToken = generateAccessToken({
+      const accessToken = generateAccessToken({
         userId: user.userId,
         displayName: user.displayName,
         email: user.email,
@@ -139,7 +139,7 @@ class UserService {
         email: user.email,
         role: user.role,
       });
-   
+
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
     } catch (err) {
       throw err;
