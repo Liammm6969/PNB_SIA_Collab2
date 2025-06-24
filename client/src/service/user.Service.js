@@ -72,15 +72,14 @@ class UserService {
     try {
       // Transform frontend form data to backend expected format
       const registrationData = {
-        fullName: userData.accountType === 'personal' ? `${userData.firstName} ${userData.lastName}` : undefined,
-        companyName: userData.accountType === 'business' ? `${userData.firstName} ${userData.lastName}` : undefined,
+        firstName: userData.accountType === 'personal' ? userData.firstName :undefined,
+        lastName:  userData.accountType === 'personal' ? userData.lastName :undefined,
+        companyName: userData.accountType === 'business' ? userData.companyName :undefined,
         email: userData.email,
         password: userData.password,
         accountType: userData.accountType,
-        role: 'User', // Default role
-        
-        address: userData.address || '',
-        dateOfBirth: userData.dateOfBirth || null,
+
+
         withdrawalMethods: 'Bank Transfer' // Default withdrawal method
       };
 

@@ -8,7 +8,7 @@ const { addTransactionSchema,
 const Roles = require('../lib/roles');
 
 
-router.use(verifyAccessToken);
+// router.use(verifyAccessToken);
 // Create a new transaction
 router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addTransactionSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transactionsController.createTransaction);
 

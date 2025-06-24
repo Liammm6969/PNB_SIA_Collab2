@@ -3,7 +3,8 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const userSchema = new mongoose.Schema({
   userId: { type: Number, unique: true },
-  fullName: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
   accountType: { type: String, enum: ['personal', 'business'], required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },

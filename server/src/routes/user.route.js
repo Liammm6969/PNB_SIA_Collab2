@@ -22,10 +22,14 @@ router.post('/verify-otp', userController.verifyOTP);
 
 
 // Get user profile by ID
-router.get('/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), userController.getUserProfile);
+// router.get('/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), userController.getUserProfile);
+
+router.get('/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), userController.getUserProfile);
 
 // List all users
-router.get('/', PermissionMiddleware(Roles.ADMIN, Roles.FINANCE), userController.listUsers);
+// router.get('/', PermissionMiddleware(Roles.ADMIN, Roles.FINANCE), userController.listUsers);
+
+router.get('/', userController.listUsers);
 
 
 

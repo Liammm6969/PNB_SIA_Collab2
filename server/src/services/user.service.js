@@ -26,7 +26,7 @@ class UserService {
 
   async registerUser(userData) {
     try {
-      let { fullName, companyName, email, password, role, address, accountType, dateOfBirth, withdrawalMethods } = userData;
+      let { firstName,lastName, companyName, email, password, role, address, accountType, dateOfBirth, withdrawalMethods } = userData;
       console.log(userData)
       const existingEmail = await User.findOne({ email });
       if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
@@ -51,7 +51,8 @@ class UserService {
       // } while (ifAccountNumberExists);
 
       const user = new User({
-        fullName,
+        firstName:firstName,
+        lastName:lastName,
         accountType,
         accountNumber: generateAccountNumber(),
         email,
