@@ -34,4 +34,17 @@ router.patch('/:id/status', transactionsController.updateTransactionStatus);
 
 router.delete('/:id', transactionsController.deleteTransaction);
 
+
+// Get all transactions
+// router.get('/', ApiLimiterMiddleware, PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transactionsController.getAllTransactions);
+
+router.get('/', transactionsController.getAllTransactions);
+
+// Withdraw transaction
+router.post('/withdraw', transactionsController.withdrawMoney);
+
+// Transfer money
+// router.post('/transfer', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(transferSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transactionsController.transferMoney);
+router.post('/transfer', transactionsController.transferMoney);
+
 module.exports = router;

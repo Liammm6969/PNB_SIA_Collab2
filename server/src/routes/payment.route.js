@@ -6,7 +6,7 @@ const {
   deletePayment
 } = require("../controllers/payment.controller.js");
 
-const transferController = require('../controllers/transfer.controller');
+
 
 const {
   addPaymentSchema,
@@ -52,6 +52,6 @@ router.delete('/:paymentId', deletePayment);
 // Transfer money between users
 // router.post('/transfer', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(transferPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), transferController.transferMoney);
 
-router.post('/transfer', transferController.transferMoney);
+
 
 module.exports = router;

@@ -1,5 +1,5 @@
-const { Transaction, User } = require("../models/index.js");
-const { TransactionNotFoundError } = require("../errors/index.js");
+const { Transaction, User,Payment } = require("../models/index.js");
+const { TransactionNotFoundError, UserNotFoundError } = require("../errors/index.js");
 class TransactionService {
   constructor() {
     this.createTransaction = this.createTransaction.bind(this);
@@ -7,8 +7,41 @@ class TransactionService {
     this.getTransactionById = this.getTransactionById.bind(this);
     this.updateTransactionStatus = this.updateTransactionStatus.bind(this);
     this.deleteTransaction = this.deleteTransaction.bind(this);
+    this.getAllTransactions = this.getAllTransactions.bind(this);
+    this.withdrawTransaction = this.withdrawTransaction.bind(this);
+    this.transferMoney = this.transferMoney.bind(this);
+    
   }
 
+  async getAllTransactions() {
+    try {
+      const transactions = await Transaction.find().sort({ createdAt: -1 });
+      return transactions;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async withdrawTransaction(userId, amount) {
+    try {
+      const user = await User.findOne({ userId: userId });
+      if (!user) throw new UserNotFoundError('User not found');
+
+      if (user.balance < amount) {
+        throw new Error('Insufficient balance');
+      }
+      const deductAmountFromUser = await User.findOneAndUpdate(
+        { userId: userId },
+        { $inc: { balance: -amount } },
+        { new: true }
+      );
+      return {
+        updatedBalance: deductAmountFromUser.balance
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
   async createTransaction(transactionData) {
     try {
       const user = await User.findOne({ userId: transactionData.userId });
@@ -74,7 +107,61 @@ class TransactionService {
       throw err;
     }
   }
-}
 
+
+  async transferMoney(transferData) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const { fromUser, toUser, amount, details } = transferData;
+      console.log(transferData);
+      const senderDoc = await User.findOne({ userId: fromUser }).session(session);
+      const receiverDoc = await User.findOne({ userId: toUser }).session(session);
+      if (!receiverDoc) throw new Error('Receiver not found');
+
+      if (!senderDoc) throw new Error('Sender not found');
+
+      if (senderDoc.balance < amount) throw new Error('Sender does not have enough balance');
+
+
+      const sender = await User.findOneAndUpdate({
+        userId: fromUser,
+        balance: { $gte: amount }
+      }, {
+        $inc: { balance: -amount }
+      }, {
+        new: true,
+        session
+      });
+
+      await User.findOneAndUpdate(
+        { userId: toUser },
+        { $inc: { balance: amount } },
+        { new: true, session }
+      );
+
+
+      const payment = new Payment({
+        fromUser,
+        toUser,
+        amount,
+        details,
+        balanceAfterPayment: sender.balance
+      });
+      await payment.save({ session });
+      await session.commitTransaction();
+      return {
+        message: 'Transfer successful',
+        payment
+      };
+    } catch (err) {
+      await session.abortTransaction();
+      return err;
+    } finally {
+      session.endSession();
+    }
+
+  };
+}
 
 module.exports = new TransactionService();

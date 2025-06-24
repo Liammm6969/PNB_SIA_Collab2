@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
-const {TransactionService} = require("../services/index.js");
+const { TransactionService } = require("../services/index.js");
 
 // Create a new transaction
 exports.createTransaction = async (req, res) => {
@@ -32,8 +32,8 @@ exports.getTransactionsByUser = async (req, res) => {
 // Get a single transaction by ID
 exports.getTransactionById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const transaction = await TransactionService.getTransactionById(id);
+    const { transactionId } = req.params;
+    const transaction = await TransactionService.getTransactionById(transactionId);
     res.status(StatusCodes.OK).json(transaction);
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
@@ -43,9 +43,9 @@ exports.getTransactionById = async (req, res) => {
 // Update transaction status
 exports.updateTransactionStatus = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { transactionId } = req.params;
     const { status } = req.body;
-    const transaction = await TransactionService.updateTransactionStatus(id, status);
+    const transaction = await TransactionService.updateTransactionStatus(transactionId, status);
     res.status(StatusCodes.OK).json(transaction);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
@@ -55,10 +55,39 @@ exports.updateTransactionStatus = async (req, res) => {
 // Delete a transaction
 exports.deleteTransaction = async (req, res) => {
   try {
-    const { id } = req.params;
-    const transaction = await TransactionService.deleteTransaction(id);
+    const { transactionId } = req.params;
+    const transaction = await TransactionService.deleteTransaction(transactionId);
     res.status(StatusCodes.OK).json(transaction);
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+  }
+};
+
+exports.getAllTransactions = async (req, res) => {
+  try {
+    const transactions = await TransactionService.getAllTransactions();
+    res.status(StatusCodes.OK).json(transactions);
+  } catch (err) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+  }
+}
+
+exports.withdrawMoney = async (req, res) => {
+  try {
+    const { userId, amount } = req.body;
+    const transaction = await TransactionService.withdrawTransaction(userId, amount);
+    res.status(StatusCodes.OK).json(transaction);
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
+  }
+};
+
+exports.transferMoney = async (req, res) => {
+  try {
+    const { fromUser, toUser, amount, details, recipientType, identifier } = req.body;
+    const transaction = await TransactionService.transferMoney(fromUser, toUser, amount, details, recipientType, identifier);
+    res.status(StatusCodes.CREATED).json(transaction);
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
   }
 };
