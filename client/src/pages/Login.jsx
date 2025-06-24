@@ -1,264 +1,190 @@
-import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader } from 'lucide-react';
-import '../styles/Login.css';
-import '../styles/AccountTypeModal.css';
-import { useNavigate } from 'react-router-dom';
-import { loginUser, verifyOTP, resendOTP } from '../services/users.Service';
-import AccountTypeModal from '../components/AccountTypeModal';
-import OTPModal from '../components/OTPModal';
+import React, { useState } from 'react';
+import { Container, Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
+import './Auth.css';
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Login = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-  const [showAccountTypeModal, setShowAccountTypeModal] = useState(false);
-  const [showOTPModal, setShowOTPModal] = useState(false);
-  const [accountType, setAccountType] = useState('');
-  const navigate = useNavigate();
+  const [validated, setValidated] = useState(false);
 
-  const handleSignUp = () => {
-    setShowAccountTypeModal(true);
-  }
-  
-  const handleSelectAccountType = (type) => {
-    setAccountType(type);
-    setShowAccountTypeModal(false);
-    navigate('/signup', { state: { accountType: type } });
-  }
-
-  useEffect(() => {
-    // Check for stored email in local storage
-    const savedEmail = localStorage.getItem('pnb-remembered-email');
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
-    }
-  }, []);
-
-  const validateForm = () => {
-    if (!email.trim()) {
-      setError('Email is required');
-      return false;
-    }
-    if (!password) {
-      setError('Password is required');
-      return false;
-    }
-    return true;
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
-
-  const handleClick = async () => {
-    setError('');
-
-    if (!validateForm()) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      setValidated(true);
+      return;
+    }
 
     setLoading(true);
-
-    // Remember email if checked
-    if (rememberMe) {
-      localStorage.setItem('pnb-remembered-email', email);
-    } else {
-      localStorage.removeItem('pnb-remembered-email');
-    }
-
     try {
-      const response = await loginUser(email, password);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('Login data:', formData);
       
-       if (response.message && response.message.includes('OTP sent')) {
-        setShowOTPModal(true);
-        setLoading(false);
-      } else {
-        // Save both user and token in localStorage for later API use
-        localStorage.setItem('pnb-user', JSON.stringify({ ...response.user, token: response.accessToken }));
-        localStorage.setItem('pnb-token', response.accessToken);
-        setLoading(false);
+      // Mock authentication check - replace with actual API response
+      const mockResponse = {
+        success: true,
+        user: {
+          email: formData.email,
+          role: formData.email.includes('admin') ? 'admin' : 'user'
+        }
+      };
+
+      if (mockResponse.success) {
+        // Store user data in localStorage or state management
+        localStorage.setItem('user', JSON.stringify(mockResponse.user));
         
-        // Redirect based on user role
-        if (response.user.role === 'Admin') {
-          navigate('/admin');
+        // Navigate based on user role
+        if (mockResponse.user.role === 'admin') {
+          navigate('/admin/dashboard');
         } else {
-          navigate('/home');
+          navigate('/dashboard');
         }
       }
     } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
       setLoading(false);
-      setError(error.message || 'Invalid email or password');
-    }
-  };
-  const handleVerifyOTP = async (email, otp) => {
-    try {
-      const response = await verifyOTP(email, otp);
-      
-     
-      localStorage.setItem('pnb-user', JSON.stringify({ ...response.user, token: response.accessToken }));
-      localStorage.setItem('pnb-token', response.accessToken);
-      
-      setShowOTPModal(false);
-      
-      // Redirect based on user role
-      if (response.user.role === 'Admin') {
-        navigate('/admin');
-      } else {
-        navigate('/home');
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const handleResendOTP = async (email) => {
-    try {
-      await resendOTP(email, password);
-    } catch (error) {
-      throw error;
     }
   };
 
   return (
-    <div className="pnb-container">
-      <div className="pnb-main-wrapper">
-        {/* Left Side - Welcome Text */}
-        <div className="pnb-left-section">
-          <h1 className="pnb-welcome-title">
-            Welcome<br />
-            Back!
-          </h1>
-          <h2 className="pnb-success-title">
-            Your success<br />
-            is our promise
-          </h2>
-          <p className="pnb-subtitle">
-            PNB crafts every service around your needs<br />
-            and future vision.
-          </p>
-        </div>
-
-        {/* Right Side - Login Form */}
-        <div className="pnb-login-card">
-          {/* PNB Logo */}
-          <div className="pnb-logo-section">
-            <div className="pnb-logo-text">
-              <img src="/src/assets/pnb.png" alt="PNB Logo" />
+    <Container fluid className="p-0 overflow-hidden">
+      <Row className="vh-100 m-0">
+        <Col md={6} className="p-5 d-flex align-items-center justify-content-center slide-in-left">
+          <div className="w-100" style={{ maxWidth: '450px' }}>
+            <div className="text-center mb-4 fade-in">
+              <h2 className="fw-bold mb-2">Welcome Back!</h2>
+              <p className="text-muted">Please enter your credentials to continue</p>
             </div>
-          </div>
-
-          <h2 className="pnb-login-title">Welcome Back</h2>
-
-          {error && (
-            <div className="pnb-error-message">
-              <AlertCircle size={18} />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <div className="pnb-form-container">
-            {/* Email Field */}
-            <div className="pnb-field-group">
-              <label className="pnb-label">Email</label>
-              <div className="pnb-input-wrapper">
-                <Mail className="pnb-input-icon" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="pnb-input"
-                  style={{ color: 'black' }}
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="pnb-field-group">
-              <label className="pnb-label">Password</label>
-              <div className="pnb-input-wrapper">
-                <Lock className="pnb-input-icon" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="pnb-input"
-                  onKeyPress={(e) => e.key === 'Enter' && handleClick()}
-                  style={{ color: 'black' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="pnb-eye-button"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-
-              <div className="pnb-password-options">
-                <div className="pnb-remember-me">
-                  <input
-                    type="checkbox"
-                    id="remember-me"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
+            
+            <Form noValidate validated={validated} onSubmit={handleSubmit} className="fade-in-up">
+              <Form.Group className="mb-3 stagger-1" controlId="formEmail">
+                <Form.Label>Email address</Form.Label>
+                <InputGroup>
+                  <InputGroup.Text className="bg-light">
+                    <FaEnvelope className="text-muted" />
+                  </InputGroup.Text>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    placeholder="Enter email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="border-start-0"
                   />
-                  <label htmlFor="remember-me">Remember me</label>
+                  <Form.Control.Feedback type="invalid">
+                    Please enter a valid email address.
+                  </Form.Control.Feedback>
+                </InputGroup>
+              </Form.Group>
+
+              <Form.Group className="mb-4 stagger-2" controlId="formPassword">
+                <Form.Label>Password</Form.Label>
+                <InputGroup>
+                  <InputGroup.Text className="bg-light">
+                    <FaLock className="text-muted" />
+                  </InputGroup.Text>
+                  <Form.Control
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="Enter password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    minLength={6}
+                    className="border-start-0 border-end-0"
+                  />
+                  <InputGroup.Text 
+                    className="bg-light cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {showPassword ? 
+                      <FaEyeSlash className="text-muted" /> : 
+                      <FaEye className="text-muted" />
+                    }
+                  </InputGroup.Text>
+                  <Form.Control.Feedback type="invalid">
+                    Password must be at least 6 characters.
+                  </Form.Control.Feedback>
+                </InputGroup>
+                <div className="d-flex justify-content-end mt-2">
+                  <Link to="/forgot-password" className="text-primary text-decoration-none small">
+                    Forgot Password?
+                  </Link>
                 </div>
-                <div className="pnb-forgot-password">
-                  <button type="button" className="pnb-forgot-link">Forgot password?</button>
-                </div>
+              </Form.Group>
+
+              <div className="d-grid gap-2 stagger-3">
+                <Button 
+                  variant="primary" 
+                  type="submit"
+                  className="py-2"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
+                </Button>
               </div>
-            </div>
 
-            {/* Login Button */}
-            <button
-              onClick={handleClick}
-              disabled={loading}
-              className="pnb-login-button"
-            >
-              {loading ? (
-                <>
-                  <Loader className="pnb-loader" size={20} />
-                  Logging in...
-                </>
-              ) : (
-                'Log in'
-              )}
-            </button>
-
-            {/* Sign Up Link */}
-            <div className="pnb-signup-section">
-              Don't have an account?{' '}
-              <button className="pnb-signup-link" onClick={handleSignUp}>Sign up</button>
-            </div>
-
-            {/* Divider */}
-            <div className="pnb-divider">
-              <div className="pnb-divider-line">
-                <div className="pnb-divider-border"></div>
+              <div className="mt-4 text-center fade-in">
+                <p className="mb-0 text-muted">Don't have an account?{' '}
+                  <Link to="/register" className="text-primary fw-bold text-decoration-none">
+                    Create Account
+                  </Link>
+                </p>
               </div>
+            </Form>
+          </div>
+        </Col>
+
+        <Col md={6} className="d-none d-md-flex align-items-center justify-content-center auth-banner slide-in-right">
+          <div className="text-center text-white p-5">
+            <div className="mb-4 fade-in">
+              <h1 className="display-4 fw-bold mb-4">Welcome to</h1>
+              <img 
+                src="https://www.pnb.com.ph/wp-content/themes/pnbrevamp/images/PNB-logo-01.svg" 
+                alt="Login Banner" 
+                className="img-fluid mb-4"
+                style={{ maxWidth: '400px' }}
+              />
+            </div>
+            <p className="lead mb-4 fade-in-up stagger-1">
+              Secure your financial future with our innovative banking solutions
+            </p>
+            <div className="features fade-in-up stagger-2">
+              <p className="mb-2">✓ 24/7 Secure Banking</p>
+              <p className="mb-2">✓ Easy Money Transfer</p>
+              <p className="mb-2">✓ Mobile Banking</p>
             </div>
           </div>
-        </div>
-      </div>
-      
-      {/* Account Type Selection Modal */}
-      <AccountTypeModal 
-        isOpen={showAccountTypeModal} 
-        onClose={() => setShowAccountTypeModal(false)} 
-        onSelectAccountType={handleSelectAccountType}
-      />
-
-      {/* OTP Verification Modal */}
-      <OTPModal
-        isOpen={showOTPModal}
-        onClose={() => setShowOTPModal(false)}
-        email={email}
-        onVerifyOTP={handleVerifyOTP}
-        onResendOTP={handleResendOTP}
-      />
-    </div>
+        </Col>
+      </Row>
+    </Container>
   );
-}
+};
 
+export default Login;
