@@ -8,7 +8,8 @@
 
 // API Configuration
 const HOST = "localhost";
-const PORT = 4000;
+const PORT = "4000";
+// const API_BASE_URL = `http://${HOST}:${PORT}/api/Philippine-National-Bank`;
 const API_BASE_URL = `http://${HOST}:${PORT}/api/Philippine-National-Bank`;
 const USERS_ENDPOINT = `${API_BASE_URL}/users`;
 
@@ -154,7 +155,8 @@ class UserService {
    */
   async createUser(userData) {
     try {
-      const response = await apiRequest(`${USERS_ENDPOINT}`, {
+      // Use /register endpoint for user creation
+      const response = await apiRequest(`${USERS_ENDPOINT}/register`, {
         method: 'POST',
         body: JSON.stringify(userData),
       });
