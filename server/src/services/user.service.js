@@ -32,34 +32,29 @@ class UserService {
       if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
 
 
-      if (accountType === 'personal') {
-        const existingFullName = await User.findOne({ fullName });
-        if (existingFullName) throw new DuplicateUserFullNameError('Name already exists');
-      }
+      // if (accountType === 'personal') {
+      //   const existingFullName = await User.findOne({ fullName });
+      //   if (existingFullName) throw new DuplicateUserFullNameError('Name already exists');
+      // }
 
-      if (accountType === 'business') {
-        const existingCompanyName = await User.findOne({ companyName });
-        if (existingCompanyName) throw new DuplicateCompanyNameError('Company name already exists');
-      }
+      // if (accountType === 'business') {
+      //   const existingCompanyName = await User.findOne({ companyName });
+      //   if (existingCompanyName) throw new DuplicateCompanyNameError('Company name already exists');
+      // }
       const hashedPassword = await bcrypt.hash(password, 10);
 
       let randomAccountNumber;
       let ifAccountNumberExists;
-      do {
-        randomAccountNumber = generateAccountNumber();
-        ifAccountNumberExists = await User.findOne({ accountNumber: randomAccountNumber });
-      } while (ifAccountNumberExists);
+      // do {
+      //   randomAccountNumber = generateAccountNumber();
+      //   ifAccountNumberExists = await User.findOne({ accountNumber: randomAccountNumber });
+      // } while (ifAccountNumberExists);
+
       const user = new User({
         fullName,
-        companyName,
+        accountType,
         email,
-        password: hashedPassword,
-        accountNumber: randomAccountNumber,
-        role,
-        address,
-        dateOfBirth,
-        withdrawalMethods,
-        accountType
+        password: password,
       });
 
       await user.save();
@@ -75,12 +70,12 @@ class UserService {
       if (!user) throw new UserNotFoundError('User not found');
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
-      const otp = generateOTP();
-      const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-      user.otp = otp;
-      user.otpExpires = otpExpires;
+      // const otp = generateOTP();
+      // const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+      // user.otp = otp;
+      // user.otpExpires = otpExpires;
       await user.save();
-      await sendOTPEmail(user.email, otp);
+      // await sendOTPEmail(user.email, otp);
       return { message: 'OTP sent to email. Please verify to complete login.', userId: user.userId };
     } catch (err) {
       throw err;
