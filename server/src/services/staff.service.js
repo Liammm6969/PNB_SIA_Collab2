@@ -1,13 +1,14 @@
 const { Staff } = require("../models/index.js");
 const mongoose = require('mongoose');
 
-class StaffService {
-  constructor() {
+class StaffService {  constructor() {
     this.createStaff = this.createStaff.bind(this);
     this.getStaffById = this.getStaffById.bind(this);
-    this.getAllStaff = this.getAllStaff.bind(this);    this.updateStaff = this.updateStaff.bind(this);
+    this.getAllStaff = this.getAllStaff.bind(this);
+    this.updateStaff = this.updateStaff.bind(this);
     this.deleteStaff = this.deleteStaff.bind(this);
     this.getStaffByDepartment = this.getStaffByDepartment.bind(this);
+    this.loginStaff = this.loginStaff.bind(this);
   }
 
   async createStaff(data) {
