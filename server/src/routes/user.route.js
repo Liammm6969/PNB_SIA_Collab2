@@ -18,7 +18,7 @@ router.post('/register', userController.registerUser);
 
 router.post('/login', userController.loginUser);
 router.post('/verify-otp', userController.verifyOTP);
-router.use(verifyAccessToken);
+// router.use(verifyAccessToken);
 
 
 // Get user profile by ID
