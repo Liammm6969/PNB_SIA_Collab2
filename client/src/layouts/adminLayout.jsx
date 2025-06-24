@@ -217,10 +217,8 @@ const AdminLayout = ({ children }) => {
             {children}
           </Container>
         </main>
-      </div>
-
-      {/* Custom Styles */}
-      <style jsx>{`
+      </div>      {/* Custom Styles */}
+      <style>{`
         .admin-topbar .dropdown-toggle::after {
           display: none;
         }

@@ -199,10 +199,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
           <BoxArrowRight size={20} className={isCollapsed ? '' : 'me-2'} />
           {!isCollapsed && <span>Logout</span>}
         </Button>
-      </div>
-
-      {/* Custom Styles */}
-      <style jsx>{`
+      </div>      {/* Custom Styles */}
+      <style>{`
         .nav-link-custom:hover {
           background: rgba(255, 255, 255, 0.15) !important;
           color: white !important;

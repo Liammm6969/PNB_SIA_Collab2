@@ -10,7 +10,17 @@ const { RouteNotFoundErrorMiddleware } = require('./src/middleware/index.js');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// CORS configuration for credentials support
+const corsOptions = {
+  origin: 'http://localhost:5173', // Your React app's URL
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(cookieparser());
 
 // Connect to MongoDB

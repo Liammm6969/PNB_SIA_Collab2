@@ -83,12 +83,9 @@ class UserService {
 
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${BASE_URL}/${userId}`, {
+      }      const response = await fetch(`${BASE_URL}/${userId}`, {
         method: 'GET',
         headers,
-        credentials: 'include',
       });
 
       const data = await response.json();
@@ -118,12 +115,9 @@ class UserService {
 
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${BASE_URL}/`, {
+      }      const response = await fetch(`${BASE_URL}/`, {
         method: 'GET',
         headers,
-        credentials: 'include',
       });
 
       const data = await response.json();
