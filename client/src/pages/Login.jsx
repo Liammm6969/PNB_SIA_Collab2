@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, InputGroup, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
+import userService from '../service/user.Service.js';
 import './Auth.css';
 
 const Login = () => {
@@ -13,14 +14,15 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
-  };
-  const handleSubmit = async (e) => {
+  };  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
     
@@ -31,26 +33,31 @@ const Login = () => {
     }
 
     setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Login data:', formData);
-      
-      // Mock authentication check - replace with actual API response
-      const mockResponse = {
-        success: true,
-        user: {
-          email: formData.email,
-          role: formData.email.includes('admin') ? 'admin' : 'user'
-        }
-      };
+    setError('');
+    setSuccess('');
 
-      if (mockResponse.success) {
-        // Store user data in localStorage or state management
-        localStorage.setItem('user', JSON.stringify(mockResponse.user));
+    try {
+      // Call the user service login method
+      const response = await userService.loginUser(formData);
+      
+      if (response.message && response.userId) {
+        setSuccess(response.message);
+        
+        // For now, simulate successful login without OTP verification
+        // In a real implementation, you would redirect to an OTP verification page
+        console.log('Login successful:', response);
+        
+        // Mock user data for navigation - replace with actual user data from OTP verification
+        const mockUser = {
+          userId: response.userId,
+          email: formData.email,
+          role: formData.email.includes('admin') ? 'Admin' : 'User'
+        };
+        
+        localStorage.setItem('user', JSON.stringify(mockUser));
         
         // Navigate based on user role
-        if (mockResponse.user.role === 'admin') {
+        if (mockUser.role === 'Admin') {
           navigate('/admin/dashboard');
         } else {
           navigate('/dashboard');
@@ -58,6 +65,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login failed:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -66,11 +74,23 @@ const Login = () => {
     <Container fluid className="p-0 overflow-hidden">
       <Row className="min-vh-100 m-0">
         <Col xs={12} lg={6} className="p-3 p-md-5 d-flex align-items-center justify-content-center slide-in-left">
-          <div className="w-100" style={{ maxWidth: '450px' }}>
-            <div className="text-center mb-3 mb-md-4 fade-in">
+          <div className="w-100" style={{ maxWidth: '450px' }}>            <div className="text-center mb-3 mb-md-4 fade-in">
               <h2 className="fw-bold mb-2 fs-3 fs-md-2">Welcome Back!</h2>
               <p className="text-muted small">Please enter your credentials to continue</p>
             </div>
+
+            {error && (
+              <Alert variant="danger" className="mb-3">
+                {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert variant="success" className="mb-3">
+                {success}
+              </Alert>
+            )}
+
               <Form noValidate validated={validated} onSubmit={handleSubmit} className="fade-in-up">
               <Form.Group className="mb-3 stagger-1" controlId="formEmail">
                 <Form.Label className="small fw-medium">Email address</Form.Label>

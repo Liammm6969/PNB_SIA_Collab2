@@ -7,7 +7,7 @@
  */
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:4000/api/Philippine-National-Bank';
+const API_BASE_URL = 'http://192.168.9.23:4000/api/Philippine-National-Bank';
 const USERS_ENDPOINT = `${API_BASE_URL}/users`;
 
 /**
@@ -78,6 +78,7 @@ class UserService {
         password: userData.password,
         accountType: userData.accountType,
         role: 'User', // Default role
+        
         address: userData.address || '',
         dateOfBirth: userData.dateOfBirth || null,
         withdrawalMethods: 'Bank Transfer' // Default withdrawal method
