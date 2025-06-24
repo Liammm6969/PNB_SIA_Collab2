@@ -1,50 +1,49 @@
 import React, { useEffect, useState } from 'react'
 import AdminLayout from '../../components/adminLayout'
-import { Table, Button, Modal, Form, Input, message, Popconfirm, Select, Tooltip, Spin, Card, Divider, Avatar, Space, Typography, Input as AntInput, Row, Col } from 'antd'
-import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, TeamOutlined } from '@ant-design/icons'
+import { Table, Button, Modal, Form, Input, message, Popconfirm, Select, Tooltip, Card, Divider, Avatar, Space, Typography, Input as AntInput, Row, Col } from 'antd'
+import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, BankOutlined } from '@ant-design/icons'
 import userService from '../../service/user.Service'
 
 const accountTypes = [
   { label: 'Personal', value: 'personal' },
   { label: 'Business', value: 'business' },
-  { label: 'Admin', value: 'admin' },
 ]
 
 const { Title, Text } = Typography;
 
-const ManageUsers = () => {
-  const [users, setUsers] = useState([])
+const ManageAccounts = () => {
+  const [accounts, setAccounts] = useState([])
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
-  const [editingUser, setEditingUser] = useState(null)
+  const [editingAccount, setEditingAccount] = useState(null)
   const [formAccountType, setFormAccountType] = useState('personal')
   const [actionLoading, setActionLoading] = useState(false)
   const [form] = Form.useForm()
   const [searchText, setSearchText] = useState('')
 
-  // Fetch users
-  const fetchUsers = async () => {
+  // Fetch accounts (users)
+  const fetchAccounts = async () => {
     setLoading(true)
     try {
       const data = await userService.getAllUsers()
-      setUsers(data)
+      setAccounts(data)
     } catch (err) {
-      message.error('Failed to fetch users')
+      message.error('Failed to fetch accounts')
     }
     setLoading(false)
   }
 
   useEffect(() => {
-    fetchUsers()
+    fetchAccounts()
   }, [])
 
   // Open modal for add/edit
-  const openModal = (user = null) => {
-    setEditingUser(user)
+  const openModal = (account = null) => {
+    setEditingAccount(account)
     setModalVisible(true)
-    if (user) {
-      form.setFieldsValue(user)
-      setFormAccountType(user.accountType || 'personal')
+    if (account) {
+      form.setFieldsValue(account)
+      setFormAccountType(account.accountType || 'personal')
     } else {
       form.resetFields()
       setFormAccountType('personal')
@@ -56,15 +55,15 @@ const ManageUsers = () => {
     setActionLoading(true)
     try {
       const values = await form.validateFields()
-      if (editingUser) {
-        await userService.updateUser(editingUser.id, values)
-        message.success('User updated')
+      if (editingAccount) {
+        await userService.updateUser(editingAccount.id, values)
+        message.success('Account updated')
       } else {
         await userService.createUser(values)
-        message.success('User created')
+        message.success('Account created')
       }
       setModalVisible(false)
-      fetchUsers()
+      fetchAccounts()
     } catch (err) {
       message.error(err.message || 'Operation failed')
     }
@@ -72,23 +71,23 @@ const ManageUsers = () => {
   }
 
   // Handle delete
-  const handleDelete = async (userId) => {
+  const handleDelete = async (accountId) => {
     try {
-      await userService.deleteUser(userId)
-      message.success('User deleted')
-      fetchUsers()
+      await userService.deleteUser(accountId)
+      message.success('Account deleted')
+      fetchAccounts()
     } catch (err) {
       message.error('Delete failed')
     }
   }
 
-  // Filter users by search
-  const filteredUsers = users.filter(user => {
-    const name = user.firstName ? `${user.firstName} ${user.lastName}` : user.businessName || '';
+  // Filter accounts by search
+  const filteredAccounts = accounts.filter(account => {
+    const name = account.firstName ? `${account.firstName} ${account.lastName}` : account.businessName || '';
     return (
       name.toLowerCase().includes(searchText.toLowerCase()) ||
-      (user.email && user.email.toLowerCase().includes(searchText.toLowerCase())) ||
-      (user.accountNumber && user.accountNumber.toString().includes(searchText))
+      (account.email && account.email.toLowerCase().includes(searchText.toLowerCase())) ||
+      (account.accountNumber && account.accountNumber.toString().includes(searchText))
     );
   });
 
@@ -108,16 +107,17 @@ const ManageUsers = () => {
     { title: 'Name', dataIndex: 'name', key: 'name', render: (_, r) => r.firstName ? `${r.firstName} ${r.lastName}` : r.businessName },
     { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'Account Type', dataIndex: 'accountType', key: 'accountType', render: (t) => t.charAt(0).toUpperCase() + t.slice(1) },
+    { title: 'Balance', dataIndex: 'balance', key: 'balance', render: (b) => b !== undefined ? `₱ ${Number(b).toLocaleString('en-PH', { minimumFractionDigits: 2 })}` : '₱ 0.00' },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Tooltip title="Edit user">
+          <Tooltip title="Edit account">
             <Button icon={<EditOutlined />} type="link" onClick={() => openModal(record)} />
           </Tooltip>
-          <Popconfirm title="Are you sure to delete this user?" onConfirm={() => handleDelete(record.id)} okText="Yes" cancelText="No">
-            <Tooltip title="Delete user">
+          <Popconfirm title="Are you sure to delete this account?" onConfirm={() => handleDelete(record.id)} okText="Yes" cancelText="No">
+            <Tooltip title="Delete account">
               <Button icon={<DeleteOutlined />} type="link" danger />
             </Tooltip>
           </Popconfirm>
@@ -140,14 +140,14 @@ const ManageUsers = () => {
           minHeight: 90,
         }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <TeamOutlined style={{ fontSize: 38, color: '#3949ab', marginRight: 18 }} />
+            <BankOutlined style={{ fontSize: 38, color: '#3949ab', marginRight: 18 }} />
             <div>
-              <Title level={2} style={{ margin: 0, color: '#1a237e', fontWeight: 700, letterSpacing: 0.5, fontSize: 28 }}>Manage Users</Title>
-              <Text type="secondary" style={{ fontSize: 15 }}>Admin control panel for user management</Text>
+              <Title level={2} style={{ margin: 0, color: '#1a237e', fontWeight: 700, letterSpacing: 0.5, fontSize: 28 }}>Manage Accounts</Title>
+              <Text type="secondary" style={{ fontSize: 15 }}>Admin control panel for account management</Text>
             </div>
           </div>
           <Button type="primary" size="middle" icon={<PlusOutlined />} onClick={() => openModal()} style={{ borderRadius: 8, fontWeight: 600, background: '#3949ab', height: 40, fontSize: 15, padding: '0 18px' }}>
-            Add User
+            Add Account
           </Button>
         </div>
         <div style={{ maxWidth: 1100, margin: '24px auto 0 auto', padding: '0 12px' }}>
@@ -156,9 +156,9 @@ const ManageUsers = () => {
             styles={{ body: { padding: 28, minHeight: '50vh' } }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', gap: 12 }}>
-              <Title level={4} style={{ margin: 0, color: '#3949ab', fontWeight: 700, letterSpacing: 0.2, fontSize: 20 }}>User List</Title>
+              <Title level={4} style={{ margin: 0, color: '#3949ab', fontWeight: 700, letterSpacing: 0.2, fontSize: 20 }}>Account List</Title>
               <AntInput
-                placeholder="Search users by name, email, or account number..."
+                placeholder="Search accounts by name, email, or account number..."
                 prefix={<SearchOutlined />}
                 allowClear
                 style={{ width: 260, borderRadius: 8, fontSize: 14, height: 36 }}
@@ -170,7 +170,7 @@ const ManageUsers = () => {
             <Table
               rowKey="id"
               columns={columns}
-              dataSource={filteredUsers}
+              dataSource={filteredAccounts}
               loading={loading}
               bordered
               pagination={{ pageSize: 8, showSizeChanger: false }}
@@ -180,7 +180,7 @@ const ManageUsers = () => {
               rowClassName={(_, idx) => idx % 2 === 0 ? 'ant-table-row-light' : 'ant-table-row-dark'}
             />
             <Modal
-              title={<span style={{ fontWeight: 700, fontSize: 22, color: '#3949ab', letterSpacing: 0.2 }}>{editingUser ? 'Edit User' : 'Add User'}</span>}
+              title={<span style={{ fontWeight: 700, fontSize: 22, color: '#3949ab', letterSpacing: 0.2 }}>{editingAccount ? 'Edit Account' : 'Add Account'}</span>}
               open={modalVisible}
               onOk={handleOk}
               onCancel={() => setModalVisible(false)}
@@ -188,7 +188,7 @@ const ManageUsers = () => {
               footer={[
                 <Button key="back" onClick={() => setModalVisible(false)} disabled={actionLoading} style={{ borderRadius: 7, fontWeight: 500, height: 38, fontSize: 14 }}>Cancel</Button>,
                 <Button key="submit" type="primary" loading={actionLoading} onClick={handleOk} style={{ borderRadius: 7, background: '#3949ab', fontWeight: 600, height: 38, fontSize: 14 }}>
-                  {editingUser ? 'Update' : 'Create'}
+                  {editingAccount ? 'Update' : 'Create'}
                 </Button>,
               ]}
               styles={{ body: { padding: 0, borderRadius: 14, background: '#f5f7fa' } }}
@@ -196,8 +196,8 @@ const ManageUsers = () => {
               <div style={{ padding: 24, borderRadius: 14, background: '#fff', boxShadow: '0 2px 8px rgba(57,73,171,0.07)' }}>
                 <div style={{ textAlign: 'center', marginBottom: 18 }}>
                   <Avatar size={54} style={{ backgroundColor: '#3949ab', marginBottom: 7 }} icon={<UserOutlined />} />
-                  <Title level={5} style={{ margin: 0, color: '#3949ab', fontWeight: 700 }}>{editingUser ? 'Edit User Details' : 'Create New User'}</Title>
-                  <Text type="secondary" style={{ fontSize: 13 }}>Fill in the user information below</Text>
+                  <Title level={5} style={{ margin: 0, color: '#3949ab', fontWeight: 700 }}>{editingAccount ? 'Edit Account Details' : 'Create New Account'}</Title>
+                  <Text type="secondary" style={{ fontSize: 13 }}>Fill in the account information below</Text>
                 </div>
                 <Form form={form} layout="vertical" style={{ maxWidth: 340, margin: '0 auto' }}>
                   <Row gutter={12}>
@@ -237,7 +237,7 @@ const ManageUsers = () => {
                         <Input style={{ borderRadius: 7, fontSize: 14, height: 36 }} placeholder="Email address" />
                       </Form.Item>
                     </Col>
-                    {!editingUser && (
+                    {!editingAccount && (
                       <Col span={24}>
                         <Form.Item name="password" label={<span style={{ fontWeight: 600 }}>Password</span>} rules={[{ required: true, min: 6, message: 'Password must be at least 6 characters' }]}> 
                           <Input.Password style={{ borderRadius: 7, fontSize: 14, height: 36 }} placeholder="Password" />
@@ -259,4 +259,4 @@ const ManageUsers = () => {
   )
 }
 
-export default ManageUsers
+export default ManageAccounts
