@@ -1,32 +1,24 @@
 // Staff Service for Philippine National Bank SIA
-// Base API URL for all staff-related endpoints
-const BASE_URL = 'http://localhost:4000/api/Philippine-National-Bank/staff';
+import api from './api.config.js';
+
+// Base endpoint for all staff-related requests
+const STAFF_ENDPOINT = '/staff';
 
 class StaffService {  /**
    * Login staff member with staffStringId and password
    * @param {string} staffStringId - Staff string ID (e.g., STAFF_3000)
    * @param {string} password - Staff password
    * @returns {Promise<Object>} Login response with staff data and department info
-   */
-  static async loginStaff(staffStringId, password) {
+   */  static async loginStaff(staffStringId, password) {
     try {
-      const response = await fetch(`${BASE_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ staffStringId, password }),
+      const response = await api.post(`${STAFF_ENDPOINT}/login`, {
+        staffStringId,
+        password
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
 
       return {
         success: true,
-        data: data,
+        data: response.data,
         message: 'Staff login successful'
       };
     } catch (error) {
@@ -157,26 +149,13 @@ class StaffService {  /**
    * @param {string} staffData.password - Staff member's password
    * @param {string} staffData.department - Department ('Finance', 'Admin', or 'Loan')
    * @returns {Promise<Object>} Creation response
-   */
-  static async createStaff(staffData) {
+   */  static async createStaff(staffData) {
     try {
-      const response = await fetch(`${BASE_URL}/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(staffData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create staff member');
-      }
+      const response = await api.post(`${STAFF_ENDPOINT}/`, staffData);
 
       return {
         success: true,
-        data: data,
+        data: response.data,
         message: 'Staff member created successfully'
       };
     } catch (error) {
@@ -191,25 +170,13 @@ class StaffService {  /**
    * Get staff member by ID
    * @param {string|number} staffId - Staff ID
    * @returns {Promise<Object>} Staff member data
-   */
-  static async getStaffById(staffId) {
+   */  static async getStaffById(staffId) {
     try {
-      const response = await fetch(`${BASE_URL}/${staffId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch staff member');
-      }
+      const response = await api.get(`${STAFF_ENDPOINT}/${staffId}`);
 
       return {
         success: true,
-        data: data,
+        data: response.data,
         message: 'Staff member retrieved successfully'
       };
     } catch (error) {
@@ -228,26 +195,13 @@ class StaffService {  /**
    * @param {string} [updateData.lastName] - Updated last name
    * @param {string} [updateData.department] - Updated department
    * @returns {Promise<Object>} Update response
-   */
-  static async updateStaff(staffId, updateData) {
+   */  static async updateStaff(staffId, updateData) {
     try {
-      const response = await fetch(`${BASE_URL}/${staffId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to update staff member');
-      }
+      const response = await api.put(`${STAFF_ENDPOINT}/${staffId}`, updateData);
 
       return {
         success: true,
-        data: data,
+        data: response.data,
         message: 'Staff member updated successfully'
       };
     } catch (error) {
@@ -262,25 +216,13 @@ class StaffService {  /**
    * Delete staff member by ID
    * @param {string|number} staffId - Staff ID
    * @returns {Promise<Object>} Deletion response
-   */
-  static async deleteStaff(staffId) {
+   */  static async deleteStaff(staffId) {
     try {
-      const response = await fetch(`${BASE_URL}/${staffId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to delete staff member');
-      }
+      const response = await api.delete(`${STAFF_ENDPOINT}/${staffId}`);
 
       return {
         success: true,
-        data: data,
+        data: response.data,
         message: 'Staff member deleted successfully'
       };
     } catch (error) {
@@ -294,25 +236,13 @@ class StaffService {  /**
   /**
    * Get all staff members
    * @returns {Promise<Object>} All staff members data
-   */
-  static async getAllStaff() {
+   */  static async getAllStaff() {
     try {
-      const response = await fetch(`${BASE_URL}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch staff members');
-      }
+      const response = await api.get(`${STAFF_ENDPOINT}/`);
 
       return {
         success: true,
-        data: data,
+        data: response.data,
         message: 'Staff members retrieved successfully'
       };
     } catch (error) {
@@ -327,25 +257,13 @@ class StaffService {  /**
    * Get staff members by department
    * @param {string} department - Department name ('Finance', 'Admin', or 'Loan')
    * @returns {Promise<Object>} Staff members in the specified department
-   */
-  static async getStaffByDepartment(department) {
+   */  static async getStaffByDepartment(department) {
     try {
-      const response = await fetch(`${BASE_URL}/department/${department}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch staff members by department');
-      }
+      const response = await api.get(`${STAFF_ENDPOINT}/department/${department}`);
 
       return {
         success: true,
-        data: data,
+        data: response.data,
         message: `Staff members from ${department} department retrieved successfully`
       };
     } catch (error) {
