@@ -1,6 +1,16 @@
 const { StaffService } = require("../services/index.js");
 const { StatusCodes } = require("http-status-codes");
 
+// Staff login
+exports.loginStaff = async (req, res) => {
+  try {
+    const { staffStringId, password } = req.body;
+    const loginResult = await StaffService.loginStaff(staffStringId, password);
+    res.status(StatusCodes.OK).json(loginResult);
+  } catch (err) {
+    res.status(StatusCodes.UNAUTHORIZED).json({ error: err.message });
+  }
+};
 
 // Create a new staff member
 exports.createStaff = async (req, res) => {

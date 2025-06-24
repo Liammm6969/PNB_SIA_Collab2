@@ -17,4 +17,7 @@ router.get('/', staffController.getAllStaff);
 
 router.get('/department/:department', staffController.getStaffByDepartment);
 
+// Staff login route
+router.post('/login', staffController.loginStaff);
+
 module.exports = router;

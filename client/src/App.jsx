@@ -17,8 +17,14 @@ const App = () => {
         
         {/* Admin Routes */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/manage-users" element={<ManageUsers />} />
-        <Route path="/admin/manage-staff" element={<ManageStaff />} />
+        <Route path="/admin/manage/users" element={<ManageUsers />} />
+        <Route path="/admin/manage/staff" element={<ManageStaff />} />
+        
+        {/* Finance Routes - For now redirect to admin dashboard */}
+        <Route path="/finance-dashboard" element={<AdminDashboard />} />
+        
+        {/* Loan Routes - For now redirect to admin dashboard */}
+        <Route path="/loans-dashboard" element={<AdminDashboard />} />
         
         {/* Default Routes */}
         <Route path="/" element={<Navigate to="/login" replace />} />

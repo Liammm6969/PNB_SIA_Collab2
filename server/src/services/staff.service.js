@@ -5,13 +5,16 @@ class StaffService {
   constructor() {
     this.createStaff = this.createStaff.bind(this);
     this.getStaffById = this.getStaffById.bind(this);
-    this.getAllStaff = this.getAllStaff.bind(this);
-    this.updateStaff = this.updateStaff.bind(this);
+    this.getAllStaff = this.getAllStaff.bind(this);    this.updateStaff = this.updateStaff.bind(this);
     this.deleteStaff = this.deleteStaff.bind(this);
     this.getStaffByDepartment = this.getStaffByDepartment.bind(this);
-  }
+    this.loginStaff = this.loginStaff.bind(this);
+  }  async createStaff(data) {
+    // Check if email already exists
+    const existingEmailStaff = await Staff.findOne({ email: data.email });
+    if (existingEmailStaff) throw new Error(`Staff with email ${data.email} already exists`);
 
-  async createStaff(data) {
+    // Create staff with plain password (no hashing)
     const staff = new Staff(data);
 
     const existingStaff = await Staff.findOne({ staffId: staff.staffId });
@@ -56,10 +59,30 @@ class StaffService {
   async getAllStaff() {
     return await Staff.find();
   }
-
   async getStaffByDepartment(department) {
     const staff = await Staff.find({ department });
     return staff;
+  }
+  async loginStaff(staffStringId, password) {
+    try {
+      const staff = await Staff.findOne({ staffStringId });
+      if (!staff) throw new Error('Staff not found');
+      
+      // For now, simple password comparison (can be enhanced with bcrypt later)
+      if (staff.password !== password) throw new Error('Invalid password');
+      
+      return { 
+        message: 'Login Successful',
+        staffId: staff.staffId,
+        staffStringId: staff.staffStringId,
+        department: staff.department,
+        firstName: staff.firstName,
+        lastName: staff.lastName,
+        email: staff.email
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 }
 

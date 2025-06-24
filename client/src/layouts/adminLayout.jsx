@@ -3,46 +3,26 @@ import { Container, Navbar, Nav, Button, Dropdown } from 'react-bootstrap'
 import { Bell, PersonCircle, Search, MenuButtonWideFill } from 'react-bootstrap-icons'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/sidebar'
-import UserService from '../services/user.Service'
+import StaffService from '../services/staff.Service'
 
 const AdminLayout = ({ children }) => {
   const navigate = useNavigate()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [userData, setUserData] = useState(null)
-  const [userProfile, setUserProfile] = useState(null)
+  const [staffData, setStaffData] = useState(null)
 
   useEffect(() => {
-    // Check if user is authenticated
-    if (!UserService.isAuthenticated()) {
+    // Check if staff is authenticated
+    if (!StaffService.isAuthenticated()) {
       navigate('/login')
       return
     }
 
-    // Get user data from localStorage
-    const storedUserData = UserService.getUserData()
-    setUserData(storedUserData)
-
-    // Fetch user profile if userId is available
-    if (storedUserData.userId) {
-      fetchUserProfile(storedUserData.userId)
-    }
+    // Get staff data from localStorage
+    const storedStaffData = StaffService.getStaffData()
+    setStaffData(storedStaffData)
   }, [navigate])
-
-  const fetchUserProfile = async (userId) => {
-    try {
-      const profile = await UserService.getUserProfile(userId)
-      setUserProfile(profile)
-    } catch (error) {
-      console.error('Error fetching user profile:', error)
-      // If token is invalid, redirect to login
-      if (error.message.includes('token') || error.message.includes('unauthorized')) {
-        handleLogout()
-      }
-    }
-  }
-
   const handleLogout = () => {
-    UserService.logout()
+    StaffService.logout()
     navigate('/login')
   }
 
@@ -51,14 +31,10 @@ const AdminLayout = ({ children }) => {
   }
 
   const getDisplayName = () => {
-    if (userProfile) {
-      if (userProfile.firstName && userProfile.lastName) {
-        return `${userProfile.firstName} ${userProfile.lastName}`
-      } else if (userProfile.businessName) {
-        return userProfile.businessName
-      }
+    if (staffData && staffData.staffFirstName && staffData.staffLastName) {
+      return `${staffData.staffFirstName} ${staffData.staffLastName}`
     }
-    return userData?.email || 'Admin'
+    return staffData?.staffEmail || 'Admin'
   }
 
   const getInitials = () => {
@@ -186,10 +162,9 @@ const AdminLayout = ({ children }) => {
                   </div>
                   <span className="d-none d-md-inline fw-semibold">{getDisplayName()}</span>
                 </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Header>
+                <Dropdown.Menu>                  <Dropdown.Header>
                     <div className="fw-semibold">{getDisplayName()}</div>
-                    <small className="text-muted">{userData?.email}</small>
+                    <small className="text-muted">{staffData?.staffEmail}</small>
                   </Dropdown.Header>
                   <Dropdown.Divider />
                   <Dropdown.Item href="/admin/profile">

@@ -1,20 +1,23 @@
 import React, { useState } from 'react'
-import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-bootstrap'
-import { Eye, EyeSlash, Bank } from 'react-bootstrap-icons'
+import { Container, Row, Col, Form, Button, Alert, InputGroup, Badge } from 'react-bootstrap'
+import { Eye, EyeSlash, Bank, PersonBadge, Person } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service.js'
+import StaffService from '../services/staff.Service.js'
 
 const Login = () => {
   const navigate = useNavigate()
   
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '', // Can be email for users or staffStringId for staff
     password: ''
   })
+  const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [showAlert, setShowAlert] = useState({ show: false, message: '', variant: '' })
+  const [detectedType, setDetectedType] = useState(null) // 'user' or 'staff'
 
   // Common styles
   const styles = {
@@ -28,24 +31,46 @@ const Login = () => {
       alignItems: 'center'
     }
   }
+  // Auto-detect account type based on input
+  const detectAccountType = (identifier) => {
+    const emailPattern = /\S+@\S+\.\S+/
+    if (emailPattern.test(identifier)) {
+      return 'user'
+    } else if (identifier.startsWith('STAFF_') || identifier.toLowerCase().includes('staff')) {
+      return 'staff'
+    }
+    return null
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+    
+    // Auto-detect account type for identifier field
+    if (name === 'identifier') {
+      const type = detectAccountType(value)
+      setDetectedType(type)
+    }
     
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
   }
-
   const validateForm = () => {
     const newErrors = {}
     
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
+    if (!formData.identifier.trim()) {
+      newErrors.identifier = 'Email or Staff ID is required'
+    } else {
+      const accountType = detectAccountType(formData.identifier)
+      if (accountType === 'user' && !/\S+@\S+\.\S+/.test(formData.identifier)) {
+        newErrors.identifier = 'Please enter a valid email address'
+      } else if (accountType === 'staff' && !formData.identifier.startsWith('STAFF_')) {
+        newErrors.identifier = 'Please enter a valid Staff ID (e.g., STAFF_3000)'
+      } else if (!accountType) {
+        newErrors.identifier = 'Please enter a valid email address or Staff ID (e.g., STAFF_3000)'
+      }
     }
     
     if (!formData.password) {
@@ -57,7 +82,6 @@ const Login = () => {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     
@@ -66,23 +90,71 @@ const Login = () => {
     setIsLoading(true)
     
     try {
-      const loginResponse = await UserService.loginUser(formData.email, formData.password)
+      let loginResponse
+      const accountType = detectAccountType(formData.identifier)
       
-      if (loginResponse.userId) {
-        UserService.setUserData({
-          userId: loginResponse.userId,
-          email: formData.email
+      if (accountType === 'staff') {
+        // Staff login
+        const result = await StaffService.loginStaff(formData.identifier, formData.password)
+        
+        if (result.success) {
+          loginResponse = result.data
+          
+          // Store staff data in localStorage
+          localStorage.setItem('staffId', loginResponse.staffId)
+          localStorage.setItem('staffEmail', loginResponse.email)
+          localStorage.setItem('staffDepartment', loginResponse.department)
+          localStorage.setItem('staffFirstName', loginResponse.firstName)
+          localStorage.setItem('staffLastName', loginResponse.lastName)
+          localStorage.setItem('staffStringId', loginResponse.staffStringId)
+          
+          setShowAlert({
+            show: true,
+            message: `Welcome ${loginResponse.firstName}! Redirecting to ${loginResponse.department} dashboard...`,
+            variant: 'success'
+          })
+          
+          // Route based on department
+          setTimeout(() => {
+            switch (loginResponse.department.toLowerCase()) {
+              case 'admin':
+                navigate('/admin/dashboard')
+                break
+              case 'finance':
+                navigate('/admin/dashboard') // Redirect finance to admin dashboard for now
+                break
+              case 'loan':
+                navigate('/loan/dashboard') // Redirect loan to admin dashboard for now
+                break
+            }
+          }, 1500)
+          
+        } else {
+          throw new Error(result.error)
+        }
+      } else if (accountType === 'user') {
+        // User login
+        loginResponse = await UserService.loginUser(formData.identifier, formData.password)
+        
+        if (loginResponse.userId) {
+          UserService.setUserData({
+            userId: loginResponse.userId,
+            email: formData.identifier
+          })
+        }
+        
+        setShowAlert({
+          show: true,
+          message: 'Login successful! Redirecting to dashboard...',
+          variant: 'success'
         })
+        
+        setTimeout(() => navigate('/dashboard'), 1500)
+      } else {
+        throw new Error('Unable to determine account type. Please check your credentials.')
       }
       
-      setShowAlert({
-        show: true,
-        message: 'Login successful! Redirecting to dashboard...',
-        variant: 'success'
-      })
-      
-      setFormData({ email: '', password: '' })
-      setTimeout(() => navigate('/dashboard'), 1500)
+      setFormData({ identifier: '', password: '' })
       
     } catch (error) {
       console.error('Login error:', error)
@@ -148,11 +220,33 @@ const Login = () => {
 
           {/* Login Form Section */}
           <Col lg={7} className="d-flex align-items-center justify-content-center p-4" style={{ height: '100vh', overflow: 'auto', minWidth: '60%' }}>
-            <div className="w-100" style={{ maxWidth: '600px' }}>
-              {/* Header */}
+            <div className="w-100" style={{ maxWidth: '600px' }}>              {/* Header */}
               <div className="text-center mb-4">
                 <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '32px' }}>Sign In</h2>
-                <p className="text-muted mb-0" style={{ fontSize: '18px' }}>Access your account</p>
+                <p className="text-muted mb-3" style={{ fontSize: '18px' }}>Access your account with email or staff ID</p>
+                
+                {/* Account Type Detection Indicator */}
+                {detectedType && (
+                  <div className="mb-3">
+                    <Badge 
+                      bg={detectedType === 'staff' ? 'primary' : 'success'} 
+                      className="px-3 py-2"
+                      style={{ fontSize: '14px' }}
+                    >
+                      {detectedType === 'staff' ? (
+                        <>
+                          <PersonBadge className="me-2" size={16} />
+                          Staff Account Detected
+                        </>
+                      ) : (
+                        <>
+                          <Person className="me-2" size={16} />
+                          Customer Account Detected
+                        </>
+                      )}
+                    </Badge>
+                  </div>
+                )}
               </div>
 
               {/* Alert */}
@@ -166,23 +260,26 @@ const Login = () => {
                 >
                   {showAlert.message}
                 </Alert>
-              )}
-
-              {/* Login Form */}
+              )}              {/* Login Form */}
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-4">
-                  <Form.Label className="fw-semibold" style={styles.label}>Email Address</Form.Label>
+                  <Form.Label className="fw-semibold" style={styles.label}>
+                    Email or Staff ID
+                  </Form.Label>
                   <Form.Control
-                    type="email"
-                    name="email"
-                    value={formData.email}
+                    type="text"
+                    name="identifier"
+                    value={formData.identifier}
                     onChange={handleChange}
-                    placeholder="Enter your email"
-                    isInvalid={!!errors.email}
-                    style={styles.input}
+                    placeholder="Enter your email address or Staff ID (e.g., user@example.com or STAFF_3000)"
+                    isInvalid={!!errors.identifier}
+                    style={{
+                      ...styles.input,
+                      borderColor: detectedType === 'staff' ? '#6f42c1' : detectedType === 'user' ? '#198754' : ''
+                    }}
                   />
                   <Form.Control.Feedback type="invalid" style={styles.feedback}>
-                    {errors.email}
+                    {errors.identifier}
                   </Form.Control.Feedback>
                 </Form.Group>
 
@@ -215,6 +312,8 @@ const Login = () => {
                     type="checkbox" 
                     label="Remember me" 
                     className="text-muted"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                     style={{ fontSize: '15px' }}
                   />
                   <Button 

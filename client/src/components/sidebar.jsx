@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Nav, Button, Badge } from 'react-bootstrap'
+import React, { useState, useEffect } from 'react'
+import { Nav, Button, Badge, Collapse } from 'react-bootstrap'
 import { 
   House, 
   People, 
@@ -11,7 +11,11 @@ import {
   BoxArrowRight,
   ChevronLeft,
   ChevronRight,
-  Bank
+  Bank,
+  ChevronDown,
+  ChevronUp,
+  Folder,
+  FolderFill
 } from 'react-bootstrap-icons'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service'
@@ -19,10 +23,18 @@ import UserService from '../services/user.Service'
 const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation()
   const navigate = useNavigate()
+  const [expandedItems, setExpandedItems] = useState({})
 
   const handleLogout = () => {
     UserService.logout()
     navigate('/login')
+  }
+
+  const toggleExpanded = (itemKey) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [itemKey]: !prev[itemKey]
+    }))
   }
 
   const navigationItems = [
@@ -30,47 +42,237 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
       title: 'Dashboard',
       icon: House,
       path: '/admin/dashboard',
-      badge: null
+      badge: null,
+      type: 'single'
     },
     {
-      title: 'Manage Users',
-      icon: People,
-      path: '/admin/manage-users',
-      badge: 'New'
-    },
-    {
-      title: 'Manage Staff',
-      icon: PersonGear,
-      path: '/admin/manage-staff',
-      badge: null
+      title: 'Manage',
+      icon: Folder,
+      iconExpanded: FolderFill,
+      type: 'parent',
+      key: 'manage',
+      children: [
+        {
+          title: 'Users',
+          icon: People,
+          path: '/admin/manage/users',
+          badge: 'New'
+        },
+        {
+          title: 'Staff',
+          icon: PersonGear,
+          path: '/admin/manage/staff',
+          badge: null
+        }
+      ]
     },
     // {
     //   title: 'Transactions',
     //   icon: CreditCard,
     //   path: '/admin/transactions',
-    //   badge: null
-    // },    {
+    //   badge: null,
+    //   type: 'single'
+    // },
+    // {
     //   title: 'Reports',
     //   icon: BarChart,
     //   path: '/admin/reports',
-    //   badge: null
+    //   badge: null,
+    //   type: 'single'
     // },
     // {
     //   title: 'Audit Logs',
     //   icon: FileEarmarkText,
     //   path: '/admin/audit-logs',
-    //   badge: null
+    //   badge: null,
+    //   type: 'single'
     // },
     // {
     //   title: 'Settings',
     //   icon: Gear,
     //   path: '/admin/settings',
-    //   badge: null
+    //   badge: null,
+    //   type: 'single'
     // }
   ]
 
   const isActiveRoute = (path) => {
     return location.pathname === path || location.pathname.startsWith(path)
+  }
+
+  const isParentActive = (children) => {
+    return children.some(child => isActiveRoute(child.path))
+  }
+  // Auto-expand parent items when their children are active
+  useEffect(() => {
+    navigationItems.forEach(item => {
+      if (item.type === 'parent' && isParentActive(item.children)) {
+        setExpandedItems(prev => ({
+          ...prev,
+          [item.key]: true
+        }))
+      }
+    })
+  }, [location.pathname])
+
+  const renderNavigationItem = (item, index) => {
+    if (item.type === 'parent') {
+      const isExpanded = expandedItems[item.key]
+      const isActive = isParentActive(item.children)
+      const IconComponent = isExpanded && item.iconExpanded ? item.iconExpanded : item.icon
+      
+      return (
+        <div key={index}>
+          {/* Parent Item */}
+          <Nav.Item className="px-3 mb-1">
+            <div
+              className={`nav-link-custom parent-nav ${isActive ? 'active' : ''}`}
+              style={{
+                color: 'white',
+                textDecoration: 'none',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                transition: 'all 0.2s ease',
+                background: isActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                cursor: 'pointer',
+                position: 'relative'
+              }}
+              onClick={() => !isCollapsed && toggleExpanded(item.key)}
+            >
+              <IconComponent size={20} className="me-3" />
+              {!isCollapsed && (
+                <>
+                  <span className="flex-grow-1">{item.title}</span>
+                  {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </>
+              )}
+            </div>
+          </Nav.Item>
+
+          {/* Child Items */}
+          {!isCollapsed && (
+            <Collapse in={isExpanded}>
+              <div className="child-nav-container">
+                {item.children.map((child, childIndex) => {
+                  const ChildIconComponent = child.icon
+                  const isChildActive = isActiveRoute(child.path)
+                  
+                  return (
+                    <Nav.Item key={childIndex} className="px-3 mb-1">
+                      <Nav.Link
+                        as={Link}
+                        to={child.path}
+                        className={`nav-link-custom child-nav ${isChildActive ? 'active' : ''}`}
+                        style={{
+                          color: 'white',
+                          textDecoration: 'none',
+                          padding: '10px 16px 10px 52px',
+                          borderRadius: '8px',
+                          transition: 'all 0.2s ease',
+                          background: isChildActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                          display: 'flex',
+                          alignItems: 'center',
+                          position: 'relative',
+                          marginLeft: '8px',
+                          borderLeft: '2px solid rgba(255, 255, 255, 0.2)'
+                        }}
+                      >
+                        <ChildIconComponent size={18} className="me-3" />
+                        <span className="flex-grow-1">{child.title}</span>
+                        {child.badge && (
+                          <Badge 
+                            bg="warning" 
+                            text="dark"
+                            className="ms-2"
+                            style={{ fontSize: '10px' }}
+                          >
+                            {child.badge}
+                          </Badge>
+                        )}
+                      </Nav.Link>
+                    </Nav.Item>
+                  )
+                })}
+              </div>
+            </Collapse>
+          )}
+
+          {/* Collapsed state - show children as dots */}
+          {isCollapsed && isActive && (
+            <div className="px-3 mb-1">
+              <div className="d-flex justify-content-center">
+                <div
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    background: '#ffc107',
+                    borderRadius: '50%',
+                    margin: '2px 0'
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )
+    } else {
+      // Single navigation item
+      const IconComponent = item.icon
+      const isActive = isActiveRoute(item.path)
+      
+      return (
+        <Nav.Item key={index} className="px-3 mb-1">
+          <Nav.Link
+            as={Link}
+            to={item.path}
+            className={`nav-link-custom ${isActive ? 'active' : ''}`}
+            style={{
+              color: 'white',
+              textDecoration: 'none',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              transition: 'all 0.2s ease',
+              background: isActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              position: 'relative'
+            }}
+          >
+            <IconComponent size={20} className="me-3" />
+            {!isCollapsed && (
+              <>
+                <span className="flex-grow-1">{item.title}</span>
+                {item.badge && (
+                  <Badge 
+                    bg="warning" 
+                    text="dark"
+                    className="ms-2"
+                    style={{ fontSize: '10px' }}
+                  >
+                    {item.badge}
+                  </Badge>
+                )}
+              </>
+            )}
+            {isCollapsed && item.badge && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '8px',
+                  right: '8px',
+                  width: '8px',
+                  height: '8px',
+                  background: '#ffc107',
+                  borderRadius: '50%'
+                }}
+              />
+            )}
+          </Nav.Link>
+        </Nav.Item>
+      )
+    }
   }
 
   return (
@@ -123,65 +325,9 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
         >
           {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </Button>
-      </div>
-
-      {/* Navigation */}
+      </div>      {/* Navigation */}
       <Nav className="flex-column py-3 sidebar-nav">
-        {navigationItems.map((item, index) => {
-          const IconComponent = item.icon
-          const isActive = isActiveRoute(item.path)
-          
-          return (
-            <Nav.Item key={index} className="px-3 mb-1">
-              <Nav.Link
-                as={Link}
-                to={item.path}
-                className={`nav-link-custom ${isActive ? 'active' : ''}`}
-                style={{
-                  color: 'white',
-                  textDecoration: 'none',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  transition: 'all 0.2s ease',
-                  background: isActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  position: 'relative'
-                }}
-              >
-                <IconComponent size={20} className="me-3" />
-                {!isCollapsed && (
-                  <>
-                    <span className="flex-grow-1">{item.title}</span>
-                    {item.badge && (
-                      <Badge 
-                        bg="warning" 
-                        text="dark"
-                        className="ms-2"
-                        style={{ fontSize: '10px' }}
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </>
-                )}
-                {isCollapsed && item.badge && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '8px',
-                      right: '8px',
-                      width: '8px',
-                      height: '8px',
-                      background: '#ffc107',
-                      borderRadius: '50%'
-                    }}
-                  />
-                )}
-              </Nav.Link>
-            </Nav.Item>
-          )
-        })}
+        {navigationItems.map((item, index) => renderNavigationItem(item, index))}
       </Nav>
 
       {/* Logout Button */}
@@ -212,6 +358,32 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
           font-weight: 600;
         }
         
+        .parent-nav:hover {
+          background: rgba(255, 255, 255, 0.15) !important;
+          color: white !important;
+        }
+        
+        .parent-nav.active {
+          background: rgba(255, 255, 255, 0.2) !important;
+          color: white !important;
+          font-weight: 600;
+        }
+        
+        .child-nav:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+          color: white !important;
+        }
+        
+        .child-nav.active {
+          background: rgba(255, 255, 255, 0.25) !important;
+          color: white !important;
+          font-weight: 600;
+        }
+        
+        .child-nav-container {
+          margin-bottom: 8px;
+        }
+        
         .sidebar-nav .nav-item .nav-link {
           border: none !important;
         }
@@ -237,6 +409,10 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
         
         .sidebar::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .collapse {
+          transition: height 0.2s ease !important;
         }
       `}</style>
     </div>
