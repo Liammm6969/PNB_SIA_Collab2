@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, InputGroup, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaUniversity } from 'react-icons/fa';
+import userService from '../service/user.Service.js';
 import './Auth.css';
 
 const Register = () => {
@@ -14,11 +15,12 @@ const Register = () => {
     password: '',
     confirmPassword: '',
     accountType: ''
-  });
-  const [showPassword, setShowPassword] = useState(false);
+  });  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleAccountTypeSelect = (accountType) => {
     setFormData({
@@ -39,7 +41,6 @@ const Register = () => {
       [e.target.name]: e.target.value
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -51,15 +52,28 @@ const Register = () => {
     }
 
     setLoading(true);
+    setError('');
+    setSuccess('');
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Registration data:', formData);
-      navigate('/login');
+      // Call the user service register method
+      const response = await userService.registerUser(formData);
+      
+      if (response.message) {
+        setSuccess(response.message);
+        console.log('Registration successful:', response);
+        
+        // Redirect to login page after successful registration
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
     } catch (error) {
       console.error('Registration failed:', error);
+      setError(error.message);
     } finally {
-      setLoading(false);    }
+      setLoading(false);
+    }
   };
   // Account Type Selection Step
   const renderAccountTypeSelection = () => (
@@ -228,14 +242,25 @@ const Register = () => {
                 onClick={handleBackToAccountType}
               >
                 ← <span className="d-none d-sm-inline ms-1">Back</span>
-              </Button>
-              <div className="flex-grow-1 text-center fade-in">
+              </Button>              <div className="flex-grow-1 text-center fade-in">
                 <h2 className="fw-bold mb-2 fs-4 fs-md-3">
                   Create {formData.accountType === 'personal' ? 'Personal' : 'Business'} Account
                 </h2>
                 <p className="text-muted small">Please fill in your information</p>
               </div>
             </div>
+
+            {error && (
+              <Alert variant="danger" className="mb-3">
+                {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert variant="success" className="mb-3">
+                {success}
+              </Alert>
+            )}
             
             <Form noValidate validated={validated} onSubmit={handleSubmit} className="fade-in-up">
               <Row className="stagger-1">
