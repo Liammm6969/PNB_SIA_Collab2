@@ -138,23 +138,22 @@ class UserService {
       throw error;
     }
   }
-
   /**
    * Logout user by removing stored tokens
    */
   static logout() {
     localStorage.removeItem('accessToken');
-    // Clear any other user-related data from localStorage
     localStorage.removeItem('userId');
     localStorage.removeItem('userEmail');
+    // Clear any other user-related data from localStorage
   }
-
   /**
    * Check if user is authenticated
    * @returns {boolean} Authentication status
    */
   static isAuthenticated() {
-    return !!localStorage.getItem('accessToken');
+    // Check for userId since the current system doesn't use access tokens
+    return !!localStorage.getItem('userId');
   }
 
   /**

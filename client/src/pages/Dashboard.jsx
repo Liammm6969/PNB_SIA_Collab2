@@ -132,46 +132,7 @@ const Dashboard = () => {
                 <Button variant="warning" className="w-100">View Reports</Button>
               </Card.Body>
             </Card>
-          </Col>
-        </Row>
-
-        {/* Quick Stats */}
-        <Row className="mt-5">
-          <Col>
-            <Card className="shadow-sm border-0">
-              <Card.Body className="p-4">
-                <h5 className="fw-bold mb-4">Quick Statistics</h5>
-                <Row className="text-center">                  <Col md={3}>
-                    <div className="p-3">
-                      <h3 className="fw-bold text-primary">
-                        ${userProfile?.balance ? userProfile.balance.toLocaleString() : '0.00'}
-                      </h3>
-                      <p className="text-muted mb-0">Current Balance</p>
-                    </div>
-                  </Col>
-                  <Col md={3}>
-                    <div className="p-3">
-                      <h3 className="fw-bold text-success">145</h3>
-                      <p className="text-muted mb-0">Total Transactions</p>
-                    </div>
-                  </Col>
-                  <Col md={3}>
-                    <div className="p-3">
-                      <h3 className="fw-bold text-warning">$2,350</h3>
-                      <p className="text-muted mb-0">Monthly Spending</p>
-                    </div>
-                  </Col>
-                  <Col md={3}>
-                    <div className="p-3">
-                      <h3 className="fw-bold text-info">98%</h3>
-                      <p className="text-muted mb-0">Success Rate</p>
-                    </div>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+          </Col>        </Row>
       </Container>
     </div>
   )
