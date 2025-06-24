@@ -56,6 +56,8 @@ class UserService {
       //   randomAccountNumber = generateAccountNumber();
       //   ifAccountNumberExists = await User.findOne({ accountNumber: randomAccountNumber });
       // } while (ifAccountNumberExists);      // Create user object with conditional fields based on account type
+
+
       const userObj = {
         accountType,
         accountNumber: generateAccountNumber(),
@@ -75,7 +77,8 @@ class UserService {
       const user = new User(userObj);
 
       await user.save();
-      return { message: 'User registered', userId: user.userId };
+
+      return { message: 'User registered', savedUser: user.userId };
     } catch (err) {
       throw err;
     }
@@ -84,7 +87,7 @@ class UserService {
   async loginUser(email, password) {
     try {
       const user = await User.findOne({ email });
-      // if (!user) throw new UserNotFoundError('User not found');
+      if (!user) throw new UserNotFoundError('User not found');
       // const isMatch = await bcrypt.compare(password, user.password);
       // if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
       // const otp = generateOTP();
