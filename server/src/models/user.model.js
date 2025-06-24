@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: function() { return this.accountType === 'business'; }
   },
+  role: { type: String, enum: ['Admin', 'User'], default: 'User' },
   accountType: { type: String, enum: ['personal', 'business'], required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },

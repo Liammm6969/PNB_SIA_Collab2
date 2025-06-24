@@ -110,6 +110,26 @@ class UserService {
     }
   }
 
+  /**
+   * Get user profile by userId
+   * @param {number|string} userId
+   * @returns {Promise<Object>} User profile object
+   */
+  async getUserProfile(userId) {
+    try {
+      const response = await apiRequest(`${USERS_ENDPOINT}/${userId}`, {
+        method: 'GET',
+      });
+      // The backend may return an array or object, handle both
+      if (Array.isArray(response)) {
+        return response[0];
+      }
+      return response;
+    } catch (error) {
+      throw new Error(`Failed to fetch user profile: ${error.message}`);
+    }
+  }
+
 }
 
 // Export singleton instance

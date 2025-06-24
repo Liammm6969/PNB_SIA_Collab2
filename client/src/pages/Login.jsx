@@ -1,31 +1,41 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, InputGroup, Alert } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
-import userService from '../service/user.Service.js';
-import './Auth.css';
+import React, { useState } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  InputGroup,
+  Alert,
+} from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from "react-icons/fa";
+import userService from "../service/user.Service.js";
+import "./Auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-  };  const handleSubmit = async (e) => {
+  };
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    
+
     if (form.checkValidity() === false) {
       e.stopPropagation();
       setValidated(true);
@@ -33,38 +43,34 @@ const Login = () => {
     }
 
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       // Call the user service login method
       const response = await userService.loginUser(formData);
-      
+
       if (response.message && response.userId) {
         setSuccess(response.message);
-        
-        // For now, simulate successful login without OTP verification
-        // In a real implementation, you would redirect to an OTP verification page
-        console.log('Login successful:', response);
-        
-        // Mock user data for navigation - replace with actual user data from OTP verification
-        const mockUser = {
-          userId: response.userId,
-          email: formData.email,
-          role: formData.email.includes('admin') ? 'Admin' : 'User'
-        };
-        
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        
-        // Navigate based on user role
-        if (mockUser.role === 'Admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/dashboard');
+        // Fetch user profile to get the role
+        try {
+          const userProfile = await userService.getUserProfile(response.userId);
+          const role = userProfile.role || (userProfile[0] && userProfile[0].role);
+          let targetRoute = "/dashboard";
+          if (role === "Admin") {
+            targetRoute = "/admin/dashboard";
+          } else if (role === "User") {
+            targetRoute = "/dashboard";
+          } // Add more roles if needed
+          setTimeout(() => {
+            navigate(targetRoute);
+          }, 1000);
+        } catch (profileError) {
+          setError("Login succeeded but failed to fetch user profile.");
         }
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -73,27 +79,39 @@ const Login = () => {
   return (
     <Container fluid className="p-0 overflow-hidden">
       <Row className="min-vh-100 m-0">
-        <Col xs={12} lg={6} className="p-3 p-md-5 d-flex align-items-center justify-content-center slide-in-left">
-          <div className="w-100" style={{ maxWidth: '450px' }}>            <div className="text-center mb-3 mb-md-4 fade-in">
+        <Col
+          xs={12}
+          lg={6}
+          className="p-3 p-md-5 d-flex align-items-center justify-content-center slide-in-left"
+        >
+          <div className="w-100" style={{ maxWidth: "450px" }}>
+            {" "}
+            <div className="text-center mb-3 mb-md-4 fade-in">
               <h2 className="fw-bold mb-2 fs-3 fs-md-2">Welcome Back!</h2>
-              <p className="text-muted small">Please enter your credentials to continue</p>
+              <p className="text-muted small">
+                Please enter your credentials to continue
+              </p>
             </div>
-
             {error && (
               <Alert variant="danger" className="mb-3">
                 {error}
               </Alert>
             )}
-
             {success && (
               <Alert variant="success" className="mb-3">
                 {success}
               </Alert>
             )}
-
-              <Form noValidate validated={validated} onSubmit={handleSubmit} className="fade-in-up">
+            <Form
+              noValidate
+              validated={validated}
+              onSubmit={handleSubmit}
+              className="fade-in-up"
+            >
               <Form.Group className="mb-3 stagger-1" controlId="formEmail">
-                <Form.Label className="small fw-medium">Email address</Form.Label>
+                <Form.Label className="small fw-medium">
+                  Email address
+                </Form.Label>
                 <InputGroup>
                   <InputGroup.Text className="bg-light d-none d-sm-flex">
                     <FaEnvelope className="text-muted" />
@@ -113,7 +131,10 @@ const Login = () => {
                 </InputGroup>
               </Form.Group>
 
-              <Form.Group className="mb-3 mb-md-4 stagger-2" controlId="formPassword">
+              <Form.Group
+                className="mb-3 mb-md-4 stagger-2"
+                controlId="formPassword"
+              >
                 <Form.Label className="small fw-medium">Password</Form.Label>
                 <InputGroup>
                   <InputGroup.Text className="bg-light d-none d-sm-flex">
@@ -129,30 +150,34 @@ const Login = () => {
                     minLength={6}
                     className="border-start-0 border-end-0 py-2 py-md-3"
                   />
-                  <InputGroup.Text 
+                  <InputGroup.Text
                     className="bg-light cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: "pointer" }}
                   >
-                    {showPassword ? 
-                      <FaEyeSlash className="text-muted" /> : 
+                    {showPassword ? (
+                      <FaEyeSlash className="text-muted" />
+                    ) : (
                       <FaEye className="text-muted" />
-                    }
+                    )}
                   </InputGroup.Text>
                   <Form.Control.Feedback type="invalid">
                     Password must be at least 6 characters.
                   </Form.Control.Feedback>
                 </InputGroup>
                 <div className="d-flex justify-content-end mt-2">
-                  <Link to="/forgot-password" className="text-primary text-decoration-none small">
+                  <Link
+                    to="/forgot-password"
+                    className="text-primary text-decoration-none small"
+                  >
                     Forgot Password?
                   </Link>
                 </div>
               </Form.Group>
 
               <div className="d-grid gap-2 stagger-3">
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   type="submit"
                   className="py-2 py-md-3 fw-medium"
                   disabled={loading}
@@ -163,29 +188,40 @@ const Login = () => {
                       Signing in...
                     </>
                   ) : (
-                    'Sign In'
+                    "Sign In"
                   )}
                 </Button>
               </div>
 
               <div className="mt-3 mt-md-4 text-center fade-in">
-                <p className="mb-0 text-muted small">Don't have an account?{' '}
-                  <Link to="/register" className="text-primary fw-bold text-decoration-none">
+                <p className="mb-0 text-muted small">
+                  Don't have an account?{" "}
+                  <Link
+                    to="/register"
+                    className="text-primary fw-bold text-decoration-none"
+                  >
                     Create Account
                   </Link>
                 </p>
               </div>
             </Form>
           </div>
-        </Col>        <Col xs={12} lg={6} className="d-none d-lg-flex align-items-center justify-content-center auth-banner slide-in-right">
+        </Col>{" "}
+        <Col
+          xs={12}
+          lg={6}
+          className="d-none d-lg-flex align-items-center justify-content-center auth-banner slide-in-right"
+        >
           <div className="text-center text-white p-3 p-md-5">
             <div className="mb-3 mb-md-4 fade-in">
-              <h1 className="display-5 display-md-4 fw-bold mb-3 mb-md-4">Welcome to</h1>
-              <img 
-                src="https://www.pnb.com.ph/wp-content/themes/pnbrevamp/images/PNB-logo-01.svg" 
-                alt="Login Banner" 
+              <h1 className="display-5 display-md-4 fw-bold mb-3 mb-md-4">
+                Welcome to
+              </h1>
+              <img
+                src="https://www.pnb.com.ph/wp-content/themes/pnbrevamp/images/PNB-logo-01.svg"
+                alt="Login Banner"
                 className="img-fluid mb-3 mb-md-4"
-                style={{ maxWidth: '300px', width: '100%' }}
+                style={{ maxWidth: "300px", width: "100%" }}
               />
             </div>
             <p className="lead mb-3 mb-md-4 fade-in-up stagger-1 fs-6 fs-md-5">

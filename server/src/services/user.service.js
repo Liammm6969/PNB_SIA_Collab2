@@ -11,9 +11,9 @@ function generateAccountNumber() {
   return `${randomatic('0', 3)}-${randomatic('0', 4)}-${randomatic('0', 3)}-${randomatic('0', 4)}`;
 }
 
-function generateOTP() {
-  return randomatic('0', 6);
-}
+// function generateOTP() {
+//   return randomatic('0', 6);
+// }
 
 class UserService {
   constructor() {
@@ -48,7 +48,7 @@ class UserService {
       //   if (existingBusinessName) throw new DuplicateCompanyNameError('Business name already exists');
       // }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // const hashedPassword = await bcrypt.hash(password, 10);
 
       let randomAccountNumber;
       let ifAccountNumberExists;
@@ -60,7 +60,8 @@ class UserService {
         accountType,
         accountNumber: generateAccountNumber(),
         email,
-        password: hashedPassword,
+        // password: hashedPassword,
+        password,
       };
 
       // Add appropriate name fields based on account type
@@ -92,7 +93,9 @@ class UserService {
       // user.otpExpires = otpExpires;
       await user.save();
       // await sendOTPEmail(user.email, otp);
-      return { message: 'OTP sent to email. Please verify to complete login.', userId: user.userId };
+      // return { message: 'OTP sent to email. Please verify to complete login.', userId: user.userId };
+
+      return { message: 'Login Successful.', userId: user.userId };
     } catch (err) {
       throw err;
     }
