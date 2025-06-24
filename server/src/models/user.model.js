@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const userSchema = new mongoose.Schema({
-  userId: { type: Number, unique: true },    
+  userId: { type: String, unique: true, sparse: true },
+  userIdSeq: { type: Number, unique: true },
+
   firstName: {
     type: String,
     required: function () { return this.accountType === 'personal'; }
@@ -23,6 +25,18 @@ const userSchema = new mongoose.Schema({
 
 },
   { timestamps: true });
+
+userSchema.plugin(AutoIncrement, { inc_field: 'userIdSeq', start_seq: 1000, increment_by: 1 });
+
+userSchema.post('save', async function (doc, next) {
+  if (!doc.userId && doc.userIdSeq) {
+    let prefix = doc.accountType === 'business' ? 'BUSNS_' : 'PRSNL_';
+    const userId = `${prefix}${doc.userIdSeq}`;
+    await doc.model('User').findByIdAndUpdate(doc._id, { userId });
+    doc.userId = userId;
+  }
+  next();
+});
 
 // Virtual property to get display name based on account type
 userSchema.virtual('displayName').get(function () {
@@ -45,6 +59,6 @@ userSchema.virtual('displayName').get(function () {
 userSchema.set('toJSON', { virtuals: true });
 userSchema.set('toObject', { virtuals: true });
 
-userSchema.plugin(AutoIncrement, { inc_field: 'userId', start_seq: 1000, increment_by: 1 });
+
 
 module.exports = mongoose.model('User', userSchema);
