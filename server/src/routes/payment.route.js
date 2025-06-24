@@ -34,13 +34,13 @@ router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addPaymentS
 router.get('/user-payments/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPayments);
 
 // Get a payment by ID
-router.get('/:id', ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPaymentById);
+router.get('/:paymentId', ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPaymentById);
 
 // Update a payment by ID
-router.put('/:id', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transferPayment);
+router.put('/:paymentId', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transferPayment);
 
 // Delete a payment by ID
-router.delete('/:id', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), deletePayment);
+router.delete('/:paymentId', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), deletePayment);
 
 // Transfer money between users
 router.post('/transfer', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(transferPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER,Roles.USER), transferController.transferMoney);
