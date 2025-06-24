@@ -9,10 +9,14 @@ const { registerUserSchema,
 
 
 // Register a new user
-router.post('/register', ValidateRequestBodyMiddleware(registerUserSchema), userController.registerUser);
+// router.post('/register', ValidateRequestBodyMiddleware(registerUserSchema), userController.registerUser);
+
+router.post('/register', userController.registerUser);
 
 // Login user
-router.post('/login', ValidateRequestBodyMiddleware(loginUserSchema), LoginLimiter, userController.loginUser);
+// router.post('/login', ValidateRequestBodyMiddleware(loginUserSchema), LoginLimiter, userController.loginUser);
+
+router.post('/login', userController.loginUser);
 router.post('/verify-otp', userController.verifyOTP);
 router.use(verifyAccessToken);
 
