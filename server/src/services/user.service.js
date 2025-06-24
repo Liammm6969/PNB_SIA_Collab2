@@ -53,6 +53,7 @@ class UserService {
       const user = new User({
         fullName,
         accountType,
+        accountNumber: generateAccountNumber(),
         email,
         password: password,
       });

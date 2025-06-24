@@ -4,7 +4,7 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 const userSchema = new mongoose.Schema({
   userId: { type: Number, unique: true },
   fullName: { type: String, required: true },
-  accountType: { type: String, enum: ['admin', 'user'], default: 'user' },
+  accountType: { type: String, enum: ['personal', 'business'], required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   balance: { type: Number, default: 0 },
