@@ -1,6 +1,8 @@
 // User Service for Philippine National Bank SIA
-// Base API URL for all user-related endpoints
-const BASE_URL = 'http://localhost:4000/api/Philippine-National-Bank/users';
+import api from './api.config.js';
+
+// Base endpoint for all user-related requests
+const USER_ENDPOINT = '/users';
 
 class UserService {
   /**
@@ -15,24 +17,11 @@ class UserService {
    * @param {string} [userData.accountNumber] - Account number (optional, format: XXX-XXXX-XXX-XXXX)
    * @param {number} [userData.balance] - Initial balance (defaults to 0)
    * @returns {Promise<Object>} Registration response
-   */
-  static async registerUser(userData) {
+   */  static async registerUser(userData) {
     try {
-      const response = await fetch(`${BASE_URL}/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
+      const response = await api.post(`${USER_ENDPOINT}/register`, userData);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -44,24 +33,14 @@ class UserService {
    * @param {string} email - User email
    * @param {string} password - User password
    * @returns {Promise<Object>} Login response with message and userId
-   */
-  static async loginUser(email, password) {
+   */  static async loginUser(email, password) {
     try {
-      const response = await fetch(`${BASE_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const response = await api.post(`${USER_ENDPOINT}/login`, {
+        email,
+        password
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -73,28 +52,19 @@ class UserService {
    * @param {string} userId - User ID
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} User profile data
-   */
-  static async getUserProfile(userId, accessToken = null) {
+   */  static async getUserProfile(userId, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }      const response = await fetch(`${BASE_URL}/${userId}`, {
-        method: 'GET',
-        headers,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch user profile');
+      const config = {};
+      
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      return data;
+      const response = await api.get(`${USER_ENDPOINT}/${userId}`, config);
+
+      return response.data;
     } catch (error) {
       console.error('Get user profile error:', error);
       throw error;
@@ -105,28 +75,19 @@ class UserService {
    * List all users (admin/testing purpose)
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Array>} Array of users
-   */
-  static async listUsers(accessToken = null) {
+   */  static async listUsers(accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }      const response = await fetch(`${BASE_URL}/`, {
-        method: 'GET',
-        headers,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch users');
+      const config = {};
+      
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      return data;
+      const response = await api.get(`${USER_ENDPOINT}/`, config);
+
+      return response.data;
     } catch (error) {
       console.error('List users error:', error);
       throw error;

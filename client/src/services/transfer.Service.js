@@ -1,6 +1,8 @@
 // Transfer Service for Philippine National Bank SIA
-// Base API URL for all transfer-related endpoints
-const BASE_URL = 'http://localhost:4000/api/Philippine-National-Bank/transfers';
+import api from './api.config.js';
+
+// Base endpoint for all transfer-related requests
+const TRANSFER_ENDPOINT = '/transfers';
 
 class TransferService {
   /**
@@ -13,31 +15,19 @@ class TransferService {
    * @param {string} [transferData.type] - Transfer type (internal, external)
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Transfer response
-   */
-  static async initiateTransfer(transferData, accessToken = null) {
+   */  static async initiateTransfer(transferData, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/initiate`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(transferData),
-      });
+      const response = await api.post(`${TRANSFER_ENDPOINT}/initiate`, transferData, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Transfer failed');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Transfer error:', error);
       throw error;
@@ -49,31 +39,19 @@ class TransferService {
    * @param {string} accountNumber - Account number to validate
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Validation response
-   */
-  static async validateRecipient(accountNumber, accessToken = null) {
+   */  static async validateRecipient(accountNumber, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/validate-recipient`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ accountNumber }),
-      });
+      const response = await api.post(`${TRANSFER_ENDPOINT}/validate-recipient`, { accountNumber }, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Validation failed');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Recipient validation error:', error);
       throw error;
@@ -89,37 +67,25 @@ class TransferService {
    * @param {string} [options.status] - Transfer status filter
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Transfer history response
-   */
-  static async getTransferHistory(userId, options = {}, accessToken = null) {
+   */  static async getTransferHistory(userId, options = {}, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
+      const config = {
+        params: {}
       };
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const queryParams = new URLSearchParams();
-      if (options.limit) queryParams.append('limit', options.limit);
-      if (options.offset) queryParams.append('offset', options.offset);
-      if (options.status) queryParams.append('status', options.status);
+      if (options.limit) config.params.limit = options.limit;
+      if (options.offset) config.params.offset = options.offset;
+      if (options.status) config.params.status = options.status;
 
-      const url = `${BASE_URL}/history/${userId}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+      const response = await api.get(`${TRANSFER_ENDPOINT}/history/${userId}`, config);
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch transfer history');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Get transfer history error:', error);
       throw error;
@@ -131,30 +97,19 @@ class TransferService {
    * @param {string} transferId - Transfer ID
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Transfer details
-   */
-  static async getTransferDetails(transferId, accessToken = null) {
+   */  static async getTransferDetails(transferId, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/${transferId}`, {
-        method: 'GET',
-        headers,
-      });
+      const response = await api.get(`${TRANSFER_ENDPOINT}/${transferId}`, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch transfer details');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Get transfer details error:', error);
       throw error;
@@ -166,30 +121,19 @@ class TransferService {
    * @param {string} transferId - Transfer ID
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Cancellation response
-   */
-  static async cancelTransfer(transferId, accessToken = null) {
+   */  static async cancelTransfer(transferId, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/${transferId}/cancel`, {
-        method: 'PUT',
-        headers,
-      });
+      const response = await api.put(`${TRANSFER_ENDPOINT}/${transferId}/cancel`, {}, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to cancel transfer');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Cancel transfer error:', error);
       throw error;
@@ -201,30 +145,19 @@ class TransferService {
    * @param {string} userId - User ID
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Array>} List of beneficiaries
-   */
-  static async getBeneficiaries(userId, accessToken = null) {
+   */  static async getBeneficiaries(userId, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/beneficiaries/${userId}`, {
-        method: 'GET',
-        headers,
-      });
+      const response = await api.get(`${TRANSFER_ENDPOINT}/beneficiaries/${userId}`, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch beneficiaries');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Get beneficiaries error:', error);
       throw error;
@@ -240,31 +173,19 @@ class TransferService {
    * @param {string} [beneficiaryData.nickname] - Beneficiary nickname
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Add beneficiary response
-   */
-  static async addBeneficiary(beneficiaryData, accessToken = null) {
+   */  static async addBeneficiary(beneficiaryData, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/beneficiaries`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(beneficiaryData),
-      });
+      const response = await api.post(`${TRANSFER_ENDPOINT}/beneficiaries`, beneficiaryData, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to add beneficiary');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Add beneficiary error:', error);
       throw error;
@@ -303,8 +224,7 @@ class TransferService {
    * Validate account number format
    * @param {string} accountNumber - Account number to validate
    * @returns {Object} Validation result
-   */
-  static validateAccountNumber(accountNumber) {
+   */  static validateAccountNumber(accountNumber) {
     const errors = [];
 
     if (!accountNumber) {

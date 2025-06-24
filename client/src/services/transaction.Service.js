@@ -1,6 +1,8 @@
 // Transaction Service for Philippine National Bank SIA
-// Base API URL for all transaction-related endpoints
-const BASE_URL = 'http://localhost:4000/api/Philippine-National-Bank/transactions';
+import api from './api.config.js';
+
+// Base endpoint for all transaction-related requests
+const TRANSACTION_ENDPOINT = '/transactions';
 
 class TransactionService {
   /**
@@ -12,37 +14,25 @@ class TransactionService {
    * @param {string} [options.type] - Transaction type filter
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Transactions response
-   */
-  static async getUserTransactions(userId, options = {}, accessToken = null) {
+   */  static async getUserTransactions(userId, options = {}, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
+      const config = {
+        params: {}
       };
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const queryParams = new URLSearchParams();
-      if (options.limit) queryParams.append('limit', options.limit);
-      if (options.offset) queryParams.append('offset', options.offset);
-      if (options.type) queryParams.append('type', options.type);
+      if (options.limit) config.params.limit = options.limit;
+      if (options.offset) config.params.offset = options.offset;
+      if (options.type) config.params.type = options.type;
 
-      const url = `${BASE_URL}/user/${userId}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+      const response = await api.get(`${TRANSACTION_ENDPOINT}/user/${userId}`, config);
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch transactions');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Get user transactions error:', error);
       throw error;
@@ -54,30 +44,19 @@ class TransactionService {
    * @param {string} transactionId - Transaction ID
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Transaction data
-   */
-  static async getTransactionById(transactionId, accessToken = null) {
+   */  static async getTransactionById(transactionId, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/${transactionId}`, {
-        method: 'GET',
-        headers,
-      });
+      const response = await api.get(`${TRANSACTION_ENDPOINT}/${transactionId}`, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch transaction');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Get transaction error:', error);
       throw error;
@@ -94,31 +73,19 @@ class TransactionService {
    * @param {string} [transactionData.description] - Transaction description
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Transaction response
-   */
-  static async createTransaction(transactionData, accessToken = null) {
+   */  static async createTransaction(transactionData, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/create`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(transactionData),
-      });
+      const response = await api.post(`${TRANSACTION_ENDPOINT}/create`, transactionData, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create transaction');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Create transaction error:', error);
       throw error;
@@ -130,30 +97,19 @@ class TransactionService {
    * @param {string} userId - User ID
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Balance data
-   */
-  static async getAccountBalance(userId, accessToken = null) {
+   */  static async getAccountBalance(userId, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/balance/${userId}`, {
-        method: 'GET',
-        headers,
-      });
+      const response = await api.get(`${TRANSACTION_ENDPOINT}/balance/${userId}`, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch balance');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Get balance error:', error);
       throw error;
@@ -166,30 +122,21 @@ class TransactionService {
    * @param {string} [period] - Period for statistics (month, year)
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Statistics data
-   */
-  static async getTransactionStats(userId, period = 'month', accessToken = null) {
+   */  static async getTransactionStats(userId, period = 'month', accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
+      const config = {
+        params: { period }
       };
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
-      const response = await fetch(`${BASE_URL}/stats/${userId}?period=${period}`, {
-        method: 'GET',
-        headers,
-      });
+      const response = await api.get(`${TRANSACTION_ENDPOINT}/stats/${userId}`, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch statistics');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Get transaction stats error:', error);
       throw error;
@@ -203,33 +150,22 @@ class TransactionService {
    * @param {number} [options.limit] - Number of payments to fetch
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Payments response
-   */
-  static async getUserPayments(userId, options = {}, accessToken = null) {
+   */  static async getUserPayments(userId, options = {}, accessToken = null) {
     try {
-      const token = accessToken || localStorage.getItem('accessToken');
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const config = {};
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
       }
 
       // Convert string userId to number for the API
       const numericUserId = userId.includes('-') ? userId : userId;
       
-      const response = await fetch(`http://localhost:4000/api/Philippine-National-Bank/payments/user-payments/${numericUserId}`, {
-        method: 'GET',
-        headers,
-      });
+      const response = await api.get(`/payments/user-payments/${numericUserId}`, config);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch payments');
-      }
-
-      return data;
+      return response.data;
     } catch (error) {
       console.error('Get user payments error:', error);
       throw error;
