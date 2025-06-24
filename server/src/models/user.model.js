@@ -2,27 +2,25 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const userSchema = new mongoose.Schema({
-  userId: { type: Number, unique: true },
+  userId: { type: Number, unique: true },  
   firstName: {
     type: String,
-    required: function () { return this.accountType === 'personal'; }
+    required: true
   },
   lastName: {
     type: String,
-    required: function () { return this.accountType === 'personal'; }
+    required: true
   },
   businessName: {
     type: String,
     required: function () { return this.accountType === 'business'; }
   },
-  role: { type: String, enum: ['Admin', 'User'], default: 'User' },
   accountType: { type: String, enum: ['personal', 'business'], required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   balance: { type: Number, default: 0 },
   accountNumber: { type: String, unique: true, required: true },
-  // otp: { type: String },
-  // otpExpires: { type: Date },
+
 },
   { timestamps: true });
 
@@ -35,7 +33,12 @@ userSchema.virtual('displayName').get(function () {
       fullName: `${this.firstName} ${this.lastName}`
     };
   } else if (this.accountType === 'business') {
-    return this.businessName;
+    return {
+      firstName: this.firstName,
+      lastName: this.lastName,
+      fullName: `${this.firstName} ${this.lastName}`,
+      businessName: this.businessName
+    };
   }
   return 'Unknown';
 });

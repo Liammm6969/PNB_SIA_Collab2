@@ -3,15 +3,14 @@ import { Container, Row, Col, Form, Button, Alert, InputGroup, Card } from 'reac
 import { Eye, EyeSlash, Person, Lock, Bank, Envelope, Phone, Building } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 
-const Register = () => {
+const Register = () => {  
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     accountType: 'personal', // Default to personal account
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-    companyName: '',
+    businessName: '',
     password: '',
     confirmPassword: ''
   })
@@ -34,31 +33,31 @@ const Register = () => {
       }))
     }
   }
-
   const handleAccountTypeChange = (accountType) => {
     setFormData(prev => ({
       ...prev,
       accountType,
-      // Clear company name when switching to personal account
-      companyName: accountType === 'personal' ? '' : prev.companyName
+      // Clear business name when switching to personal account
+      businessName: accountType === 'personal' ? '' : prev.businessName
     }))
-    // Clear company name error when switching account types
-    if (errors.companyName) {
+    // Clear business name error when switching account types
+    if (errors.businessName) {
       setErrors(prev => ({
         ...prev,
-        companyName: ''
+        businessName: ''
       }))
     }
   }
-
   const validateForm = () => {
     const newErrors = {}
     
-    if (!formData.firstName.trim()) {
+    // First name is only required for personal accounts
+    if (formData.accountType === 'personal' && !formData.firstName.trim()) {
       newErrors.firstName = 'First name is required'
     }
     
-    if (!formData.lastName.trim()) {
+    // Last name is only required for personal accounts
+    if (formData.accountType === 'personal' && !formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required'
     }
     
@@ -67,15 +66,10 @@ const Register = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address'
     }
-      if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required'
-    } else if (!/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number'
-    }
     
-    // Company name is only required for business accounts
-    if (formData.accountType === 'business' && !formData.companyName.trim()) {
-      newErrors.companyName = 'Company name is required for business accounts'
+    // Business name is only required for business accounts
+    if (formData.accountType === 'business' && !formData.businessName.trim()) {
+      newErrors.businessName = 'Business name is required for business accounts'
     }
     
     if (!formData.password) {
@@ -275,10 +269,8 @@ const Register = () => {
                       </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
-                </Row>
-
-                <Row className="g-2">
-                  <Col xs={6}>
+                </Row>                <Row className="g-2">
+                  <Col xs={12}>
                     <Form.Group className="mb-2">
                       <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Email Address</Form.Label>
                       <Form.Control
@@ -296,43 +288,23 @@ const Register = () => {
                       </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
-                  <Col xs={6}>
-                    <Form.Group className="mb-2">
-                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Phone Number</Form.Label>
-                      <Form.Control
-                        size="sm"
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="Enter phone number"
-                        isInvalid={!!errors.phone}
-                        style={{ fontSize: '13px', height: '30px' }}
-                      />
-                      <Form.Control.Feedback type="invalid" style={{ fontSize: '11px' }}>
-                        {errors.phone}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                {/* Company Name - Fixed height container to prevent layout shift */}
+                </Row>                {/* Business Name - Fixed height container to prevent layout shift */}
                 <div style={{ minHeight: '55px', marginBottom: '8px' }}>
                   {formData.accountType === 'business' && (
                     <Form.Group className="mb-2">
-                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Company Name</Form.Label>
+                      <Form.Label className="fw-semibold" style={{ fontSize: '12px' }}>Business Name</Form.Label>
                       <Form.Control
                         size="sm"
                         type="text"
-                        name="companyName"
-                        value={formData.companyName}
+                        name="businessName"
+                        value={formData.businessName}
                         onChange={handleChange}
-                        placeholder="Enter company name"
-                        isInvalid={!!errors.companyName}
+                        placeholder="Enter business name"
+                        isInvalid={!!errors.businessName}
                         style={{ fontSize: '13px', height: '30px' }}
                       />
                       <Form.Control.Feedback type="invalid" style={{ fontSize: '11px' }}>
-                        {errors.companyName}
+                        {errors.businessName}
                       </Form.Control.Feedback>
                     </Form.Group>
                   )}
