@@ -11,11 +11,13 @@ const Register = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    businessName: '',
     email: '',
     password: '',
     confirmPassword: '',
     accountType: ''
-  });  const [showPassword, setShowPassword] = useState(false);
+  });
+  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
@@ -261,54 +263,80 @@ const Register = () => {
                 {success}
               </Alert>
             )}
-            
-            <Form noValidate validated={validated} onSubmit={handleSubmit} className="fade-in-up">
-              <Row className="stagger-1">
-                <Col xs={12} sm={6}>
-                  <Form.Group className="mb-3" controlId="formFirstName">
-                    <Form.Label className="small fw-medium">First Name</Form.Label>
+              <Form noValidate validated={validated} onSubmit={handleSubmit} className="fade-in-up">
+              {formData.accountType === 'personal' ? (
+                // Personal Account Fields
+                <Row className="stagger-1">
+                  <Col xs={12} sm={6}>
+                    <Form.Group className="mb-3" controlId="formFirstName">
+                      <Form.Label className="small fw-medium">First Name</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text className="bg-light d-none d-sm-flex">
+                          <FaUser className="text-muted" />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="text"
+                          name="firstName"
+                          placeholder="First name"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          required
+                          className="border-start-0 py-2 py-md-3"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          First name is required.
+                        </Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12} sm={6}>
+                    <Form.Group className="mb-3" controlId="formLastName">
+                      <Form.Label className="small fw-medium">Last Name</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text className="bg-light d-none d-sm-flex">
+                          <FaUser className="text-muted" />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="text"
+                          name="lastName"
+                          placeholder="Last name"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          required
+                          className="border-start-0 py-2 py-md-3"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          Last name is required.
+                        </Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              ) : (
+                // Business Account Fields
+                <div className="stagger-1">
+                  <Form.Group className="mb-3" controlId="formBusinessName">
+                    <Form.Label className="small fw-medium">Business Name</Form.Label>
                     <InputGroup>
                       <InputGroup.Text className="bg-light d-none d-sm-flex">
-                        <FaUser className="text-muted" />
+                        <FaUniversity className="text-muted" />
                       </InputGroup.Text>
                       <Form.Control
                         type="text"
-                        name="firstName"
-                        placeholder="First name"
-                        value={formData.firstName}
+                        name="businessName"
+                        placeholder="Enter business name"
+                        value={formData.businessName}
                         onChange={handleChange}
                         required
                         className="border-start-0 py-2 py-md-3"
                       />
                       <Form.Control.Feedback type="invalid">
-                        First name is required.
+                        Business name is required.
                       </Form.Control.Feedback>
                     </InputGroup>
                   </Form.Group>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Form.Group className="mb-3" controlId="formLastName">
-                    <Form.Label className="small fw-medium">Last Name</Form.Label>
-                    <InputGroup>
-                      <InputGroup.Text className="bg-light d-none d-sm-flex">
-                        <FaUser className="text-muted" />
-                      </InputGroup.Text>
-                      <Form.Control
-                        type="text"
-                        name="lastName"
-                        placeholder="Last name"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        required
-                        className="border-start-0 py-2 py-md-3"
-                      />
-                      <Form.Control.Feedback type="invalid">
-                        Last name is required.
-                      </Form.Control.Feedback>
-                    </InputGroup>
-                  </Form.Group>
-                </Col>
-              </Row>
+                </div>
+              )}
 
               <Form.Group className="mb-3 stagger-2" controlId="formAccountType">
                 <Form.Label className="small fw-medium">Account Type</Form.Label>

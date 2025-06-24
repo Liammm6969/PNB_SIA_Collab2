@@ -1,15 +1,59 @@
 const joi = require('joi');
 
 const registerUserSchema = joi.object({
-  fullName: joi.string().alphanum()
-    .min(5)
-    .max(30).messages({
-      'string.base': 'Full name must be a string',
-      'string.empty': 'Full name cannot be empty',
-      'string.min': 'Full name must be at least 5 characters long',
-      'string.max': 'Full name must not exceed 30 characters',
-      'any.required': 'Full name is required'
+  firstName: joi.string()
+    .min(2)
+    .max(30)
+    .when('accountType', {
+      is: 'personal',
+      then: joi.required(),
+      otherwise: joi.forbidden()
+    })
+    .messages({
+      'string.base': 'First name must be a string',
+      'string.empty': 'First name cannot be empty',
+      'string.min': 'First name must be at least 2 characters long',
+      'string.max': 'First name must not exceed 30 characters',
+      'any.required': 'First name is required for personal accounts'
     }),
+    
+  lastName: joi.string()
+    .min(2)
+    .max(30)
+    .when('accountType', {
+      is: 'personal',
+      then: joi.required(),
+      otherwise: joi.forbidden()
+    })
+    .messages({
+      'string.base': 'Last name must be a string',
+      'string.empty': 'Last name cannot be empty',
+      'string.min': 'Last name must be at least 2 characters long',
+      'string.max': 'Last name must not exceed 30 characters',
+      'any.required': 'Last name is required for personal accounts'
+    }),
+
+  businessName: joi.string()
+    .min(2)
+    .max(100)
+    .when('accountType', {
+      is: 'business',
+      then: joi.required(),
+      otherwise: joi.forbidden()
+    })
+    .messages({
+      'string.base': 'Business name must be a string',
+      'string.empty': 'Business name cannot be empty',
+      'string.min': 'Business name must be at least 2 characters long',
+      'string.max': 'Business name must not exceed 100 characters',
+      'any.required': 'Business name is required for business accounts'
+    }),
+
+  accountType: joi.string().valid('personal', 'business').required().messages({
+    'string.base': 'Account type must be a string',
+    'any.only': 'Account type must be either personal or business',
+    'any.required': 'Account type is required'
+  }),
  
   email: joi.string().email({
     minDomainSegments: 2,

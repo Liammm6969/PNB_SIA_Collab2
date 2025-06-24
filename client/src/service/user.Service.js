@@ -57,24 +57,23 @@ const apiRequest = async (url, options = {}) => {
  * Contains all user-related operations
  */
 class UserService {
-  
-  /**
+    /**
    * Register a new user
    * @param {Object} userData - User registration data
-   * @param {string} userData.firstName - User's first name
-   * @param {string} userData.lastName - User's last name  
+   * @param {string} userData.firstName - User's first name (required for personal accounts)
+   * @param {string} userData.lastName - User's last name (required for personal accounts)
+   * @param {string} userData.businessName - Business name (required for business accounts)
    * @param {string} userData.email - User's email address
    * @param {string} userData.password - User's password
    * @param {string} userData.accountType - Account type ('personal' or 'business')
    * @returns {Promise<Object>} Registration response
-   */
-  async registerUser(userData) {
+   */async registerUser(userData) {
     try {
       // Transform frontend form data to backend expected format
       const registrationData = {
-        firstName: userData.accountType === 'personal' ? userData.firstName :undefined,
-        lastName:  userData.accountType === 'personal' ? userData.lastName :undefined,
-        companyName: userData.accountType === 'business' ? userData.companyName :undefined,
+        firstName: userData.accountType === 'personal' ? userData.firstName : undefined,
+        lastName: userData.accountType === 'personal' ? userData.lastName : undefined,
+        businessName: userData.accountType === 'business' ? userData.businessName : undefined,
         email: userData.email,
         password: userData.password,
         accountType: userData.accountType,

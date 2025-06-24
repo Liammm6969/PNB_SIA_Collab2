@@ -23,24 +23,31 @@ class UserService {
     this.listUsers = this.listUsers.bind(this);
     this.verifyOTP = this.verifyOTP.bind(this);
   }
+  async businessRegister(userData) {
+    try {
+        let {businessName, email, password,  accountType,  } = userData;
+ const existingBusinessName = await User.findOne({ businessName });
+        if (existingBusinessName) throw new DuplicateCompanyNameError('Business name already exists');
+
+
+    } catch (error) {
+      
+    }
+  }
 
   async registerUser(userData) {
     try {
-      let { firstName,lastName, companyName, email, password, role, address, accountType, dateOfBirth, withdrawalMethods } = userData;
+      let { firstName, lastName, businessName, email, password,  accountType,  } = userData;
       console.log(userData)
       const existingEmail = await User.findOne({ email });
       if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
 
-
-      // if (accountType === 'personal') {
-      //   const existingFullName = await User.findOne({ fullName });
-      //   if (existingFullName) throw new DuplicateUserFullNameError('Name already exists');
+      // Optional: Check for duplicate business names for business accounts
+      // if (accountType === 'business' && businessName) {
+      //   const existingBusinessName = await User.findOne({ businessName });
+      //   if (existingBusinessName) throw new DuplicateCompanyNameError('Business name already exists');
       // }
 
-      // if (accountType === 'business') {
-      //   const existingCompanyName = await User.findOne({ companyName });
-      //   if (existingCompanyName) throw new DuplicateCompanyNameError('Company name already exists');
-      // }
       const hashedPassword = await bcrypt.hash(password, 10);
 
       let randomAccountNumber;
@@ -48,16 +55,23 @@ class UserService {
       // do {
       //   randomAccountNumber = generateAccountNumber();
       //   ifAccountNumberExists = await User.findOne({ accountNumber: randomAccountNumber });
-      // } while (ifAccountNumberExists);
-
-      const user = new User({
-        firstName:firstName,
-        lastName:lastName,
+      // } while (ifAccountNumberExists);      // Create user object with conditional fields based on account type
+      const userObj = {
         accountType,
         accountNumber: generateAccountNumber(),
         email,
-        password: password,
-      });
+        password: hashedPassword,
+      };
+
+      // Add appropriate name fields based on account type
+      if (accountType === 'personal') {
+        userObj.firstName = firstName;
+        userObj.lastName = lastName;
+      } else if (accountType === 'business') {
+        userObj.businessName = businessName;
+      }
+
+      const user = new User(userObj);
 
       await user.save();
       return { message: 'User registered', userId: user.userId };
@@ -109,20 +123,20 @@ class UserService {
       if (user.otp !== otp) throw new Error('Invalid OTP.');
       if (user.otpExpires < new Date()) throw new OTPError('OTP expired. Please login again.');
       user.otp = undefined;
-      user.otpExpires = undefined;
-      await user.save();
-      const accessToken = generateAccessToken({
-        id: user.userId,
-        fullName: user.fullName,
+      user.otpExpires = undefined
+        const accessToken = generateAccessToken({
+        userId: user.userId,
+        displayName: user.displayName,
         email: user.email,
         role: user.role,
       });
       const refreshToken = generateRefreshToken({
-        id: user.userId,
-        fullName: user.fullName,
+        userId: user.userId,
+        displayName: user.displayName,
         email: user.email,
         role: user.role,
       });
+   
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
     } catch (err) {
       throw err;
