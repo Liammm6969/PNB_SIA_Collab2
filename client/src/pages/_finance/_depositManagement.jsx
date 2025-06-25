@@ -16,6 +16,7 @@ import {
   Building,
   Printer
 } from 'react-bootstrap-icons'
+import { TextField } from '@mui/material'
 import DepositRequestService from '../../services/depositRequest.Service'
 import StaffService from '../../services/staff.Service'
 import '../../styles/financeStyles/depositManagement.css'
@@ -236,17 +237,38 @@ const DepositManagement = () => {
       {/* Filters and Search */}
       <div className="deposit-mgmt-filter-card mb-4">
         <div className="deposit-mgmt-search">
-          <InputGroup>
-            <InputGroup.Text>
-              <Search size={16} />
-            </InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Search by customer name or request ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </InputGroup>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search by customer name or request ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: <Search size={16} style={{ marginRight: 8, color: '#6b7280' }} />,
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+                backgroundColor: '#f9fafb',
+                '&:hover': {
+                  backgroundColor: '#f3f4f6',
+                },
+                '&.Mui-focused': {
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 0 0 2px rgba(34, 197, 94, 0.2)',
+                },
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#e5e7eb',
+              },
+              '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+              },
+              '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#22c55e',
+              },
+            }}
+          />
         </div>
         <div className="deposit-mgmt-status">
           <Form.Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
