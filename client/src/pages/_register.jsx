@@ -1,8 +1,9 @@
 import React from 'react'
 import { Container, Row, Col, Form, Button, Alert, InputGroup, Card } from 'react-bootstrap'
-import { Eye, EyeSlash, Person, Building } from 'react-bootstrap-icons'
+import { Eye, EyeSlash, Person, Building, Lock, Envelope, GeoAlt, Calendar, Calendar3 } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service.js'
+import '../styles/Register.css'
 
 // Custom hook for register form logic
 function useRegisterForm(getInitialFormState, navigate) {
@@ -190,6 +191,8 @@ const Register = () => {
     firstName: '',
     lastName: '',
     email: '',
+    address: '',
+    dateOfBirth: '',
     businessName: '',
     password: '',
     confirmPassword: ''
@@ -211,212 +214,220 @@ const Register = () => {
   } = useRegisterForm(getInitialFormState, navigate)
 
   return (
-    <div className="register-page" style={{ height: '100vh', overflow: 'hidden' }}>
-      <Container fluid className="h-100">
-        <Row className="h-100">
-          {/* Banner Section */}
-          <Col lg={5} className="d-none d-lg-flex align-items-center justify-content-center p-0" style={{ maxWidth: '40%' }}>            <div 
-              className="banner-section w-100 h-100 d-flex align-items-center justify-content-center position-relative"
-              style={{ 
-                background: 'linear-gradient(135deg, #1e3a8a 0%, #6366f1 100%)',
-                height: '100vh'
-              }}
+    <div className="register-page">
+      <div className="register-card">
+        <div className="form-side">
+          {/* PNB Logo */}
+          <div className="pnb-logo">
+            <img src="/Logo.png" alt="PNB Logo" />
+          </div>
+          
+          {/* Form header */}
+          <div className="form-header">
+            <h1>Create Account</h1>
+            <p>Join our banking platform</p>
+          </div>
+          
+          {/* Alert for messages */}
+          {showAlert.show && (
+            <Alert 
+              variant={showAlert.variant} 
+              dismissible 
+              onClose={() => setShowAlert({ show: false, message: '', variant: '' })}
+              className="mb-4"
             >
-              {/* Background Pattern */}
+              {showAlert.message}
+            </Alert>
+          )}
+          
+          {/* Account type selection */}
+          <div className="account-type">
+            <div className="account-type-label">Choose Account Type</div>
+            <div className="account-type-options">
               <div 
-                className="position-absolute w-100 h-100"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                  opacity: 0.3
-                }}
-              />              {/* Banner Content */}
-              <div className="text-center text-white position-relative z-index-1 px-4">
-                <div className="mb-4">
-                  <img 
-                    src="/Logo.png" 
-                    alt="PNB Logo" 
-                    style={{ 
-                      width: '220px', 
-                      height: '220px', 
-                      objectFit: 'contain',
-                      marginBottom: '0'
-                    }}
-                    className="mb-3"
+                className={`account-type-option ${formData.accountType === 'personal' ? 'active' : ''}`}
+                onClick={() => handleAccountTypeChange('personal')}
+              >
+                <div className="icon">
+                  <Person />
+                </div>
+                <div className="label">Personal</div>
+              </div>
+              <div 
+                className={`account-type-option ${formData.accountType === 'business' ? 'active' : ''}`}
+                onClick={() => handleAccountTypeChange('business')}
+              >
+                <div className="icon">
+                  <Building />
+                </div>
+                <div className="label">Business</div>
+              </div>
+            </div>
+          </div>
+          
+          <Form onSubmit={handleSubmit}>
+            {/* Name fields - conditional based on account type */}
+            {formData.accountType === 'personal' ? (
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">First Name</label>
+                  <input
+                    type="text"
+                    className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    placeholder="Enter first name"
                   />
+                  {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
                 </div>
-                <h1 className="h2 fw-bold mb-3">Join PNB Today</h1>
-                <h4 className="fw-light mb-3">Banking System</h4>
-                <p className="mb-4 opacity-75" style={{ fontSize: '16px' }}>
-                  Create your account and experience secure, modern banking solutions.
-                </p>
-                <div className="d-flex justify-content-center gap-3 flex-wrap">
-                  <div className="text-center">
-                    <div className="fw-bold h5">Free</div>
-                    <small className="opacity-75">Account Setup</small>
-                  </div>
-                  <div className="text-center">
-                    <div className="fw-bold h5">Instant</div>
-                    <small className="opacity-75">Activation</small>
-                  </div>
-                  <div className="text-center">
-                    <div className="fw-bold h5">Secure</div>
-                    <small className="opacity-75">Platform</small>
-                  </div>
+                <div className="form-group">
+                  <label className="form-label">Last Name</label>
+                  <input
+                    type="text"
+                    className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    placeholder="Enter last name"
+                  />
+                  {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
                 </div>
+              </div>
+            ) : (
+              <div className="form-group mb-3">
+                <label className="form-label">Business Name</label>
+                <input
+                  type="text"
+                  className={`form-control ${errors.businessName ? 'is-invalid' : ''}`}
+                  name="businessName"
+                  value={formData.businessName}
+                  onChange={handleChange}
+                  placeholder="Enter business name"
+                />
+                {errors.businessName && <div className="invalid-feedback">{errors.businessName}</div>}
+              </div>
+            )}
+            
+            {/* Address field */}
+            <div className="form-group mb-3">
+              <label className="form-label">Address</label>
+              <div className="input-with-icon">
+                <GeoAlt className="input-icon" />
+                <input
+                  type="text"
+                  className="form-control"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="Enter your address"
+                />
               </div>
             </div>
-          </Col>
-
-          {/* Register Form Section */}
-          <Col lg={7} className="d-flex align-items-center justify-content-center p-3" style={{ height: '100vh', overflow: 'auto', minWidth: '60%' }}>
-            <div className="w-100" style={{ maxWidth: '600px' }}>              {/* Header */}
-              <div className="text-center mb-2">
-                <h2 className="fw-bold text-dark mb-1" style={{ fontSize: '24px' }}>Create Account</h2>
-                <p className="text-muted mb-0" style={{ fontSize: '14px' }}>Join our banking platform</p>
-              </div>
-
-              {/* Alert */}
-              {showAlert.show && (
-                <Alert 
-                  variant={showAlert.variant} 
-                  dismissible 
-                  onClose={() => setShowAlert({ show: false, message: '', variant: '' })}
-                  className="mb-2"
-                  style={{ fontSize: '13px' }}
-                >
-                  {showAlert.message}
-                </Alert>
-              )}
-
-              {/* Account Type Selection */}
-              <div className="mb-2">
-                <Form.Label className="fw-semibold mb-1 d-block" style={styles.label}>Choose Account Type</Form.Label>
-                <Row className="g-2">
-                  <Col xs={6}>                    <Card 
-                      className={`text-center cursor-pointer ${formData.accountType === 'personal' ? 'border-primary bg-light' : 'border-secondary'}`}
-                      style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
-                      onClick={() => handleAccountTypeChange('personal')}
-                    >
-                      <Card.Body className="py-1">
-                        <Person size={20} className={formData.accountType === 'personal' ? 'text-primary' : 'text-muted'} style={{ color: formData.accountType === 'personal' ? '#1e3a8a' : undefined }} />
-                        <div className={`mt-1 fw-semibold ${formData.accountType === 'personal' ? 'text-primary' : 'text-dark'}`} style={{ fontSize: '12px', color: formData.accountType === 'personal' ? '#1e3a8a' : undefined }}>
-                          Personal
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                  <Col xs={6}>                    <Card 
-                      className={`text-center cursor-pointer ${formData.accountType === 'business' ? 'border-primary bg-light' : 'border-secondary'}`}
-                      style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
-                      onClick={() => handleAccountTypeChange('business')}
-                    >
-                      <Card.Body className="py-1">
-                        <Building size={20} className={formData.accountType === 'business' ? 'text-primary' : 'text-muted'} style={{ color: formData.accountType === 'business' ? '#1e3a8a' : undefined }} />
-                        <div className={`mt-1 fw-semibold ${formData.accountType === 'business' ? 'text-primary' : 'text-dark'}`} style={{ fontSize: '12px', color: formData.accountType === 'business' ? '#1e3a8a' : undefined }}>
-                          Business
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
-              </div>
-
-              {/* Register Form */}
-              <Form onSubmit={handleSubmit}>
-                {formData.accountType === 'personal' && (
-                  <Row className="g-2">
-                    <Col xs={6}>
-                      <Field label="First Name" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} error={errors.firstName} />
-                    </Col>
-                    <Col xs={6}>
-                      <Field label="Last Name" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} error={errors.lastName} />
-                    </Col>
-                  </Row>
-                )}
-                {formData.accountType === 'business' && (
-                  <Row className="g-2">
-                    <Col xs={12}>
-                      <Field label="Business Name" name="businessName" placeholder="Enter business name" value={formData.businessName} onChange={handleChange} error={errors.businessName} />
-                    </Col>
-                  </Row>
-                )}
-                <Row className="g-2">
-                  <Col xs={12}>
-                    <Field label="Email Address" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} error={errors.email} />
-                  </Col>
-                </Row>
-                <Row className="g-2">
-                  <Col xs={6}>
-                    <PasswordField 
-                      label="Password" 
-                      name="password" 
-                      placeholder="Create password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      error={errors.password}
-                      show={showPassword}
-                      toggleShow={() => setShowPassword(v => !v)}
-                    />
-                  </Col>
-                  <Col xs={6}>
-                    <PasswordField 
-                      label="Confirm Password" 
-                      name="confirmPassword" 
-                      placeholder="Confirm password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      error={errors.confirmPassword}
-                      show={showConfirmPassword}
-                      toggleShow={() => setShowConfirmPassword(v => !v)}
-                    />
-                  </Col>
-                </Row>
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="w-100 fw-semibold mt-2 mb-2"
-                  disabled={isLoading}
-                  style={{ 
-                    background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    height: '35px'
-                  }}
-                >
-                  {isLoading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Creating Account...
-                    </>
-                  ) : (
-                    'Create Account'
-                  )}
-                </Button>
-                <div className="text-center">
-                  <span className="text-muted" style={{ fontSize: '12px' }}>
-                    Already have an account?{' '}
-                    <Link 
-                      to="/login"
-                      className="text-decoration-none fw-semibold"
-                      style={{ fontSize: '12px' }}
-                    >
-                      Sign In
-                    </Link>
-                  </span>
-                </div>
-              </Form>
-
-              {/* Footer */}
-              <div className="text-center mt-1">
-                <p className="text-muted mb-0" style={{ fontSize: '10px' }}>
-                  © 2025 PNB Banking System. All rights reserved.
-                </p>
+            
+            {/* Date of Birth field */}
+            <div className="form-group mb-3">
+              <label className="form-label">Date of Birth</label>
+              <div className="input-with-icon">
+                <Calendar3 className="input-icon" />
+                <input
+                  type="date"
+                  className="form-control"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                />
               </div>
             </div>
-          </Col>
-        </Row>
-      </Container>
+            
+            {/* Email field */}
+            <div className="form-group mb-3">
+              <label className="form-label">Email Address</label>
+              <div className="input-with-icon">
+                <Envelope className="input-icon" />
+                <input
+                  type="email"
+                  className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                />
+                {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+              </div>
+            </div>
+            
+            {/* Password field */}
+            <div className="form-group mb-3">
+              <label className="form-label">Password</label>
+              <div className="input-with-icon">
+                <Lock className="input-icon" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                />
+                <div className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeSlash /> : <Eye />}
+                </div>
+                {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+              </div>
+            </div>
+            
+            {/* Confirm Password field */}
+            <div className="form-group mb-4">
+              <label className="form-label">Confirm Password</label>
+              <div className="input-with-icon">
+                <Lock className="input-icon" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm your password"
+                />
+                <div className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  {showConfirmPassword ? <EyeSlash /> : <Eye />}
+                </div>
+                {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
+              </div>
+            </div>
+            
+            {/* Submit button */}
+            <button 
+              type="submit" 
+              className="submit-button"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </Form>
+          
+          {/* Sign in link */}
+          <div className="sign-in-link">
+            Already have an account? <Link to="/login">Sign In</Link>
+          </div>
+          
+          {/* Copyright */}
+          <div className="text-center mt-4">
+            <small className="text-muted">© 2025 PNB Banking System. All rights reserved.</small>
+          </div>
+        </div>
+        
+        {/* Right side - Banner */}
+        <div className="banner-side">
+          <div className="banner-content">
+            <h2>Hello,</h2>
+            <div className="tagline">Welcome!</div>
+            <h3>Your success is our promise</h3>
+            <p>PNB crafts every service around your needs and future vision.</p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
