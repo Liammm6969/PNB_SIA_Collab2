@@ -22,8 +22,6 @@
 
 ### 📊 Repository Analytics
 
-### 📊 Repository Analytics
-
 **💡 Repository Status:** 
 - ✅ **Repository URL**: [github.com/Buchi-dev/PNB_SIA_Collab](https://github.com/Buchi-dev/PNB_SIA_Collab)
 - 🔒 **Visibility**: Private repository (badges may show "repo not found")
@@ -62,21 +60,6 @@
 │ 🔗  Remote: github.com/Buchi-dev/...       │
 └─────────────────────────────────────────────┘
 
-🎯 Actual File Distribution:
-JavaScript  ████████████████████████ 89.4% (7,936 files)
-JSON        ████                     10.0% (887 files)  
-CSS         █                        0.24% (21 files)
-JSX         █                        0.24% (21 files)
-Other       █                        0.12% (various)
-
-📊 Real Development Activity:
-├── Backend Development: 45+ controllers, services, models
-├── Frontend Development: 28+ React components & pages  
-├── Database Models: 8+ MongoDB schemas
-├── API Endpoints: 40+ RESTful endpoints
-├── Authentication: JWT + Role-based access
-└── UI Components: Bootstrap + Custom styling
-```
 
 ### 🚀 Quick Repository Access
 
@@ -108,24 +91,6 @@ cd client && npm run dev  # Frontend on :5173
 | 📦 **Repository Size** | ![Size](https://img.shields.io/github/repo-size/Buchi-dev/PNB_SIA_Collab?style=flat-square&logo=github&logoColor=white&label=Size&color=yellow) | Total codebase size |
 | 🔄 **Total Pushes** | ![Pushes](https://img.shields.io/badge/Pushes-89+-brightgreen?style=flat-square&logo=git&logoColor=white) | Code deployments |
 | 🔄 **Total Pulls** | ![Pulls](https://img.shields.io/badge/Pulls-156+-lightblue?style=flat-square&logo=git&logoColor=white) | Code synchronizations |
-
-### 🎯 Real Development Activity
-
-```
-📊 Code Frequency (Based on Actual Data)
-┌─────────────────────────────────────────────────┐
-│  Week 1    ████████████░░░░░░░░  65% (148 commits) │
-│  Week 2    ██████████████████░░  85% (193 commits) │
-│  Week 3    ████████████████████  95% (216 commits) │
-│  Week 4    ██████████████░░░░░░  72% (164 commits) │
-└─────────────────────────────────────────────────┘
-
-🔄 Recent Git Operations (Live Data):
-✅ Latest Push: Frontend dashboard optimization
-✅ Latest Pull: Backend API security updates  
-✅ Latest Merge: Feature/user-beneficiaries → main
-✅ Latest Tag: v2.1.0 - Multi-role banking system
-```
 
 ### 📋 Project Development Phases
 
