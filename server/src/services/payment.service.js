@@ -307,6 +307,19 @@ class PaymentService {
       throw err;
     }
   }
+
+  async getAllPayments() {
+    try {
+      const payments = await Payment.find({})
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .lean();
+      
+      return payments;
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 module.exports = new PaymentService();

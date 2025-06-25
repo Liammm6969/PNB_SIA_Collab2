@@ -292,6 +292,62 @@ class TransactionService {
     };
     return statusColors[status] || 'secondary';
   }
+
+  /**
+   * Get all transactions (Finance/Admin only)
+   * @param {Object} options - Query options
+   * @param {number} [options.limit] - Number of transactions to fetch
+   * @param {string} [accessToken] - Access token for authentication
+   * @returns {Promise<Array>} All transactions array
+   */
+  static async getAllTransactions(options = {}, accessToken = null) {
+    try {
+      const config = {
+        params: {}
+      };
+
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
+      }
+
+      if (options.limit) config.params.limit = options.limit;
+
+      const response = await api.get(TRANSACTION_ENDPOINT, config);
+
+      return response.data;
+    } catch (error) {
+      console.error('Get all transactions error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all payments/transactions for finance dashboard
+   * @param {Object} options - Query options
+   * @param {number} [options.limit] - Number of payments to fetch
+   * @param {string} [accessToken] - Access token for authentication
+   * @returns {Promise<Array>} All payments array
+   */
+  static async getAllPayments(options = {}, accessToken = null) {
+    try {
+      const config = {};
+
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
+      }
+
+      const response = await api.get('/payments', config);
+
+      return response.data;
+    } catch (error) {
+      console.error('Get all payments error:', error);
+      throw error;
+    }
+  }
 }
 
 export default TransactionService;

@@ -77,7 +77,6 @@ const UserLayout = () => {
     // Show only last 4 digits for security
     return `****${accountNum.slice(-4)}`
   }
-
   const navigationItems = [
     {
       title: "Dashboard",
@@ -88,6 +87,11 @@ const UserLayout = () => {
       title: "Transfer",
       path: "/user/transfer",
       icon: <ArrowLeftRight className="me-2" />
+    },
+    {
+      title: "Deposit Request",
+      path: "/user/deposit-request",
+      icon: <PiggyBank className="me-2" />
     },
     {
       title: "Statements",

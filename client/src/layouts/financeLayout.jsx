@@ -15,7 +15,8 @@ import {
   Building,
   Cash,
   GraphUp,
-  Eye
+  Eye,
+  Send
 } from 'react-bootstrap-icons'
 import StaffService from '../services/staff.Service'
 
@@ -71,7 +72,6 @@ const FinanceLayout = () => {
       ? `${staff.staffFirstName} ${staff.staffLastName}` 
       : 'Finance Staff'
   }
-
   // Helper function to format staff ID for display
   const getDisplayStaffId = () => {
     if (!staff || !staff.staffStringId) return 'STAFF_****'
@@ -80,6 +80,7 @@ const FinanceLayout = () => {
     // Show only last 4 characters for security
     return `****${staffId.slice(-4)}`
   }
+  
   const navigationItems = [
     {
       title: "Dashboard",
@@ -92,6 +93,12 @@ const FinanceLayout = () => {
       path: "/finance/deposits",
       icon: <Cash className="me-2" />,
       description: "Process User Deposits"
+    },
+    {
+      title: "Deposit Processing",
+      path: "/finance/processing",
+      icon: <Send className="me-2" />,
+      description: "Credit Approved Deposits"
     },
     {
       title: "Reports",

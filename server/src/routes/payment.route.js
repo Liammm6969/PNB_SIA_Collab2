@@ -1,6 +1,7 @@
 const {
   createPayment,
   getPayments,
+  getAllPayments,
   getPaymentById,
   getUserStatements,
   createWithdrawal,
@@ -35,7 +36,10 @@ const router = express.Router();
 
 router.post('/', createPayment);
 
-// Get all payments
+// Get all payments (Finance/Admin only)
+router.get('/', getAllPayments);
+
+// Get payments for specific user
 // router.get('/user-payments/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPayments);
 router.get('/user-payments/:userId', getPayments);
 

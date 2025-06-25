@@ -86,11 +86,19 @@ exports.createDeposit = async (req, res) => {
   }
 }
 
-
+exports.getAllPayments = async (req, res) => {
+  try {
+    const payments = await PaymentService.getAllPayments();
+    res.status(StatusCodes.OK).json(payments);
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+  }
+}
 
 exports.module = {
   createPayment: exports.createPayment,
   getPayments: exports.getPayments,
+  getAllPayments: exports.getAllPayments,
   getUserStatements: exports.getUserStatements,
   getPaymentById: exports.getPaymentById,
   createWithdrawal: exports.createWithdrawal,

@@ -3,11 +3,13 @@ const TransactionModel = require('./transaction.model');
 const UserModel = require('./user.model');
 const StaffModel = require('./staff.model');
 const BeneficiaryModel = require('./beneficiary.model');
+const DepositRequestModel = require('./depositRequest.model');
 
 module.exports = {
   Payment: PaymentModel,
   Transaction: TransactionModel,
   User: UserModel,
   Staff: StaffModel,
-  Beneficiary: BeneficiaryModel
+  Beneficiary: BeneficiaryModel,
+  DepositRequest: DepositRequestModel
 };
