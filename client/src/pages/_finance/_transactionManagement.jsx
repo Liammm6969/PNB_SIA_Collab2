@@ -69,13 +69,14 @@ const TransactionManagement = () => {
       setLoading(false)
     }
   }
-
   // Filter transactions based on type, status, and search term
   const filteredTransactions = transactions.filter(transaction => {
     const matchesType = filterType === 'All' || transaction.type === filterType
     const matchesStatus = filterStatus === 'All' || transaction.status === filterStatus
-    const matchesSearch = transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const transactionId = transaction.id ? transaction.id.toString() : ''
+    const transactionDescription = transaction.description ? transaction.description.toString() : ''
+    const matchesSearch = transactionId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         transactionDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          transaction.fromUser.toString().includes(searchTerm) ||
                          transaction.toUser.toString().includes(searchTerm)
     

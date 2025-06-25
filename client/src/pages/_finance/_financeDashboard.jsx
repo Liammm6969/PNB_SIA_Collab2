@@ -406,10 +406,10 @@ const FinanceDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentTransactions.map((transaction) => (
-                      <tr key={transaction.paymentStringId || transaction.id}>
+                    {recentTransactions.map((transaction, index) => (
+                      <tr key={transaction.paymentStringId || transaction.paymentId || transaction.id || `transaction-${index}`}>
                         <td className="border-0">
-                          <code className="text-primary">{transaction.paymentStringId || transaction.id}</code>
+                          <code className="text-primary">{transaction.paymentStringId || transaction.paymentId || transaction.id}</code>
                         </td>
                         <td className="border-0">
                           <Badge bg={getTransactionTypeBadge(transaction.fromUser === 0 ? 'deposit' : 'transfer').bg}>
