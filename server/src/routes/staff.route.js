@@ -7,7 +7,7 @@ const { addStaffSchema,
 
   router.use(verifyAccessToken);
 
-router.post('/login', ValidateRequestBodyMiddleware(loginStaffSchema), staffController.loginStaff);
+router.post('/login',  staffController.loginStaff);
 
 router.post('/', ValidateRequestBodyMiddleware(addStaffSchema), staffController.createStaff);
 

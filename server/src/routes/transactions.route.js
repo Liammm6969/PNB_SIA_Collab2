@@ -4,7 +4,7 @@ const transactionsController = require('../controllers/transactions.controller')
 
 const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, verifyAccessToken, PermissionMiddleware, ApiLimiterMiddleware } = require('../middleware');
 const { addTransactionSchema,
-  validateTransactionIdSchema, validateUserIdSchema, updateTransactionSchema } = require('../schema');
+  validateTransactionIdSchema, validateUserIdSchema, updateTransactionSchema,withdrawSchema } = require('../schema');
 const Roles = require('../lib/roles');
 
 
@@ -45,6 +45,6 @@ router.post('/withdraw', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(wit
 
 // Transfer money
 // router.post('/transfer', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(transferSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transactionsController.transferMoney);
-router.post('/transfer', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(transferSchema), transactionsController.transferMoney);
+router.post('/transfer', ApiLimiterMiddleware, transactionsController.transferMoney);
 
 module.exports = router;
