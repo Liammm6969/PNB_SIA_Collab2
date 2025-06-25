@@ -50,38 +50,6 @@
 | 💻 **Clone Command** | `git clone https://github.com/Buchi-dev/PNB_SIA_Collab.git` | Local development setup |
 | 📋 **Copy URL** | `https://github.com/Buchi-dev/PNB_SIA_Collab` | Share with team members |
 
-### 🔧 Development Metrics (Real Data from Your Repository)
-
-```
-📈 Actual Repository Statistics:
-┌─────────────────────────────────────────────┐
-│ 🏗️  Project: PNB Multi-Role Banking System │
-│ 📁  Repository: PNB_SIA_Collab              │
-│ 📊  Total Files: 8,865 files               │
-│ 💾  Languages: 5 programming languages     │
-│ 🌿  Branches: main, axios, selerqc-*       │
-│ 🔗  Remote: github.com/Buchi-dev/...       │
-└─────────────────────────────────────────────┘
-
-
-### 🚀 Quick Repository Access
-
-```bash
-# Clone your actual repository
-git clone https://github.com/Buchi-dev/PNB_SIA_Collab.git
-
-# Navigate to project
-cd PNB_SIA_Collab
-
-# Install dependencies
-cd server && npm install
-cd ../client && npm install
-
-# Start the banking system
-cd server && npm start    # Backend on :4000
-cd client && npm run dev  # Frontend on :5173
-```
-
 ### 🔄 Development Statistics
 
 | **Metric** | **Count** | **Description** |
