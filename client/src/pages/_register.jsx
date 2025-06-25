@@ -1,14 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Container, Row, Col, Form, Button, Alert, InputGroup, Card } from 'react-bootstrap'
-import { Eye, EyeSlash, Person, Bank, Building } from 'react-bootstrap-icons'
+import { Eye, EyeSlash, Person, Building } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service.js'
 
-const Register = () => {  
+const Register = () => {
   const navigate = useNavigate()
-  
-  // Initial form state helper
-  const getInitialFormState = () => ({
+
+  const getInitialFormState = useCallback(() => ({
     accountType: 'personal',
     firstName: '',
     lastName: '',
@@ -16,21 +15,20 @@ const Register = () => {
     businessName: '',
     password: '',
     confirmPassword: ''
-  })
-  
+  }), [])
+
   const [formData, setFormData] = useState(getInitialFormState())
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [showAlert, setShowAlert] = useState({ show: false, message: '', variant: '' })
-  
-  // Common styles to avoid repetition
+
   const styles = {
     input: { fontSize: '13px', height: '30px' },
     label: { fontSize: '12px' },
     feedback: { fontSize: '11px' },
-    eyeToggle: { 
+    eyeToggle: {
       cursor: 'pointer',
       height: '30px',
       display: 'flex',
@@ -38,20 +36,19 @@ const Register = () => {
     }
   }
 
-  // Clear specific error when user starts typing
-  const clearError = (fieldName) => {
+  const clearError = useCallback((fieldName) => {
     if (errors[fieldName]) {
       setErrors(prev => ({ ...prev, [fieldName]: '' }))
     }
-  }
-  
-  const handleChange = (e) => {
+  }, [errors])
+
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     clearError(name)
-  }
+  }, [clearError])
 
-  const handleAccountTypeChange = (accountType) => {
+  const handleAccountTypeChange = useCallback((accountType) => {
     setFormData(prev => ({
       ...prev,
       accountType,
@@ -59,8 +56,6 @@ const Register = () => {
       lastName: accountType === 'business' ? '' : prev.lastName,
       businessName: accountType === 'personal' ? '' : prev.businessName
     }))
-    
-    // Clear errors for fields that are no longer relevant
     const newErrors = { ...errors }
     if (accountType === 'business') {
       delete newErrors.firstName
@@ -69,60 +64,46 @@ const Register = () => {
       delete newErrors.businessName
     }
     setErrors(newErrors)
-  }
+  }, [errors])
 
-  // Simplified password validation
-  const validatePassword = (password) => {
+  const validatePassword = useCallback((password) => {
     if (!password) return 'Password is required'
     if (password.length < 8) return 'Password must be at least 8 characters'
     if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter'
     if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter'
     if (!/\d/.test(password)) return 'Password must contain at least one number'
     return ''
-  }
-  
-  const validateForm = () => {
+  }, [])
+
+  const validateForm = useCallback(() => {
     const newErrors = {}
-    
-    // Validate based on account type
     if (formData.accountType === 'personal') {
       if (!formData.firstName.trim()) newErrors.firstName = 'First name is required'
       if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required'
     } else {
       if (!formData.businessName.trim()) newErrors.businessName = 'Business name is required'
     }
-    
-    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required'
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address'
     }
-    
-    // Password validation
     const passwordError = validatePassword(formData.password)
     if (passwordError) newErrors.password = passwordError
-    
-    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password'
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match'
     }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
-  }
+  }, [formData, validatePassword])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
-    
     if (!validateForm()) return
-
     setIsLoading(true)
-    
     try {
-      // Prepare user data based on account type
       const userData = formData.accountType === 'personal'
         ? UserService.createPersonalAccountData(
             formData.firstName,
@@ -135,18 +116,14 @@ const Register = () => {
             formData.email,
             formData.password
           )
-      
       await UserService.registerUser(userData)
-      
       setShowAlert({
         show: true,
         message: 'Registration successful! Redirecting to login...',
         variant: 'success'
       })
-      
       setFormData(getInitialFormState())
       setTimeout(() => navigate('/login'), 2000)
-      
     } catch (error) {
       console.error('Registration error:', error)
       setShowAlert({
@@ -157,10 +134,9 @@ const Register = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [formData, getInitialFormState, navigate, validateForm])
 
-  // Reusable form field component
-  const FormField = ({ label, name, type = 'text', placeholder, size = 'sm' }) => (
+  const FormField = useCallback(({ label, name, type = 'text', placeholder, size = 'sm' }) => (
     <Form.Group className="mb-2">
       <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
       <Form.Control
@@ -177,10 +153,9 @@ const Register = () => {
         {errors[name]}
       </Form.Control.Feedback>
     </Form.Group>
-  )
+  ), [formData, errors, handleChange, styles])
 
-  // Reusable password field component
-  const PasswordField = ({ label, name, placeholder, showPassword, toggleShow }) => (
+  const PasswordField = useCallback(({ label, name, placeholder, showPassword, toggleShow }) => (
     <Form.Group className="mb-2">
       <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
       <InputGroup size="sm">
@@ -201,7 +176,7 @@ const Register = () => {
         {errors[name]}
       </Form.Control.Feedback>
     </Form.Group>
-  )
+  ), [formData, errors, handleChange, styles])
 
   return (
     <div className="register-page" style={{ height: '100vh', overflow: 'hidden' }}>
@@ -364,7 +339,8 @@ const Register = () => {
                       toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
                     />
                   </Col>
-                </Row>                <Button
+                </Row>
+                <Button
                   variant="primary"
                   type="submit"
                   className="w-100 fw-semibold mt-2 mb-2"
