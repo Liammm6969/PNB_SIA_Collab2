@@ -16,7 +16,8 @@ const {
   addPaymentSchema,
   transferPaymentSchema,
   validatePaymentIdSchema,
-  validateUserIdSchema
+  validateUserIdSchema,
+  withdrawSchema,
 } = require("../schema/index.js");
 
 const {
@@ -50,7 +51,7 @@ router.get('/user-statements/:userId', ValidateRequestRouteParameterMiddleware(v
 router.post('/withdraw', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(withdrawSchema), createWithdrawal);
 
 // Create deposit
-router.post('/deposit', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(depositSchema), createDeposit);
+router.post('/deposit', ApiLimiterMiddleware, createDeposit);
 
 // Get a payment by ID
 // router.get('/:paymentId', ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPaymentById);
