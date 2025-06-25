@@ -1,9 +1,9 @@
 import React from 'react'
-import { Container, Row, Col, Form, Button, Alert, InputGroup, Badge } from 'react-bootstrap'
-import { Eye, EyeSlash, PersonBadge, Person } from 'react-bootstrap-icons'
+import { Eye, EyeSlash, PersonBadge, Person, X } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service.js'
 import StaffService from '../services/staff.Service.js'
+import '../styles/_login.css'
 
 // Custom hook for login form logic
 function useLoginForm(navigate) {
@@ -68,12 +68,12 @@ function useLoginForm(navigate) {
           localStorage.setItem('staffDepartment', loginResponse.department)
           localStorage.setItem('staffFirstName', loginResponse.firstName)
           localStorage.setItem('staffLastName', loginResponse.lastName)
-          localStorage.setItem('staffStringId', loginResponse.staffStringId);
+          localStorage.setItem('staffStringId', loginResponse.staffStringId)
           setShowAlert({
             show: true,
             message: `Welcome ${loginResponse.firstName}! Redirecting to ${loginResponse.department} dashboard...`,
             variant: 'success'
-          });
+          })
           setTimeout(() => {
             switch (loginResponse.department.toLowerCase()) {
               case 'admin':
@@ -112,7 +112,7 @@ function useLoginForm(navigate) {
       setShowAlert({
         show: true,
         message: error.message || 'Login failed. Please check your credentials.',
-        variant: 'danger'
+        variant: 'error'
       })
     } finally {
       setIsLoading(false)
@@ -136,59 +136,87 @@ function useLoginForm(navigate) {
   }
 }
 
-const styles = {
-  input: { fontSize: '16px', height: '48px' },
-  label: { fontSize: '16px' },
-  feedback: { fontSize: '14px' },
-  eyeToggle: { cursor: 'pointer', height: '48px', display: 'flex', alignItems: 'center' }
-}
-
-function Field({ label, name, type = 'text', placeholder, value, onChange, error, style, ...rest }) {
+// Form Input Component
+function FormInput({ label, name, type = 'text', placeholder, value, onChange, error, className, ...rest }) {
   return (
-    <Form.Group className="mb-4">
-      <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
-      <Form.Control
+    <div className="form-group">
+      <label className="form-label" htmlFor={name}>
+        {label}
+      </label>
+      <input
+        id={name}
         type={type}
         name={name}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        isInvalid={!!error}
-        style={{ ...styles.input, ...style }}
+        className={`form-input ${className || ''} ${error ? 'error' : ''}`}
         {...rest}
       />
-      <Form.Control.Feedback type="invalid" style={styles.feedback}>
-        {error}
-      </Form.Control.Feedback>
-    </Form.Group>
+      {error && (
+        <div className="form-error">
+          {error}
+        </div>
+      )}
+    </div>
   )
 }
 
-function PasswordField({ label, name, placeholder, value, onChange, error, show, toggleShow }) {
+// Password Input Component
+function PasswordInput({ label, name, placeholder, value, onChange, error, show, onToggle }) {
   return (
-    <Form.Group className="mb-4">
-      <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
-      <InputGroup>
-        <Form.Control
+    <div className="form-group">
+      <label className="form-label" htmlFor={name}>
+        {label}
+      </label>
+      <div className="password-input-group">
+        <input
+          id={name}
           type={show ? 'text' : 'password'}
           name={name}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          isInvalid={!!error}
-          style={styles.input}
+          className={`form-input ${error ? 'error' : ''}`}
         />
-        <InputGroup.Text style={styles.eyeToggle} onClick={toggleShow}>
-          {show ? <EyeSlash className="text-muted" size={20} /> : <Eye className="text-muted" size={20} />}
-        </InputGroup.Text>
-      </InputGroup>
-      <Form.Control.Feedback type="invalid" style={styles.feedback}>
-        {error}
-      </Form.Control.Feedback>
-    </Form.Group>
+        <button
+          type="button"
+          className="password-toggle"
+          onClick={onToggle}
+          aria-label={show ? 'Hide password' : 'Show password'}
+        >
+          {show ? <EyeSlash size={20} /> : <Eye size={20} />}
+        </button>
+      </div>
+      {error && (
+        <div className="form-error">
+          {error}
+        </div>
+      )}
+    </div>
   )
 }
 
+// Alert Component
+function Alert({ show, variant, message, onClose }) {
+  if (!show) return null
+  
+  return (
+    <div className={`alert ${variant}`}>
+      <span>{message}</span>
+      <button
+        type="button"
+        className="alert-close"
+        onClick={onClose}
+        aria-label="Close alert"
+      >
+        <X size={18} />
+      </button>
+    </div>
+  )
+}
+
+// Main Login Component
 const Login = () => {
   const navigate = useNavigate()
   const {
@@ -207,115 +235,87 @@ const Login = () => {
   } = useLoginForm(navigate)
 
   return (
-    <div className="login-page" style={{ height: '100vh', overflow: 'hidden' }}>
-      <Container fluid className="h-100">
-        <Row className="h-100">
+    <div className="login-page">
+      <div className="login-container">
+        <div className="login-card">
           {/* Banner Section */}
-          <Col lg={5} className="d-none d-lg-flex align-items-center justify-content-center p-0" style={{ maxWidth: '40%' }}>            <div 
-              className="banner-section w-100 h-100 d-flex align-items-center justify-content-center position-relative"
-              style={{ 
-                background: 'linear-gradient(135deg, #1e3a8a 0%, #6366f1 100%)',
-                height: '100vh'
-              }}
-            >
-              {/* Background Pattern */}
-              <div 
-                className="position-absolute w-100 h-100"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                  opacity: 0.3
-                }}
-              />              {/* Banner Content */}
-              <div className="text-center text-white position-relative z-index-1 px-4">
-                <div className="mb-4">
-                  <img 
-                    src="/Logo.png" 
-                    alt="PNB Logo" 
-                    style={{ 
-                      width: '220px', 
-                      height: '220px', 
-                      objectFit: 'contain',
-                      marginBottom: '0'
-                    }}
-                    className="mb-3"
-                  />
+          <div className="banner-section">
+            <div className="banner-pattern"></div>
+            <div className="banner-content">
+              <img 
+                src="/Logo.png" 
+                alt="PNB Logo" 
+                className="banner-logo"
+              />
+              <h1 className="banner-title">Welcome to PNB</h1>
+              <h2 className="banner-subtitle">Banking System</h2>
+              <p className="banner-description">
+                Secure, reliable, and modern banking solutions for your financial needs.
+              </p>
+              <div className="banner-features">
+                <div className="banner-feature">
+                  <div className="banner-feature-value">24/7</div>
+                  <div className="banner-feature-label">Support</div>
                 </div>
-                <h1 className="h2 fw-bold mb-3">Welcome to PNB</h1>
-                <h4 className="fw-light mb-3">Banking System</h4>
-                <p className="mb-4 opacity-75" style={{ fontSize: '16px' }}>
-                  Secure, reliable, and modern banking solutions for your financial needs.
-                </p>
-                <div className="d-flex justify-content-center gap-3 flex-wrap">
-                  <div className="text-center">
-                    <div className="fw-bold h5">24/7</div>
-                    <small className="opacity-75">Support</small>
-                  </div>
-                  <div className="text-center">
-                    <div className="fw-bold h5">256-bit</div>
-                    <small className="opacity-75">Encryption</small>
-                  </div>
-                  <div className="text-center">
-                    <div className="fw-bold h5">10M+</div>
-                    <small className="opacity-75">Customers</small>
-                  </div>
+                <div className="banner-feature">
+                  <div className="banner-feature-value">256-bit</div>
+                  <div className="banner-feature-label">Encryption</div>
+                </div>
+                <div className="banner-feature">
+                  <div className="banner-feature-value">10M+</div>
+                  <div className="banner-feature-label">Customers</div>
                 </div>
               </div>
             </div>
-          </Col>
+          </div>
 
-          {/* Login Form Section */}
-          <Col lg={7} className="d-flex align-items-center justify-content-center p-4" style={{ height: '100vh', overflow: 'auto', minWidth: '60%' }}>
-            <div className="w-100" style={{ maxWidth: '600px' }}>              {/* Header */}
-              <div className="text-center mb-4">
-                <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '32px' }}>Sign In</h2>
-                <p className="text-muted mb-3" style={{ fontSize: '18px' }}>Access your account with email or staff ID</p>
+          {/* Form Section */}
+          <div className="form-section">
+            <div className="form-container">
+              {/* Header */}
+              <div className="form-header">
+                <h1 className="form-title">Sign In</h1>
+                <p className="form-subtitle">Access your account with email or staff ID</p>
                 
-                {/* Account Type Detection Indicator */}
+                {/* Account Type Detection Badge */}
                 {detectedType && (
-                  <div className="mb-3">
-                    <Badge 
-                      bg={detectedType === 'staff' ? 'primary' : 'success'} 
-                      className="px-3 py-2"
-                      style={{ fontSize: '14px' }}
-                    >
-                      {detectedType === 'staff' ? (
-                        <>
-                          <PersonBadge className="me-2" size={16} />
-                          Staff Account Detected
-                        </>
-                      ) : (
-                        <>
-                          <Person className="me-2" size={16} />
-                          Customer Account Detected
-                        </>
-                      )}
-                    </Badge>
+                  <div className={`account-type-badge ${detectedType}`}>
+                    {detectedType === 'staff' ? (
+                      <>
+                        <PersonBadge className="account-type-icon" size={16} />
+                        Staff Account Detected
+                      </>
+                    ) : (
+                      <>
+                        <Person className="account-type-icon" size={16} />
+                        Customer Account Detected
+                      </>
+                    )}
                   </div>
                 )}
               </div>
 
               {/* Alert */}
-              {showAlert.show && (
-                <Alert 
-                  variant={showAlert.variant} 
-                  dismissible 
-                  onClose={() => setShowAlert({ show: false, message: '', variant: '' })}
-                  className="mb-4"
-                  style={{ fontSize: '15px' }}
-                >
-                  {showAlert.message}
-                </Alert>
-              )}              <Form onSubmit={handleSubmit}>
-                <Field
+              <Alert 
+                show={showAlert.show}
+                variant={showAlert.variant}
+                message={showAlert.message}
+                onClose={() => setShowAlert({ show: false, message: '', variant: '' })}
+              />
+
+              {/* Login Form */}
+              <form onSubmit={handleSubmit}>
+                <FormInput
                   label="Email or Staff ID"
                   name="identifier"
-                  placeholder="Enter your email address or Staff ID (e.g., user@example.com or STAFF_3000)"
+                  placeholder="Enter your email address or Staff ID (e.g., STAFF_3000)"
                   value={formData.identifier}
                   onChange={handleChange}
                   error={errors.identifier}
-                  style={{ borderColor: detectedType === 'staff' ? '#6366f1' : detectedType === 'user' ? '#1e3a8a' : '' }}
+                  className={detectedType ? `${detectedType}-detected` : ''}
                 />
-                <PasswordField
+
+                <PasswordInput
                   label="Password"
                   name="password"
                   placeholder="Enter your password"
@@ -323,71 +323,54 @@ const Login = () => {
                   onChange={handleChange}
                   error={errors.password}
                   show={showPassword}
-                  toggleShow={() => setShowPassword(v => !v)}
+                  onToggle={() => setShowPassword(!showPassword)}
                 />
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <Form.Check 
-                    type="checkbox" 
-                    label="Remember me" 
-                    className="text-muted"
-                    checked={rememberMe}
-                    onChange={e => setRememberMe(e.target.checked)}
-                    style={{ fontSize: '15px' }}
-                  />
-                  <Button 
-                    variant="link" 
-                    className="text-decoration-none p-0"
-                    style={{ fontSize: '15px' }}
-                  >
+
+                <div className="form-options">
+                  <label className="remember-me">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                    />
+                    Remember me
+                  </label>
+                  <a href="#" className="forgot-password">
                     Forgot Password?
-                  </Button>
+                  </a>
                 </div>
-                <Button
-                  variant="primary"
+
+                <button
                   type="submit"
-                  className="w-100 fw-semibold mb-4"
+                  className="submit-button"
                   disabled={isLoading}
-                  style={{ 
-                    background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    height: '50px'
-                  }}
                 >
                   {isLoading ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <div className="spinner"></div>
                       Signing In...
                     </>
                   ) : (
                     'Sign In'
                   )}
-                </Button>
-                <div className="text-center">
-                  <span className="text-muted" style={{ fontSize: '15px' }}>
-                    Don't have an account?{' '}
-                    <Link 
-                      to="/register"
-                      className="text-decoration-none fw-semibold"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Sign Up
-                    </Link>
-                  </span>
-                </div>
-              </Form>
+                </button>
 
-              {/* Footer */}
-              <div className="text-center mt-4">
-                <p className="text-muted mb-0" style={{ fontSize: '13px' }}>
-                  © 2025 PNB Banking System. All rights reserved.
-                </p>
+                <div className="form-footer">
+                  <div className="signup-link">
+                    Don't have an account?{' '}
+                    <Link to="/register">Sign Up</Link>
+                  </div>
+                </div>
+              </form>
+
+              {/* Copyright */}
+              <div className="copyright">
+                © 2025 PNB Banking System. All rights reserved.
               </div>
             </div>
-          </Col>
-        </Row>
-      </Container>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
