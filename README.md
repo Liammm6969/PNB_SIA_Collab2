@@ -16,12 +16,12 @@
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| 📝 **Total Commits** | ![Commits](https://img.shields.io/github/commit-activity/y/username/PNB_SIA?style=flat-square&logo=git&logoColor=white&label=Commits&color=green) | Code commits this year |
-| 🌿 **Active Branches** | ![Branches](https://img.shields.io/github/forks/username/PNB_SIA?style=flat-square&logo=git&logoColor=white&label=Branches&color=blue) | Development branches |
-| 🔀 **Pull Requests** | ![PRs](https://img.shields.io/github/issues-pr/username/PNB_SIA?style=flat-square&logo=github&logoColor=white&label=Pull%20Requests&color=purple) | Code review requests |
-| 📈 **Contributors** | ![Contributors](https://img.shields.io/github/contributors/username/PNB_SIA?style=flat-square&logo=github&logoColor=white&label=Contributors&color=orange) | Active developers |
-| 🏷️ **Latest Release** | ![Release](https://img.shields.io/github/v/release/username/PNB_SIA?style=flat-square&logo=github&logoColor=white&label=Version&color=red) | Current version |
-| 📦 **Repository Size** | ![Size](https://img.shields.io/github/repo-size/username/PNB_SIA?style=flat-square&logo=github&logoColor=white&label=Size&color=yellow) | Total codebase size |
+| 📝 **Total Commits** | ![Commits](https://img.shields.io/github/commit-activity/y/Buchi-dev/PNB_SIA_Collab?style=flat-square&logo=git&logoColor=white&label=Commits&color=green) | Code commits this year |
+| 🌿 **Active Branches** | ![Branches](https://img.shields.io/github/forks/Buchi-dev/PNB_SIA_Collab?style=flat-square&logo=git&logoColor=white&label=Branches&color=blue) | Development branches |
+| 🔀 **Pull Requests** | ![PRs](https://img.shields.io/github/issues-pr/Buchi-dev/PNB_SIA_Collab?style=flat-square&logo=github&logoColor=white&label=Pull%20Requests&color=purple) | Code review requests |
+| 📈 **Contributors** | ![Contributors](https://img.shields.io/github/contributors/Buchi-dev/PNB_SIA_Collab?style=flat-square&logo=github&logoColor=white&label=Contributors&color=orange) | Active developers |
+| 🏷️ **Latest Release** | ![Release](https://img.shields.io/github/v/release/Buchi-dev/PNB_SIA_Collab?style=flat-square&logo=github&logoColor=white&label=Version&color=red) | Current version |
+| 📦 **Repository Size** | ![Size](https://img.shields.io/github/repo-size/Buchi-dev/PNB_SIA_Collab?style=flat-square&logo=github&logoColor=white&label=Size&color=yellow) | Total codebase size |
 
 ### 🎯 Development Activity
 
@@ -162,8 +162,8 @@ User Withdrawals → User Balance ↓ → Central Bank Reserve ↑
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd PNB_SIA
+   git clone https://github.com/Buchi-dev/PNB_SIA_Collab.git
+   cd PNB_SIA_Collab
    ```
 
 2. **Install dependencies**
