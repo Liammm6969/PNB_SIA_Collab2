@@ -661,4 +661,21 @@
     width: 100%;
     max-width: 100%;
   }
+}
+
+.input-icon-group.account-number {
+  position: relative;
+}
+.input-icon-group.account-number .input-icon {
+  left: 1em;
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #b6bcc8;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+.input-icon-group.account-number .transfer-input {
+  padding-left: 2.7em;
 } 

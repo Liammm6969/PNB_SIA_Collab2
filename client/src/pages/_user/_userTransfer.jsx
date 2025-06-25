@@ -413,7 +413,7 @@ const _userTransfer = () => {
               {/* Recipient Section */}
               <div className="form-section">
                 <label className="form-label" htmlFor="recipientAccount">Recipient Account Number</label>
-                <div className="input-icon-group">
+                <div className="input-icon-group account-number">
                   <input
                     type="text"
                     id="recipientAccount"
@@ -429,7 +429,7 @@ const _userTransfer = () => {
                     maxLength="17"
                     autoComplete="off"
                   />
-                  <span className="input-icon"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/><path d="M4.5 19.5a7.5 7.5 0 0115 0v.25a.25.25 0 01-.25.25h-14.5a.25.25 0 01-.25-.25V19.5z"/></svg></span>
+                  <span className="input-icon"><CreditCard2Front size={20} /></span>
                 </div>
                 {recipient && (
                   <div className="recipient-info">
