@@ -68,22 +68,25 @@ function useLoginForm(navigate) {
           localStorage.setItem('staffDepartment', loginResponse.department)
           localStorage.setItem('staffFirstName', loginResponse.firstName)
           localStorage.setItem('staffLastName', loginResponse.lastName)
-          localStorage.setItem('staffStringId', loginResponse.staffStringId)
+          localStorage.setItem('staffStringId', loginResponse.staffStringId);
           setShowAlert({
             show: true,
             message: `Welcome ${loginResponse.firstName}! Redirecting to ${loginResponse.department} dashboard...`,
             variant: 'success'
-          })
+          });
           setTimeout(() => {
             switch (loginResponse.department.toLowerCase()) {
               case 'admin':
                 navigate('/admin/dashboard')
                 break
               case 'finance':
-                navigate('/admin/dashboard')
+                navigate('/finance/dashboard')
                 break
               case 'loan':
                 navigate('/loan/dashboard')
+                break
+              default:
+                navigate('/admin/dashboard')
                 break
             }
           }, 1500)
