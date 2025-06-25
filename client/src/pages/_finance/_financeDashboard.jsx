@@ -1,164 +1,203 @@
-import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Table, Badge, Alert, Spinner } from 'react-bootstrap'
-import { 
-  Cash, 
-  GraphUp, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Eye, 
-  Download, 
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Table,
+  Badge,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
+import {
+  Cash,
+  GraphUp,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Eye,
+  Download,
   Building,
   FileText,
   ArrowRepeat,
   PersonCircle,
   PiggyBank,
-  ExclamationTriangle
-} from 'react-bootstrap-icons'
-import DepositRequestService from '../../services/depositRequest.Service'
-import TransactionService from '../../services/transaction.Service'
-import BankReserveService from '../../services/bankReserve.Service'
+  ExclamationTriangle,
+} from "react-bootstrap-icons";
+import DepositRequestService from "../../services/depositRequest.Service";
+import TransactionService from "../../services/transaction.Service";
+import BankReserveService from "../../services/bankReserve.Service";
+
+// Create service instances
+const bankReserveService = new BankReserveService();
 
 const FinanceDashboard = () => {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [refreshing, setRefreshing] = useState(false)
-  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
   // Bank Reserve Data
-  const [bankReserve, setBankReserve] = useState(null)
-  
+  const [bankReserve, setBankReserve] = useState(null);
+
   // Real data from API
   const [stats, setStats] = useState({
     pending: { count: 0, totalAmount: 0 },
     approved: { count: 0, totalAmount: 0 },
     rejected: { count: 0, totalAmount: 0 },
-    processing: { count: 0, totalAmount: 0 }
-  })
-  
-  const [recentDeposits, setRecentDeposits] = useState([])
-  const [recentTransactions, setRecentTransactions] = useState([])
+    processing: { count: 0, totalAmount: 0 },
+  });
+
+  const [recentDeposits, setRecentDeposits] = useState([]);
+  const [recentTransactions, setRecentTransactions] = useState([]);
   const [analytics, setAnalytics] = useState({
     todayRequests: 0,
     monthlyApproved: 0,
-    successRatio: 0
-  })
+    successRatio: 0,
+  });
   useEffect(() => {
-    loadDashboardData()
-  }, [])
+    loadDashboardData();
+  }, []);
   const loadDashboardData = async () => {
     try {
-      setLoading(true)
-      setError('')
-      
-      // Load deposit request statistics
-      const statsData = await DepositRequestService.getDepositRequestStats()
-      setStats(statsData)
+      setLoading(true);
+      setError("");
 
-      // Load bank reserve data
+      // Load deposit request statistics
+      const statsData = await DepositRequestService.getDepositRequestStats();
+      setStats(statsData); // Load bank reserve data
       try {
-        const bankReserveData = await BankReserveService.getBankReserve()
-        setBankReserve(bankReserveData.data)
+        const bankReserveData = await bankReserveService.getBankReserve();
+        setBankReserve(bankReserveData.data);
       } catch (bankError) {
-        console.warn('Could not load bank reserve:', bankError.message)
-        setBankReserve(null)
+        console.warn("Could not load bank reserve:", bankError.message);
+        setBankReserve(null);
       }
-      
+
       // Load recent deposit requests (pending ones first)
-      const pendingRequests = await DepositRequestService.getAllDepositRequests('Pending', 10)
-      setRecentDeposits(pendingRequests)
-        // Load recent transactions from all users
+      const pendingRequests = await DepositRequestService.getAllDepositRequests(
+        "Pending",
+        10
+      );
+      setRecentDeposits(pendingRequests);
+      // Load recent transactions from all users
       try {
-        const allPayments = await TransactionService.getAllPayments()
+        const allPayments = await TransactionService.getAllPayments();
         // Get the latest 10 payments
-        const sortedPayments = allPayments.sort((a, b) => 
-          new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)
-        ).slice(0, 10)
-        setRecentTransactions(sortedPayments)
+        const sortedPayments = allPayments
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)
+          )
+          .slice(0, 10);
+        setRecentTransactions(sortedPayments);
       } catch (transactionError) {
-        console.warn('Could not load payments:', transactionError.message)
-        setRecentTransactions([])
+        console.warn("Could not load payments:", transactionError.message);
+        setRecentTransactions([]);
       }
-      
+
       // Calculate analytics
-      const today = new Date().toDateString()
-      const thisMonth = new Date().getMonth()
-      const thisYear = new Date().getFullYear()
-      
-      const todayRequests = recentDeposits.filter(deposit => 
-        new Date(deposit.createdAt).toDateString() === today
-      ).length
-      
-      const monthlyApproved = statsData.approved.totalAmount || 0
-      const totalProcessed = (statsData.approved.count || 0) + (statsData.rejected.count || 0)
-      const successRatio = totalProcessed > 0 ? 
-        Math.round(((statsData.approved.count || 0) / totalProcessed) * 100) : 0
-      
+      const today = new Date().toDateString();
+      const thisMonth = new Date().getMonth();
+      const thisYear = new Date().getFullYear();
+
+      const todayRequests = recentDeposits.filter(
+        (deposit) => new Date(deposit.createdAt).toDateString() === today
+      ).length;
+
+      const monthlyApproved = statsData.approved.totalAmount || 0;
+      const totalProcessed =
+        (statsData.approved.count || 0) + (statsData.rejected.count || 0);
+      const successRatio =
+        totalProcessed > 0
+          ? Math.round(((statsData.approved.count || 0) / totalProcessed) * 100)
+          : 0;
+
       setAnalytics({
         todayRequests,
         monthlyApproved,
-        successRatio
-      })
-      
+        successRatio,
+      });
     } catch (error) {
-      console.error('Failed to load dashboard data:', error)
-      setError('Failed to load dashboard data. Please try again.')
+      console.error("Failed to load dashboard data:", error);
+      setError("Failed to load dashboard data. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleRefresh = async () => {
     try {
-      setRefreshing(true)
-      await loadDashboardData()
+      setRefreshing(true);
+      await loadDashboardData();
     } catch (error) {
-      setError('Failed to refresh dashboard data')
+      setError("Failed to refresh dashboard data");
     } finally {
-      setRefreshing(false)
+      setRefreshing(false);
     }
-  }
+  };
   const getStatusBadge = (status) => {
     const statusConfig = {
-      Pending: { bg: 'warning', icon: <Clock size={12} className="me-1" />, text: 'Pending' },
-      Approved: { bg: 'success', icon: <CheckCircle size={12} className="me-1" />, text: 'Approved' },
-      Rejected: { bg: 'danger', icon: <XCircle size={12} className="me-1" />, text: 'Rejected' }
-    }
+      Pending: {
+        bg: "warning",
+        icon: <Clock size={12} className="me-1" />,
+        text: "Pending",
+      },
+      Approved: {
+        bg: "success",
+        icon: <CheckCircle size={12} className="me-1" />,
+        text: "Approved",
+      },
+      Rejected: {
+        bg: "danger",
+        icon: <XCircle size={12} className="me-1" />,
+        text: "Rejected",
+      },
+    };
 
-    const config = statusConfig[status] || { bg: 'secondary', icon: null, text: status }
+    const config = statusConfig[status] || {
+      bg: "secondary",
+      icon: null,
+      text: status,
+    };
     return (
-      <Badge bg={config.bg} className="d-flex align-items-center" style={{ fontSize: '0.75rem', width: 'fit-content' }}>
+      <Badge
+        bg={config.bg}
+        className="d-flex align-items-center"
+        style={{ fontSize: "0.75rem", width: "fit-content" }}
+      >
         {config.icon}
         {config.text}
       </Badge>
-    )
-  }
+    );
+  };
 
   const getTransactionTypeBadge = (type) => {
     const typeConfig = {
-      deposit: { bg: 'success', text: 'Deposit' },
-      transfer: { bg: 'primary', text: 'Transfer' },
-      withdrawal: { bg: 'warning', text: 'Withdrawal' }
-    }
-    return typeConfig[type] || { bg: 'secondary', text: 'Transaction' }
-  }
+      deposit: { bg: "success", text: "Deposit" },
+      transfer: { bg: "primary", text: "Transfer" },
+      withdrawal: { bg: "warning", text: "Withdrawal" },
+    };
+    return typeConfig[type] || { bg: "secondary", text: "Transaction" };
+  };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP',
+    return new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
       minimumFractionDigits: 2,
-    }).format(amount || 0)
-  }
+    }).format(amount || 0);
+  };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-PH', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+    return new Date(dateString).toLocaleDateString("en-PH", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   if (loading) {
     return (
@@ -170,7 +209,7 @@ const FinanceDashboard = () => {
           <p>Loading dashboard data...</p>
         </div>
       </Container>
-    )
+    );
   }
 
   return (
@@ -187,14 +226,17 @@ const FinanceDashboard = () => {
           </p>
         </div>
         <div className="d-flex gap-2">
-          <Button 
-            variant="outline-primary" 
-            size="sm" 
+          <Button
+            variant="outline-primary"
+            size="sm"
             onClick={handleRefresh}
             disabled={refreshing}
           >
-            <ArrowRepeat className={`me-1 ${refreshing ? 'spin' : ''}`} size={16} />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            <ArrowRepeat
+              className={`me-1 ${refreshing ? "spin" : ""}`}
+              size={16}
+            />
+            {refreshing ? "Refreshing..." : "Refresh"}
           </Button>
           <Button variant="success" className="d-flex align-items-center">
             <Download size={16} className="me-2" />
@@ -204,7 +246,7 @@ const FinanceDashboard = () => {
       </div>
 
       {error && (
-        <Alert variant="danger" dismissible onClose={() => setError('')}>
+        <Alert variant="danger" dismissible onClose={() => setError("")}>
           {error}
         </Alert>
       )}
@@ -278,23 +320,33 @@ const FinanceDashboard = () => {
         </Col>
 
         <Col xl={3} md={6}>
-          <Card className={`border-0 h-100 ${bankReserve ? 
-            `finance-stat-card-${BankReserveService.getReserveStatusColor(bankReserve.total_balance)}` : 
-            'finance-stat-card-info'}`}>
+          <Card
+            className={`border-0 h-100 ${
+              bankReserve
+                ? `finance-stat-card-${BankReserveService.getReserveStatusColor(
+                    bankReserve.total_balance
+                  )}`
+                : "finance-stat-card-info"
+            }`}
+          >
             <Card.Body className="p-4">
               <div className="d-flex align-items-center justify-content-between">
                 <div>
                   <h6 className="text-white-50 mb-1">Bank Reserve</h6>
                   <h3 className="fw-bold mb-0 text-white">
-                    {bankReserve ? 
-                      BankReserveService.formatCurrency(bankReserve.total_balance) : 
-                      'Loading...'}
+                    {bankReserve
+                      ? BankReserveService.formatCurrency(
+                          bankReserve.total_balance
+                        )
+                      : "Loading..."}
                   </h3>
                   <small className="text-white-50">
                     <PiggyBank size={12} className="me-1" />
-                    {bankReserve ? 
-                      `${BankReserveService.getReserveStatusText(bankReserve.total_balance)} Level` : 
-                      'Fetching data...'}
+                    {bankReserve
+                      ? `${BankReserveService.getReserveStatusText(
+                          bankReserve.total_balance
+                        )} Level`
+                      : "Fetching data..."}
                   </small>
                 </div>
                 <div className="p-3 bg-white bg-opacity-20 rounded-circle">
@@ -321,9 +373,15 @@ const FinanceDashboard = () => {
                     <FileText size={20} className="me-2 text-success" />
                     Pending Deposit Requests
                   </h5>
-                  <p className="text-muted mb-0 mt-1">Recent deposit requests awaiting approval</p>
+                  <p className="text-muted mb-0 mt-1">
+                    Recent deposit requests awaiting approval
+                  </p>
                 </div>
-                <Button variant="outline-primary" size="sm" onClick={() => window.location.href = '/finance/deposits'}>
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={() => (window.location.href = "/finance/deposits")}
+                >
                   View All
                 </Button>
               </div>
@@ -333,18 +391,30 @@ const FinanceDashboard = () => {
                 <div className="text-center py-5">
                   <FileText size={48} className="text-muted mb-3" />
                   <p className="text-muted">No pending deposit requests</p>
-                  <small className="text-muted">All deposit requests have been processed</small>
+                  <small className="text-muted">
+                    All deposit requests have been processed
+                  </small>
                 </div>
               ) : (
                 <Table responsive hover className="mb-0">
                   <thead>
                     <tr>
-                      <th className="border-0 text-muted fw-semibold">Request ID</th>
-                      <th className="border-0 text-muted fw-semibold">Customer</th>
-                      <th className="border-0 text-muted fw-semibold">Amount</th>
-                      <th className="border-0 text-muted fw-semibold">Status</th>
+                      <th className="border-0 text-muted fw-semibold">
+                        Request ID
+                      </th>
+                      <th className="border-0 text-muted fw-semibold">
+                        Customer
+                      </th>
+                      <th className="border-0 text-muted fw-semibold">
+                        Amount
+                      </th>
+                      <th className="border-0 text-muted fw-semibold">
+                        Status
+                      </th>
                       <th className="border-0 text-muted fw-semibold">Date</th>
-                      <th className="border-0 text-muted fw-semibold">Actions</th>
+                      <th className="border-0 text-muted fw-semibold">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -355,8 +425,12 @@ const FinanceDashboard = () => {
                         </td>
                         <td className="border-0">
                           <div>
-                            <div className="fw-semibold">{deposit.customerName}</div>
-                            <small className="text-muted">{deposit.accountNumber}</small>
+                            <div className="fw-semibold">
+                              {deposit.customerName}
+                            </div>
+                            <small className="text-muted">
+                              {deposit.accountNumber}
+                            </small>
                           </div>
                         </td>
                         <td className="border-0">
@@ -368,7 +442,9 @@ const FinanceDashboard = () => {
                           {getStatusBadge(deposit.status)}
                         </td>
                         <td className="border-0">
-                          <small className="text-muted">{formatDate(deposit.createdAt)}</small>
+                          <small className="text-muted">
+                            {formatDate(deposit.createdAt)}
+                          </small>
                         </td>
                         <td className="border-0">
                           <div className="d-flex gap-1">
@@ -377,7 +453,9 @@ const FinanceDashboard = () => {
                               size="sm"
                               className="p-2"
                               title="View Details"
-                              onClick={() => window.location.href = `/finance/deposits`}
+                              onClick={() =>
+                                (window.location.href = `/finance/deposits`)
+                              }
                             >
                               <Eye size={14} />
                             </Button>
@@ -387,7 +465,8 @@ const FinanceDashboard = () => {
                     ))}
                   </tbody>
                 </Table>
-              )}            </Card.Body>
+              )}{" "}
+            </Card.Body>
           </Card>
         </Col>
       </Row>
@@ -403,9 +482,17 @@ const FinanceDashboard = () => {
                     <Cash size={20} className="me-2 text-success" />
                     Recent Transactions
                   </h5>
-                  <p className="text-muted mb-0 mt-1">Latest financial transactions across all accounts</p>
+                  <p className="text-muted mb-0 mt-1">
+                    Latest financial transactions across all accounts
+                  </p>
                 </div>
-                <Button variant="outline-primary" size="sm" onClick={() => window.location.href = '/finance/transactions'}>
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={() =>
+                    (window.location.href = "/finance/transactions")
+                  }
+                >
                   View All
                 </Button>
               </div>
@@ -415,39 +502,76 @@ const FinanceDashboard = () => {
                 <div className="text-center py-5">
                   <Cash size={48} className="text-muted mb-3" />
                   <p className="text-muted">No recent transactions</p>
-                  <small className="text-muted">Transaction data will appear here once available</small>
+                  <small className="text-muted">
+                    Transaction data will appear here once available
+                  </small>
                 </div>
               ) : (
                 <Table responsive hover className="mb-0">
                   <thead>
                     <tr>
-                      <th className="border-0 text-muted fw-semibold">Transaction ID</th>
+                      <th className="border-0 text-muted fw-semibold">
+                        Transaction ID
+                      </th>
                       <th className="border-0 text-muted fw-semibold">Type</th>
                       <th className="border-0 text-muted fw-semibold">From</th>
                       <th className="border-0 text-muted fw-semibold">To</th>
-                      <th className="border-0 text-muted fw-semibold">Amount</th>
+                      <th className="border-0 text-muted fw-semibold">
+                        Amount
+                      </th>
                       <th className="border-0 text-muted fw-semibold">Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentTransactions.map((transaction, index) => (
-                      <tr key={transaction.paymentStringId || transaction.paymentId || transaction.id || `transaction-${index}`}>
+                      <tr
+                        key={
+                          transaction.paymentStringId ||
+                          transaction.paymentId ||
+                          transaction.id ||
+                          `transaction-${index}`
+                        }
+                      >
                         <td className="border-0">
-                          <code className="text-primary">{transaction.paymentStringId || transaction.paymentId || transaction.id}</code>
+                          <code className="text-primary">
+                            {transaction.paymentStringId ||
+                              transaction.paymentId ||
+                              transaction.id}
+                          </code>
                         </td>
                         <td className="border-0">
-                          <Badge bg={getTransactionTypeBadge(transaction.fromUser === 0 ? 'deposit' : 'transfer').bg}>
-                            {transaction.fromUser === 0 ? 'Deposit' : 'Transfer'}
+                          <Badge
+                            bg={
+                              getTransactionTypeBadge(
+                                transaction.fromUser === 0
+                                  ? "deposit"
+                                  : "transfer"
+                              ).bg
+                            }
+                          >
+                            {transaction.fromUser === 0
+                              ? "Deposit"
+                              : "Transfer"}
                           </Badge>
-                        </td>                        <td className="border-0">
+                        </td>
+                        <td className="border-0">
                           <span className="text-muted">
-                            {transaction.fromUser === 0 ? 'Finance' : (transaction.fromUserDetails?.name || `User ${transaction.fromUser}`)}
+                            {transaction.fromUser === 0
+                              ? "Finance"
+                              : transaction.fromUserDetails?.name ||
+                                `User ${transaction.fromUser}`}
                           </span>
                         </td>
                         <td className="border-0">
                           <div className="d-flex align-items-center">
-                            <PersonCircle size={16} className="me-2 text-muted" />
-                            <span>{transaction.toUserDetails?.name || `User ${transaction.toUser}`}</span>
+                            <PersonCircle
+                              size={16}
+                              className="me-2 text-muted"
+                            />
+                            <span>
+                              {transaction.toUserDetails?.name ||
+                                `User ${transaction.toUser}`}
+                            </span>
                           </div>
                         </td>
                         <td className="border-0">
@@ -456,7 +580,11 @@ const FinanceDashboard = () => {
                           </div>
                         </td>
                         <td className="border-0">
-                          <small className="text-muted">{formatDate(transaction.createdAt || transaction.date)}</small>
+                          <small className="text-muted">
+                            {formatDate(
+                              transaction.createdAt || transaction.date
+                            )}
+                          </small>
                         </td>
                       </tr>
                     ))}
@@ -469,7 +597,9 @@ const FinanceDashboard = () => {
       </Row>
 
       {/* Custom Styles */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .finance-stat-card {
           background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
           border-radius: 16px;
@@ -511,6 +641,17 @@ const FinanceDashboard = () => {
         .finance-stat-card-info:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 32px rgba(23, 162, 184, 0.3);
+        }
+
+        .finance-stat-card-success {
+          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+          border-radius: 16px;
+          color: white;
+        }
+
+        .finance-stat-card-success:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);
         }
 
         .finance-stat-card-success {
@@ -566,9 +707,11 @@ const FinanceDashboard = () => {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-      `}} />
+      `,
+        }}
+      />
     </Container>
-  )
-}
+  );
+};
 
-export default FinanceDashboard
+export default FinanceDashboard;

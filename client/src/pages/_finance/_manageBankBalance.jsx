@@ -15,8 +15,8 @@ import {
 } from 'react-bootstrap';
 import {
   CashCoin,
-  TrendingUp,
-  TrendingDown,
+  GraphUp,
+  ArrowDown,
   ExclamationTriangle,
   CheckCircle,
   InfoCircle,
@@ -27,6 +27,9 @@ import {
 } from 'react-bootstrap-icons';
 import BankReserveService from '../../services/bankReserve.Service';
 import StaffService from '../../services/staff.Service';
+
+// Create an instance of the service
+const bankReserveService = new BankReserveService();
 
 const _manageBankBalance = () => {
   const [bankReserve, setBankReserve] = useState(null);
@@ -42,7 +45,6 @@ const _manageBankBalance = () => {
   useEffect(() => {
     loadBankData();
   }, []);
-
   const loadBankData = async () => {
     try {
       setLoading(true);
@@ -50,8 +52,8 @@ const _manageBankBalance = () => {
 
       // Load both bank reserve and stats
       const [reserveResponse, statsResponse] = await Promise.all([
-        BankReserveService.getBankReserve(),
-        BankReserveService.getBankReserveStats()
+        bankReserveService.getBankReserve(),
+        bankReserveService.getBankReserveStats()
       ]);
 
       setBankReserve(reserveResponse.data);

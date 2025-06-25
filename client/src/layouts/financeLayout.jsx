@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { Navbar, Nav, Container, Dropdown, Offcanvas } from 'react-bootstrap'
+import { Navbar, Nav, Container, Dropdown, Offcanvas, Badge } from 'react-bootstrap'
 import { 
   PersonCircle, 
   BoxArrowRight, 
