@@ -2,6 +2,9 @@ const {
   createPayment,
   getPayments,
   getPaymentById,
+  getUserStatements,
+  createWithdrawal,
+  createDeposit,
   transferPayment,
   deletePayment
 } = require("../controllers/payment.controller.js");
@@ -35,6 +38,15 @@ router.post('/', createPayment);
 // Get all payments
 // router.get('/user-payments/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPayments);
 router.get('/user-payments/:userId', getPayments);
+
+// Get user statements
+router.get('/user-statements/:userId', getUserStatements);
+
+// Create withdrawal
+router.post('/withdraw', createWithdrawal);
+
+// Create deposit
+router.post('/deposit', createDeposit);
 
 // Get a payment by ID
 // router.get('/:paymentId', ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPaymentById);

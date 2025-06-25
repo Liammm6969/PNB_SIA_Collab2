@@ -52,7 +52,6 @@ const _userStatements = () => {
   useEffect(() => {
     applyFilters();
   }, [statements, searchTerm, dateRange, filterType, filterStatus]);
-
   const loadStatements = async () => {
     try {
       setLoading(true);
@@ -63,93 +62,30 @@ const _userStatements = () => {
         return;
       }
 
-      // Mock statements data for now
-      const mockStatements = [
-        {
-          id: 'TXN001',
-          date: new Date().toISOString(),
-          type: 'transfer',
-          description: 'Transfer to John Doe',
-          amount: -5000,
-          balance: 25000.50,
-          status: 'completed',
-          reference: 'REF001',
-          category: 'Transfer'
-        },
-        {
-          id: 'TXN002',
-          date: new Date(Date.now() - 86400000).toISOString(),
-          type: 'deposit',
-          description: 'Salary Deposit',
-          amount: 30000,
-          balance: 30000.50,
-          status: 'completed',
-          reference: 'REF002',
-          category: 'Income'
-        },
-        {
-          id: 'TXN003',
-          date: new Date(Date.now() - 172800000).toISOString(),
-          type: 'payment',
-          description: 'Online Purchase - Amazon',
-          amount: -2500,
-          balance: 0.50,
-          status: 'completed',
-          reference: 'REF003',
-          category: 'Shopping'
-        },
-        {
-          id: 'TXN004',
-          date: new Date(Date.now() - 259200000).toISOString(),
-          type: 'withdrawal',
-          description: 'ATM Withdrawal',
-          amount: -3000,
-          balance: 3000.50,
-          status: 'completed',
-          reference: 'REF004',
-          category: 'Cash'
-        },
-        {
-          id: 'TXN005',
-          date: new Date(Date.now() - 345600000).toISOString(),
-          type: 'transfer',
-          description: 'Transfer from Jane Smith',
-          amount: 8000,
-          balance: 6000.50,
-          status: 'completed',
-          reference: 'REF005',
-          category: 'Transfer'
-        },
-        {
-          id: 'TXN006',
-          date: new Date(Date.now() - 432000000).toISOString(),
-          type: 'payment',
-          description: 'Utility Bill Payment',
-          amount: -1500,
-          balance: -1999.50,
-          status: 'pending',
-          reference: 'REF006',
-          category: 'Bills'
-        }
-      ];
-
-      setStatements(mockStatements);
+      // Get real statements from the API
+      const statements = await TransactionService.getUserStatements(userData.userId);
+      
+      if (Array.isArray(statements)) {
+        setStatements(statements);
+      } else {
+        setStatements([]);
+      }
     } catch (err) {
-      setError(err.message || 'Failed to load statements');
+      console.error('Error loading statements:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to load statements');
     } finally {
       setLoading(false);
     }
   };
-
   const applyFilters = () => {
     let filtered = [...statements];
 
     // Search filter
     if (searchTerm) {
       filtered = filtered.filter(statement =>
-        statement.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        statement.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        statement.category.toLowerCase().includes(searchTerm.toLowerCase())
+        statement.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        statement.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        statement.category?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -202,18 +138,48 @@ const _userStatements = () => {
     setSelectedTransaction(transaction);
     setShowDetailModal(true);
   };
-
   const handleDownloadStatement = () => {
-    // Mock download functionality
-    const dataStr = JSON.stringify(filteredStatements, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = `statement_${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
+    try {
+      // Create a structured statement report
+      const userData = UserService.getUserData();
+      const statementData = {
+        accountHolder: userData.displayName?.fullName || 'Account Holder',
+        accountNumber: userData.accountNumber || 'N/A',
+        statementPeriod: {
+          from: dateRange.startDate || 'All time',
+          to: dateRange.endDate || new Date().toISOString().split('T')[0]
+        },
+        generatedOn: new Date().toISOString(),
+        transactions: filteredStatements.map(statement => ({
+          date: statement.date,
+          reference: statement.reference,
+          description: statement.description,
+          type: statement.type,
+          category: statement.category,
+          amount: statement.amount,
+          balance: statement.balance,
+          status: statement.status
+        })),
+        summary: {
+          totalTransactions: filteredStatements.length,
+          totalDebits: filteredStatements.filter(s => s.amount < 0).reduce((sum, s) => sum + Math.abs(s.amount), 0),
+          totalCredits: filteredStatements.filter(s => s.amount > 0).reduce((sum, s) => sum + s.amount, 0)
+        }
+      };
+
+      const dataStr = JSON.stringify(statementData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `account_statement_${new Date().toISOString().split('T')[0]}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+    } catch (error) {
+      console.error('Error downloading statement:', error);
+      setError('Failed to download statement');
+    }
   };
 
   const clearFilters = () => {

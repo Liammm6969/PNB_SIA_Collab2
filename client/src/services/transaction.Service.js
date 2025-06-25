@@ -142,6 +142,42 @@ class TransactionService {
       throw error;
     }
   }
+  /**
+   * Get user statements (comprehensive transaction history)
+   * @param {string} userId - User ID
+   * @param {Object} options - Query options
+   * @param {string} [options.startDate] - Start date filter
+   * @param {string} [options.endDate] - End date filter
+   * @param {string} [options.type] - Transaction type filter
+   * @param {string} [options.status] - Status filter
+   * @param {string} [accessToken] - Access token for authentication
+   * @returns {Promise<Object>} Statements response
+   */
+  static async getUserStatements(userId, options = {}, accessToken = null) {
+    try {
+      const config = {
+        params: {}
+      };
+
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
+      }
+
+      if (options.startDate) config.params.startDate = options.startDate;
+      if (options.endDate) config.params.endDate = options.endDate;
+      if (options.type && options.type !== 'all') config.params.type = options.type;
+      if (options.status && options.status !== 'all') config.params.status = options.status;
+
+      const response = await api.get(`/payments/user-statements/${userId}`, config);
+
+      return response.data;
+    } catch (error) {
+      console.error('Get user statements error:', error);
+      throw error;
+    }
+  }
 
   /**
    * Get user payments by user ID (actual money transfers)
@@ -150,7 +186,7 @@ class TransactionService {
    * @param {number} [options.limit] - Number of payments to fetch
    * @param {string} [accessToken] - Access token for authentication
    * @returns {Promise<Object>} Payments response
-   */  static async getUserPayments(userId, options = {}, accessToken = null) {
+   */static async getUserPayments(userId, options = {}, accessToken = null) {
     try {
       const config = {};
 

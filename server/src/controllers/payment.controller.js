@@ -17,6 +17,23 @@ exports.getPayments = async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 }
+
+exports.getUserStatements = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const filters = {
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
+      type: req.query.type,
+      status: req.query.status
+    };
+    
+    const statements = await PaymentService.getUserStatements(userId, filters);
+    res.status(StatusCodes.OK).json(statements);
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+  }
+}
 exports.getPaymentById = async (req, res) => {
   try {
     const { paymentId } = req.params;
@@ -49,12 +66,35 @@ exports.deletePayment = async (req, res) => {
   }
 }
 
+exports.createWithdrawal = async (req, res) => {
+  try {
+    const { userId, amount, details } = req.body;
+    const withdrawal = await PaymentService.createWithdrawal(userId, amount, details);
+    res.status(StatusCodes.CREATED).json(withdrawal);
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
+  }
+}
+
+exports.createDeposit = async (req, res) => {
+  try {
+    const { userId, amount, details } = req.body;
+    const deposit = await PaymentService.createDeposit(userId, amount, details);
+    res.status(StatusCodes.CREATED).json(deposit);
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
+  }
+}
+
 
 
 exports.module = {
   createPayment: exports.createPayment,
   getPayments: exports.getPayments,
+  getUserStatements: exports.getUserStatements,
   getPaymentById: exports.getPaymentById,
+  createWithdrawal: exports.createWithdrawal,
+  createDeposit: exports.createDeposit,
   updatePayment: exports.updatePayment,
   deletePayment: exports.deletePayment
 };
