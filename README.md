@@ -114,26 +114,6 @@ cd client && npm run dev  # Frontend on :5173
 | ![JSON](https://img.shields.io/badge/JSON-1.8%25-orange?style=flat-square&logo=json&logoColor=white) | Config | 8 files | Configuration |
 | ![Markdown](https://img.shields.io/badge/Markdown-0.6%25-green?style=flat-square&logo=markdown&logoColor=white) | Docs | 3 files | Documentation |
 
-### 🎯 Real Development Activity (Live Data)
-
-```
-📊 Code Frequency (Based on Actual Repository Data)
-┌─────────────────────────────────────────────────┐
-│  Week 1    ████████████░░░░░░░░  65% (148 commits) │
-│  Week 2    ██████████████████░░  85% (193 commits) │
-│  Week 3    ████████████████████  95% (216 commits) │
-│  Week 4    ██████████████░░░░░░  72% (164 commits) │
-└─────────────────────────────────────────────────┘
-
-🔄 Recent Git Operations (From Repository):
-✅ Latest Push: Frontend dashboard optimization
-✅ Latest Pull: Backend API security updates  
-✅ Latest Merge: Feature/user-beneficiaries → main
-✅ Latest Tag: v2.1.0 - Multi-role banking system
-```
-
-
-
 ### 🔗 Repository Links & Direct Access
 
 | **Resource** | **Link** | **Description** |
