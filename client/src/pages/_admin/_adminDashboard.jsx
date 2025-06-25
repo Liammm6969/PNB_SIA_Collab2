@@ -7,6 +7,8 @@ import {
   Table,
   Badge,
   ProgressBar,
+  Alert,
+  Spinner,
 } from "react-bootstrap";
 import {
   People,
@@ -18,69 +20,47 @@ import {
   Download,
 } from "react-bootstrap-icons";
 import AdminLayout from "../../layouts/adminLayout";
+import AdminService from "../../services/admin.Service";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
-    totalUsers: 1250,
-    totalTransactions: 8450,
-    totalRevenue: 125000,
-    securityAlerts: 3,
+    totalUsers: 0,
+    totalTransactions: 0,
+    totalRevenue: 0,
+    securityAlerts: 0,
   });
 
-  const [recentUsers, setRecentUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      type: "Personal",
-      status: "Active",
-      joinDate: "2025-01-20",
-    },
-    {
-      id: 2,
-      name: "ABC Corp",
-      email: "contact@abc.com",
-      type: "Business",
-      status: "Pending",
-      joinDate: "2025-01-19",
-    },
-    {
-      id: 3,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      type: "Personal",
-      status: "Active",
-      joinDate: "2025-01-18",
-    },
-  ]);
+  const [recentUsers, setRecentUsers] = useState([]);
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [recentTransactions, setRecentTransactions] = useState([
-    {
-      id: "TXN001",
-      user: "John Doe",
-      amount: 2500,
-      type: "Transfer",
-      status: "Completed",
-      date: "2025-01-20 14:30",
-    },
-    {
-      id: "TXN002",
-      user: "ABC Corp",
-      amount: 15000,
-      type: "Payment",
-      status: "Processing",
-      date: "2025-01-20 13:15",
-    },
-    {
-      id: "TXN003",
-      user: "Jane Smith",
-      amount: 750,
-      type: "Withdrawal",
-      status: "Completed",
-      date: "2025-01-20 12:45",
-    },
-  ]);
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
+        // Fetch all dashboard data in parallel
+        const [statsData, usersData, transactionsData] = await Promise.all([
+          AdminService.getDashboardStats(),
+          AdminService.getRecentUsers(5),
+          AdminService.getRecentTransactions(5),
+        ]);
+
+        setStats(statsData);
+        setRecentUsers(usersData);
+        setRecentTransactions(transactionsData);
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+        setError("Failed to load dashboard data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
   const getStatusBadge = (status) => {
     const statusConfig = {
       Active: { bg: "success", text: "Active" },
@@ -102,8 +82,52 @@ const AdminDashboard = () => {
     }).format(amount);
   };
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const getUserDisplayName = (user) => {
+    if (user.accountType === "personal") {
+      return `${user.firstName} ${user.lastName}`;
+    } else if (user.accountType === "business") {
+      return user.businessName;
+    }
+    return "Unknown User";
+  };
+
+  const getTransactionDisplayName = (transaction, userType) => {
+    const user =
+      userType === "from" ? transaction.fromUser : transaction.toUser;
+    if (!user) return "Unknown User";
+    return getUserDisplayName(user);
+  };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: "60vh" }}
+        >
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </div>
+      </AdminLayout>
+    );
+  }
   return (
     <AdminLayout>
+      {error && (
+        <Alert variant="danger" className="mb-4">
+          {error}
+        </Alert>
+      )}
+
       {/* Page Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -220,8 +244,7 @@ const AdminDashboard = () => {
                   View All
                 </Button>
               </div>
-            </Card.Header>
-            <Card.Body className="pt-3">
+            </Card.Header>            <Card.Body className="pt-3">
               <Table responsive className="mb-0">
                 <thead>
                   <tr>
@@ -233,19 +256,21 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {recentUsers.map((user) => (
-                    <tr key={user.id}>
+                    <tr key={user._id}>
                       <td className="border-0">
                         <div>
-                          <div className="fw-semibold">{user.name}</div>
+                          <div className="fw-semibold">
+                            {getUserDisplayName(user)}
+                          </div>
                           <small className="text-muted">{user.email}</small>
                         </div>
                       </td>
                       <td className="border-0">
-                        <span className="text-muted">{user.type}</span>
+                        <span className="text-muted text-capitalize">
+                          {user.accountType}
+                        </span>
                       </td>
-                      <td className="border-0">
-                        {getStatusBadge(user.status)}
-                      </td>
+                      <td className="border-0">{getStatusBadge("Active")}</td>
                       <td className="border-0">
                         <Button
                           variant="link"
@@ -277,8 +302,7 @@ const AdminDashboard = () => {
                   View All
                 </Button>
               </div>
-            </Card.Header>
-            <Card.Body className="pt-3">
+            </Card.Header>            <Card.Body className="pt-3">
               <Table responsive className="mb-0">
                 <thead>
                   <tr>
@@ -292,12 +316,16 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {recentTransactions.map((transaction) => (
-                    <tr key={transaction.id}>
+                    <tr key={transaction._id}>
                       <td className="border-0">
                         <div>
-                          <div className="fw-semibold">{transaction.id}</div>
+                          <div className="fw-semibold">
+                            {transaction.transactionStringId ||
+                              `TXN_${transaction.transactionId}`}
+                          </div>
                           <small className="text-muted">
-                            {transaction.user}
+                            {getTransactionDisplayName(transaction, "from")} →{" "}
+                            {getTransactionDisplayName(transaction, "to")}
                           </small>
                         </div>
                       </td>
@@ -307,7 +335,7 @@ const AdminDashboard = () => {
                         </span>
                       </td>
                       <td className="border-0">
-                        {getStatusBadge(transaction.status)}
+                        {getStatusBadge("Completed")}
                       </td>
                       <td className="border-0">
                         <Button

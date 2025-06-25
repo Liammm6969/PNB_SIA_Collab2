@@ -4,6 +4,7 @@ const UserRoute = require('./user.route');
 const StaffRoute = require('./staff.route');
 const BeneficiaryRoute = require('./beneficiary.route');
 const DepositRequestRoute = require('./depositRequest.route');
+const AdminRoute = require('./admin.route');
 const express = require('express');
 const router = express.Router();
 const { StatusCodes } = require("http-status-codes");
@@ -14,10 +15,10 @@ router.get('/', (req, res) => {
     routes: {
       payments: 'http://localhost:4000/api/Philippine-National-Bank/payments',
       transactions: 'http://localhost:4000/api/Philippine-National-Bank/transactions',
-      users: 'http://localhost:4000/api/Philippine-National-Bank/users',
-      staff: 'http://localhost:4000/api/Philippine-National-Bank/staff',
+      users: 'http://localhost:4000/api/Philippine-National-Bank/users',      staff: 'http://localhost:4000/api/Philippine-National-Bank/staff',
       beneficiaries: 'http://localhost:4000/api/Philippine-National-Bank/beneficiaries',
       depositRequests: 'http://localhost:4000/api/Philippine-National-Bank/deposit-requests',
+      admin: 'http://localhost:4000/api/Philippine-National-Bank/admin',
     }
   });
 });
@@ -35,6 +36,7 @@ router.use('/users', UserRoute);
 router.use('/staff', StaffRoute);
 router.use('/beneficiaries', BeneficiaryRoute);
 router.use('/deposit-requests', DepositRequestRoute);
+router.use('/admin', AdminRoute);
 
 
 module.exports = router;

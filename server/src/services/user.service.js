@@ -130,6 +130,18 @@ class UserService {
     }
   }
 
+  async getRecentUsers(limit = 10) {
+    try {
+      const users = await User.find()
+        .select('-password')
+        .sort({ createdAt: -1 })
+        .limit(limit);
+      return users;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async verifyOTP(email, otp) {
     try {
       const user = await User.findOne({ email });

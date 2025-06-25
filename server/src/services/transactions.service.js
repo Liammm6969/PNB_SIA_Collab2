@@ -24,6 +24,19 @@ class TransactionService {
     }
   }
 
+  async getRecentTransactions(limit = 10) {
+    try {
+      const transactions = await Transaction.find()
+        .populate('fromUser', 'firstName lastName businessName accountType userId')
+        .populate('toUser', 'firstName lastName businessName accountType userId')
+        .sort({ createdAt: -1 })
+        .limit(limit);
+      return transactions;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async withdrawTransaction(userId, amount) {
     try {
       const user = await User.findOne({ userId: userId });
