@@ -34,7 +34,7 @@ import UserService from '../../services/user.Service';
 import TransferService from '../../services/transfer.Service';
 import TransactionService from '../../services/transaction.Service';
 import BeneficiaryService from '../../services/beneficiary.Service';
-import '../../styles/_userTransfer.css';
+import '../../styles/userStyles/_userTransfer.css';
 
 const _userTransfer = () => {
   const [formData, setFormData] = useState({

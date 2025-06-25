@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Table, Badge, Modal, Form, Alert, Tabs, Tab, InputGroup, Spinner } from 'react-bootstrap'
+import { Container, Card, Button, Table, Badge, Modal, Form, Alert, InputGroup, Spinner } from 'react-bootstrap'
 import { 
   Cash, 
   Search, 
-  Filter, 
   Eye, 
   CheckCircle, 
   XCircle, 
@@ -14,18 +13,12 @@ import {
   PersonCircle,
   CreditCard,
   Calendar,
-  ExclamationTriangle,
-  Info,
   Building,
-  GraphUp,
-  GraphDown,
-  Printer,
-  Send,
-  ArrowUpCircle,
-  ArrowDownCircle
+  Printer
 } from 'react-bootstrap-icons'
 import DepositRequestService from '../../services/depositRequest.Service'
 import StaffService from '../../services/staff.Service'
+import '../../styles/financeStyles/depositManagement.css'
 
 const DepositManagement = () => {
   const [deposits, setDeposits] = useState([])
@@ -194,107 +187,89 @@ const DepositManagement = () => {
       )}
 
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h1 className="h3 fw-bold text-dark mb-1">
-            <Building size={28} className="me-2 text-success" />
-            Deposit Management
-          </h1>
-          <p className="text-muted mb-0">
-            Review, approve, and manage customer deposit requests
-          </p>
+      <div className="deposit-mgmt-header">
+        <div className="deposit-mgmt-header-left">
+          <div className="deposit-mgmt-header-icon">
+            <FileText size={28} className="text-white" />
+          </div>
+          <div>
+            <div className="deposit-mgmt-header-title">Deposit Management</div>
+            <div className="deposit-mgmt-header-subtitle">Review, approve, and manage customer deposit requests</div>
+          </div>
         </div>
-        <div className="d-flex gap-2">
-          <Button variant="outline-success" onClick={loadDepositRequests}>
-            <Download size={16} className="me-2" />
-            Refresh
+        <div className="deposit-mgmt-header-actions">
+          <Button
+            className="finance-dashboard-btn refresh"
+            onClick={loadDepositRequests}
+            disabled={loading}
+          >
+            <Clock size={16} className={`me-2${loading ? ' spin' : ''}`} />
+            {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
           <Button variant="success">
-            <Upload size={16} className="me-2" />
+            <Download size={16} className="me-2" />
             Export Report
           </Button>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <Row className="g-3 mb-4">
-        <Col lg={3} md={6} sm={6}>
-          <Card className="border-0 deposit-stat-card bg-primary text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{counts.total}</h4>
-              <small>Total Requests</small>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={3} md={6} sm={6}>
-          <Card className="border-0 deposit-stat-card bg-warning text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{counts.pending}</h4>
-              <small>Pending Review</small>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={3} md={6} sm={6}>
-          <Card className="border-0 deposit-stat-card bg-success text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{counts.approved}</h4>
-              <small>Approved</small>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={3} md={6} sm={6}>
-          <Card className="border-0 deposit-stat-card bg-danger text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{counts.rejected}</h4>
-              <small>Rejected</small>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      {/* Stats */}
+      <div className="finance-stat-grid mb-4">
+        <div className="finance-stat-card finance-stat-card-info">
+          <div className="stat-label">Total Requests</div>
+          <div className="stat-value">{counts.total}</div>
+        </div>
+        <div className="finance-stat-card finance-stat-card-warning">
+          <div className="stat-label">Pending Review</div>
+          <div className="stat-value">{counts.pending}</div>
+        </div>
+        <div className="finance-stat-card finance-stat-card-success">
+          <div className="stat-label">Approved</div>
+          <div className="stat-value">{counts.approved}</div>
+        </div>
+        <div className="finance-stat-card finance-stat-card-danger">
+          <div className="stat-label">Rejected</div>
+          <div className="stat-value">{counts.rejected}</div>
+        </div>
+      </div>
 
       {/* Filters and Search */}
-      <Card className="border-0 deposit-card mb-4">
-        <Card.Body>
-          <Row className="g-3 align-items-center">
-            <Col lg={4}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <Search size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  type="text"
-                  placeholder="Search by customer name, account, or deposit ID..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </InputGroup>
-            </Col>
-            <Col lg={3}>
-              <Form.Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-                <option value="All">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-              </Form.Select>
-            </Col>
-            <Col lg={5} className="text-end">
-              <span className="text-muted">
-                Showing {filteredDeposits.length} of {deposits.length} requests
-              </span>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+      <div className="deposit-mgmt-filter-card mb-4">
+        <div className="deposit-mgmt-search">
+          <InputGroup>
+            <InputGroup.Text>
+              <Search size={16} />
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Search by customer name or request ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </InputGroup>
+        </div>
+        <div className="deposit-mgmt-status">
+          <Form.Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+            <option value="All">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </Form.Select>
+        </div>
+        <div className="deposit-mgmt-count">
+          Showing {filteredDeposits.length} of {deposits.length} requests
+        </div>
+      </div>
 
       {/* Deposits Table */}
-      <Card className="border-0 deposit-card">
-        <Card.Header className="bg-transparent border-bottom-0 pb-0">
+      <div className="deposit-mgmt-table-card">
+        <div className="px-4 pt-4 pb-0">
           <h5 className="fw-bold mb-0 d-flex align-items-center">
             <FileText size={20} className="me-2 text-success" />
             Deposit Requests
           </h5>
-        </Card.Header>
-        <Card.Body className="pt-3">
+        </div>
+        <div className="pt-3 px-4">
           {filteredDeposits.length === 0 ? (
             <div className="text-center py-5">
               <FileText size={48} className="text-muted mb-3" />
@@ -304,97 +279,66 @@ const DepositManagement = () => {
               </small>
             </div>
           ) : (
-            <Table responsive hover className="mb-0">
-              <thead>
-                <tr>
-                  <th className="border-0 text-muted fw-semibold">Request ID</th>
-                  <th className="border-0 text-muted fw-semibold">Customer</th>
-                  <th className="border-0 text-muted fw-semibold">Amount</th>
-                  <th className="border-0 text-muted fw-semibold">Status</th>
-                  <th className="border-0 text-muted fw-semibold">Date</th>
-                  <th className="border-0 text-muted fw-semibold">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDeposits.map((deposit) => (
-                  <tr key={deposit.id}>
-                    <td className="border-0">
-                      <div>
-                        <div className="fw-semibold text-primary">{deposit.id}</div>
-                        <small className="text-muted">User: {deposit.userId}</small>
-                      </div>
-                    </td>
-                    <td className="border-0">
-                      <div>
+            <div className="table-responsive">
+              <table className="table deposit-mgmt-table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th className="border-0">REQUEST ID</th>
+                    <th className="border-0">CUSTOMER</th>
+                    <th className="border-0">AMOUNT</th>
+                    <th className="border-0">STATUS</th>
+                    <th className="border-0">DATE</th>
+                    <th className="border-0">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDeposits.map((deposit) => (
+                    <tr key={deposit.id}>
+                      <td className="border-0 align-middle">
+                        <a href="#" className="deposit-id-link fw-semibold">{deposit.id}</a>
+                        <div className="text-muted small">User: {deposit.userId}</div>
+                      </td>
+                      <td className="border-0 align-middle">
                         <div className="fw-semibold">{deposit.customerName}</div>
-                        <small className="text-muted">{deposit.accountNumber}</small>
-                        <Badge bg={deposit.accountType === 'business' ? 'primary' : 'secondary'} className="ms-1">
-                          {deposit.accountType || 'Personal'}
-                        </Badge>
-                      </div>
-                    </td>
-                    <td className="border-0">
-                      <div className="fw-bold text-success fs-6">
-                        {formatCurrency(deposit.amount)}
-                      </div>
-                    </td>
-                    <td className="border-0">
-                      {getStatusBadge(deposit.status)}
-                    </td>
-                    <td className="border-0">
-                      <div>
-                        <small className="text-muted d-block">Submitted:</small>
-                        <small>{formatDate(deposit.createdAt)}</small>
+                        <div className="text-muted small">{deposit.accountNumber} <span className="account-type-badge">{deposit.accountType || 'personal'}</span></div>
+                      </td>
+                      <td className="border-0 align-middle">
+                        <span className="text-success fw-bold">{formatCurrency(deposit.amount)}</span>
+                      </td>
+                      <td className="border-0 align-middle">
+                        {deposit.status === 'Approved' && <span className="status-badge status-badge-approved">Approved</span>}
+                        {deposit.status === 'Rejected' && <span className="status-badge status-badge-rejected">Rejected</span>}
+                        {deposit.status === 'Pending' && <span className="status-badge status-badge-pending">Pending</span>}
+                      </td>
+                      <td className="border-0 align-middle">
+                        <div className="small text-muted">Submitted:</div>
+                        <div className="small">{formatDate(deposit.createdAt)}</div>
                         {deposit.processedAt && (
                           <>
-                            <small className="text-muted d-block">Processed:</small>
-                            <small>{formatDate(deposit.processedAt)}</small>
+                            <div className="small text-muted mt-1">Processed:</div>
+                            <div className="small">{formatDate(deposit.processedAt)}</div>
                           </>
                         )}
-                      </div>
-                    </td>
-                    <td className="border-0">
-                      <div className="d-flex gap-1">
+                      </td>
+                      <td className="border-0 align-middle">
                         <Button
-                          variant="outline-info"
+                          variant="link"
                           size="sm"
-                          className="p-2"
+                          className="p-2 view-btn"
                           title="View Details"
                           onClick={() => handleViewDeposit(deposit)}
                         >
-                          <Eye size={14} />
+                          <Eye size={18} />
                         </Button>
-                        {deposit.status === 'Pending' && (
-                          <>
-                            <Button
-                              variant="outline-success"
-                              size="sm"
-                              className="p-2"
-                              title="Approve Deposit"
-                              onClick={() => handleProcessDeposit(deposit, 'approve')}
-                            >
-                              <CheckCircle size={14} />
-                            </Button>
-                            <Button
-                              variant="outline-danger"
-                              size="sm"
-                              className="p-2"
-                              title="Reject Deposit"
-                              onClick={() => handleProcessDeposit(deposit, 'reject')}
-                            >
-                              <XCircle size={14} />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </Card.Body>
-      </Card>
+        </div>
+      </div>
 
       {/* Deposit Detail Modal */}
       <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)} size="lg" centered>
@@ -407,8 +351,8 @@ const DepositManagement = () => {
         <Modal.Body className="p-0">
           {selectedDeposit && (
             <div className="p-4">
-              <Row className="g-4">
-                <Col md={6}>
+              <div className="row g-4">
+                <div className="col-md-6">
                   <Card className="border-0 bg-light">
                     <Card.Body>
                       <h6 className="fw-bold text-success mb-3">
@@ -432,8 +376,8 @@ const DepositManagement = () => {
                       </div>
                     </Card.Body>
                   </Card>
-                </Col>
-                <Col md={6}>
+                </div>
+                <div className="col-md-6">
                   <Card className="border-0 bg-light">
                     <Card.Body>
                       <h6 className="fw-bold text-success mb-3">
@@ -460,8 +404,8 @@ const DepositManagement = () => {
                       )}
                     </Card.Body>
                   </Card>
-                </Col>
-                <Col md={6}>
+                </div>
+                <div className="col-md-6">
                   <Card className="border-0 bg-light">
                     <Card.Body>
                       <h6 className="fw-bold text-success mb-3">
@@ -481,8 +425,8 @@ const DepositManagement = () => {
                       )}
                     </Card.Body>
                   </Card>
-                </Col>
-                <Col md={6}>
+                </div>
+                <div className="col-md-6">
                   <Card className="border-0 bg-light">
                     <Card.Body>
                       <h6 className="fw-bold text-success mb-3">
@@ -495,8 +439,8 @@ const DepositManagement = () => {
                       </div>
                     </Card.Body>
                   </Card>
-                </Col>
-              </Row>
+                </div>
+              </div>
             </div>
           )}
         </Modal.Body>
@@ -611,53 +555,6 @@ const DepositManagement = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Custom Styles */}
-      <style>{`
-        .deposit-stat-card {
-          border-radius: 12px;
-          transition: all 0.3s ease;
-        }
-
-        .deposit-stat-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .deposit-card {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 16px;
-          box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-          transition: all 0.3s ease;
-        }
-
-        .deposit-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
-        }
-
-        .table tbody tr:hover {
-          background-color: rgba(40, 167, 69, 0.05) !important;
-        }
-
-        .btn-outline-success:hover {
-          background-color: #28a745;
-          border-color: #28a745;
-        }
-
-        .btn-outline-danger:hover {
-          background-color: #dc3545;
-          border-color: #dc3545;
-        }
-
-        .btn-outline-info:hover {
-          background-color: #17a2b8;
-          border-color: #17a2b8;
-        }
-      `}</style>
     </Container>
   )
 }
