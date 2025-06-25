@@ -199,6 +199,34 @@ class TransactionService {
       minute: '2-digit',
     });
   }
+  /**
+   * Transfer money between accounts
+   * @param {Object} transferData - Transfer data
+   * @param {string} transferData.fromUser - Sender account (userId or accountNumber)
+   * @param {string} transferData.toUser - Recipient account (userId or accountNumber)
+   * @param {number} transferData.amount - Transfer amount
+   * @param {string} [transferData.details] - Transfer description
+   * @param {string} [accessToken] - Access token for authentication
+   * @returns {Promise<Object>} Transfer response
+   */
+  static async transferMoney(transferData, accessToken = null) {
+    try {
+      const config = {};
+
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
+      }
+
+      const response = await api.post(`${TRANSACTION_ENDPOINT}/transfer`, transferData, config);
+
+      return response.data;
+    } catch (error) {
+      console.error('Transfer money error:', error);
+      throw error;
+    }
+  }
 
   /**
    * Get transaction type display name

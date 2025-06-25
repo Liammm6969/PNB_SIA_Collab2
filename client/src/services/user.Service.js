@@ -95,11 +95,11 @@ class UserService {
   }
   /**
    * Logout user by removing stored tokens
-   */
-  static logout() {
+   */  static logout() {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userId');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('accountNumber');
     // Clear any other user-related data from localStorage
   }
   /**
@@ -118,7 +118,6 @@ class UserService {
   static getAccessToken() {
     return localStorage.getItem('accessToken');
   }
-
   /**
    * Store user data in localStorage
    * @param {Object} userData - User data to store
@@ -130,8 +129,10 @@ class UserService {
     if (userData.email) {
       localStorage.setItem('userEmail', userData.email);
     }
+    if (userData.accountNumber) {
+      localStorage.setItem('accountNumber', userData.accountNumber);
+    }
   }
-
   /**
    * Get stored user data
    * @returns {Object} Stored user data
@@ -140,6 +141,7 @@ class UserService {
     return {
       userId: localStorage.getItem('userId'),
       email: localStorage.getItem('userEmail'),
+      accountNumber: localStorage.getItem('accountNumber'),
     };
   }
 

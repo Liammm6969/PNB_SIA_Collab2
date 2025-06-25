@@ -137,7 +137,6 @@ const _userTransfer = () => {
       setRecipient(null);
     }
   };
-
   const validateRecipient = async () => {
     if (!formData.recipientAccount) return;
 
@@ -151,17 +150,21 @@ const _userTransfer = () => {
       setValidatingRecipient(true);
       setError('');
       
-      // Mock recipient validation
+      // For now, we'll use a simple validation since we don't have a dedicated recipient validation endpoint
+      // In a real implementation, you would call an API to validate the recipient account
+      // Example: const result = await TransferService.validateRecipient(formData.recipientAccount);
+      
+      // Mock recipient validation - in a real app, this would come from the API
       const mockRecipient = {
         accountNumber: formData.recipientAccount,
-        name: 'John Doe',
+        name: 'Account Holder', // This would come from the API
         accountType: 'personal',
         isActive: true
       };
       
       setRecipient(mockRecipient);
     } catch (err) {
-      setError(err.message || 'Failed to validate recipient');
+      setError(err.response?.data?.error || err.message || 'Failed to validate recipient');
       setRecipient(null);
     } finally {
       setValidatingRecipient(false);
@@ -195,22 +198,23 @@ const _userTransfer = () => {
 
     setShowConfirmModal(true);
   };
-
   const confirmTransfer = async () => {
     try {
       setLoading(true);
       setShowConfirmModal(false);
+      setError('');
 
       const userData = UserService.getUserData();
       const transferData = {
-        fromUserId: userData.userId,
-        toAccountNumber: formData.recipientAccount,
+        fromUser: userData.accountNumber, // Use account number
+        toUser: formData.recipientAccount,
         amount: parseFloat(formData.amount),
-        description: formData.description || `Transfer to ${recipient.name}`,
-        type: 'internal'
+        details: formData.description || `Transfer to ${recipient.name}`
       };
 
-      // Mock transfer success
+      // Call the real transfer API
+      const result = await TransactionService.transferMoney(transferData);
+      
       setSuccess(`Transfer of ${TransactionService.formatCurrency(transferData.amount)} to ${recipient.name} completed successfully!`);
       
       // Reset form
@@ -228,7 +232,7 @@ const _userTransfer = () => {
       loadRecentTransfers();
 
     } catch (err) {
-      setError(err.message || 'Transfer failed');
+      setError(err.response?.data?.error || err.message || 'Transfer failed');
     } finally {
       setLoading(false);
     }
