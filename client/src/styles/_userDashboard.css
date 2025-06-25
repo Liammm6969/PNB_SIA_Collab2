@@ -672,45 +672,6 @@
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .dashboard-root {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  }
-  
-  .welcome-title {
-    color: #f9fafb;
-  }
-  
-  .welcome-subtitle {
-    color: #9ca3af;
-  }
-  
-  .quick-actions-card,
-  .stat-card,
-  .transactions-card {
-    background: rgba(31, 41, 55, 0.8);
-    border-color: rgba(75, 85, 99, 0.3);
-  }
-  
-  .quick-actions-title,
-  .transactions-title {
-    color: #f9fafb;
-  }
-  
-  .transaction-description {
-    color: #f9fafb;
-  }
-  
-  .transaction-meta {
-    color: #9ca3af;
-  }
-  
-  .stat-label {
-    color: #9ca3af;
-  }
-}
-
 /* Animation classes for enhanced interactions */
 .fade-in {
   animation: fadeIn 0.6s ease-out;
