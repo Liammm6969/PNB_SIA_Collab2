@@ -100,7 +100,7 @@ function useLoginForm(navigate) {
           message: 'Login successful! Redirecting to dashboard...',
           variant: 'success'
         })
-        setTimeout(() => navigate('/dashboard'), 1500)
+        setTimeout(() => navigate('/user/dashboard'), 1500)
       } else {
         throw new Error('Unable to determine account type. Please check your credentials.')
       }

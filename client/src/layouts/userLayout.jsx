@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Navbar, Nav, Container, Dropdown, Badge, Offcanvas } from 'react-bootstrap'
 import { 
@@ -13,17 +13,69 @@ import {
   House,
   List
 } from 'react-bootstrap-icons'
+import UserService from '../services/user.Service'
 
 const UserLayout = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [showOffcanvas, setShowOffcanvas] = useState(false)
-  
-  // Mock user data - in real app this would come from auth context
-  const user = {
-    name: "John Doe",
-    email: "john.doe@email.com",
-    accountNumber: "****1234"
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadUserData()
+  }, [])
+
+  const loadUserData = async () => {
+    try {
+      setLoading(true)
+      
+      // Check if user is authenticated
+      if (!UserService.isAuthenticated()) {
+        navigate('/login')
+        return
+      }
+
+      const userData = UserService.getUserData()
+      
+      if (!userData.userId) {
+        navigate('/login')
+        return
+      }
+
+      // Load user profile from API
+      const userProfile = await UserService.getUserProfile(userData.userId)
+      setUser(userProfile)
+      
+    } catch (error) {
+      console.error('Failed to load user data:', error)
+      // If API call fails, redirect to login
+      navigate('/login')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Helper function to get user display name
+  const getUserDisplayName = () => {
+    if (!user) return 'User'
+    
+    if (user.accountType === 'business') {
+      return user.businessName || 'Business User'
+    } else {
+      return user.firstName && user.lastName 
+        ? `${user.firstName} ${user.lastName}` 
+        : 'Personal User'
+    }
+  }
+
+  // Helper function to format account number for display
+  const getDisplayAccountNumber = () => {
+    if (!user || !user.accountNumber) return '****0000'
+    
+    const accountNum = user.accountNumber
+    // Show only last 4 digits for security
+    return `****${accountNum.slice(-4)}`
   }
 
   const navigationItems = [
@@ -43,16 +95,28 @@ const UserLayout = () => {
       icon: <FileText className="me-2" />
     }
   ]
-
   const handleLogout = () => {
-    // Clear user session/token
-    localStorage.removeItem('token')
+    // Clear user session/token using UserService
+    UserService.logout()
     navigate('/login')
   }
-
   const handleNavigation = (path) => {
     navigate(path)
     setShowOffcanvas(false)
+  }
+
+  // Show loading state if user data is being fetched
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <div className="mt-2">Loading user data...</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -130,18 +194,17 @@ const UserLayout = () => {
             </Dropdown>
 
             {/* User Profile Dropdown */}
-            <Dropdown>
-              <Dropdown.Toggle variant="link" className="user-dropdown d-flex align-items-center text-decoration-none border-0">
+            <Dropdown>              <Dropdown.Toggle variant="link" className="user-dropdown d-flex align-items-center text-decoration-none border-0">
                 <PersonCircle size={32} className="me-2" />
                 <div className="d-none d-md-block text-start">
-                  <div className="fw-semibold">{user.name}</div>
-                  <small className="text-muted">{user.accountNumber}</small>
+                  <div className="fw-semibold">{getUserDisplayName()}</div>
+                  <small className="text-muted">{getDisplayAccountNumber()}</small>
                 </div>
               </Dropdown.Toggle>
               <Dropdown.Menu align="end" className="user-dropdown-menu">
                 <Dropdown.Header>
-                  <div>{user.name}</div>
-                  <small className="text-muted">{user.email}</small>
+                  <div>{getUserDisplayName()}</div>
+                  <small className="text-muted">{user?.email || 'No email'}</small>
                 </Dropdown.Header>
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={() => navigate('/user/profile')}>
