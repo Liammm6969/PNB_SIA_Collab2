@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // Base API URL
-const BASE_API_URL = 'http://192.168.88.244:4000/api/Philippine-National-Bank';
+const BASE_API_URL = 'http://localhost:4000/api/Philippine-National-Bank';
 
 // Create Axios instance with default configuration
 const api = axios.create({
