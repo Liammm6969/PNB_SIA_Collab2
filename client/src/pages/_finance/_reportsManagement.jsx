@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Table, Badge, Modal, Form, Alert, ProgressBar } from 'react-bootstrap'
+import { Container, Card, Button, Table, Badge, Modal, Form, Alert } from 'react-bootstrap'
 import { 
   FileText, 
   Download, 
   Calendar, 
-  Filter, 
   Eye, 
   Printer,
   Send,
@@ -21,6 +20,7 @@ import {
   Search,
   Upload
 } from 'react-bootstrap-icons'
+import '../../styles/financeStyles/reportsManagement.css'
 
 const ReportsManagement = () => {
   const [selectedReport, setSelectedReport] = useState(null)
@@ -227,17 +227,17 @@ const ReportsManagement = () => {
       )}
 
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h1 className="h3 fw-bold text-dark mb-1">
-            <FileText size={28} className="me-2 text-success" />
-            Reports Management
-          </h1>
-          <p className="text-muted mb-0">
-            Generate, manage, and download financial reports and analytics
-          </p>
+      <div className="reports-header">
+        <div className="reports-header-left">
+          <div className="reports-header-icon">
+            <FileText size={28} className="text-white" />
+          </div>
+          <div>
+            <div className="reports-header-title">Reports Management</div>
+            <div className="reports-header-subtitle">Generate, manage, and download financial reports and analytics</div>
+          </div>
         </div>
-        <div className="d-flex gap-2">
+        <div className="reports-header-actions">
           <Button variant="outline-success">
             <Upload size={16} className="me-2" />
             Upload Template
@@ -249,210 +249,166 @@ const ReportsManagement = () => {
         </div>
       </div>
 
-      {/* Report Statistics */}
-      <Row className="g-3 mb-4">
-        <Col lg={2} md={4} sm={6}>
-          <Card className="border-0 report-stat-card bg-primary text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{reportStats.totalReports}</h4>
-              <small>Total Reports</small>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={2} md={4} sm={6}>
-          <Card className="border-0 report-stat-card bg-success text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{reportStats.generatedToday}</h4>
-              <small>Generated Today</small>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={2} md={4} sm={6}>
-          <Card className="border-0 report-stat-card bg-warning text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{reportStats.pendingReports}</h4>
-              <small>Pending</small>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={2} md={4} sm={6}>
-          <Card className="border-0 report-stat-card bg-info text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{reportStats.scheduledReports}</h4>
-              <small>Scheduled</small>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={2} md={4} sm={6}>
-          <Card className="border-0 report-stat-card bg-secondary text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{reportStats.avgGenerationTime}</h4>
-              <small>Avg Generation</small>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={2} md={4} sm={6}>
-          <Card className="border-0 report-stat-card bg-dark text-white">
-            <Card.Body className="text-center p-3">
-              <h4 className="mb-1">{reportStats.totalDownloads}</h4>
-              <small>Total Downloads</small>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      {/* Stats */}
+      <div className="finance-stat-grid mb-4">
+        <div className="finance-stat-card finance-stat-card-info">
+          <div className="stat-label">Total Reports</div>
+          <div className="stat-value">{reportStats.totalReports}</div>
+        </div>
+        <div className="finance-stat-card finance-stat-card-success">
+          <div className="stat-label">Generated Today</div>
+          <div className="stat-value">{reportStats.generatedToday}</div>
+        </div>
+        <div className="finance-stat-card finance-stat-card-warning">
+          <div className="stat-label">Pending</div>
+          <div className="stat-value">{reportStats.pendingReports}</div>
+        </div>
+        <div className="finance-stat-card finance-stat-card-info">
+          <div className="stat-label">Scheduled</div>
+          <div className="stat-value">{reportStats.scheduledReports}</div>
+        </div>
+        <div className="finance-stat-card finance-stat-card-secondary">
+          <div className="stat-label">Avg Generation</div>
+          <div className="stat-value">{reportStats.avgGenerationTime}</div>
+        </div>
+        <div className="finance-stat-card finance-stat-card-dark">
+          <div className="stat-label">Total Downloads</div>
+          <div className="stat-value">{reportStats.totalDownloads}</div>
+        </div>
+      </div>
 
       {/* Report Templates */}
-      <Row className="g-4 mb-4">
-        <Col>
-          <Card className="border-0 report-card">
-            <Card.Header className="bg-transparent border-bottom-0 pb-0">
-              <h5 className="fw-bold mb-0 d-flex align-items-center">
-                <BarChart size={20} className="me-2 text-success" />
-                Available Report Templates
-              </h5>
-            </Card.Header>
-            <Card.Body>
-              <Row className="g-3">
-                {reportTemplates.map((report) => (
-                  <Col lg={4} md={6} key={report.id}>
-                    <Card className="border report-template-card h-100">
-                      <Card.Body className="p-4">
-                        <div className="d-flex align-items-start mb-3">
-                          <div className="me-3">
-                            {report.icon}
-                          </div>
-                          <div className="flex-grow-1">
-                            <h6 className="fw-bold mb-1">{report.name}</h6>
-                            <p className="text-muted small mb-2">{report.description}</p>
-                            <div className="d-flex align-items-center gap-2 mb-2">
-                              {getCategoryBadge(report.category)}
-                              <Badge bg="outline-secondary">{report.frequency}</Badge>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="mb-3">
-                          <small className="text-muted d-block mb-2">Available Formats:</small>
-                          <div className="d-flex gap-1">
-                            {report.format.map((fmt, index) => (
-                              <Badge key={index} bg="light" text="dark" className="d-flex align-items-center">
-                                {getFormatIcon(fmt)}
-                                {fmt}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="mb-3">
-                          <small className="text-muted d-block mb-2">Report Fields:</small>
-                          <div className="small text-muted">
-                            {report.fields.slice(0, 2).join(', ')}
-                            {report.fields.length > 2 && ` + ${report.fields.length - 2} more`}
-                          </div>
-                        </div>
-
-                        <div className="d-flex justify-content-between align-items-center">
-                          <small className="text-muted">
-                            Last: {formatDate(report.lastGenerated)}
-                          </small>
-                          <Button 
-                            variant="success" 
-                            size="sm"
-                            onClick={() => handleGenerateReport(report)}
-                          >
-                            <Download size={14} className="me-1" />
-                            Generate
-                          </Button>
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Recent Reports */}
-      <Card className="border-0 report-card">
-        <Card.Header className="bg-transparent border-bottom-0 pb-0">
-          <div className="d-flex justify-content-between align-items-center">
-            <h5 className="fw-bold mb-0 d-flex align-items-center">
-              <Clock size={20} className="me-2 text-success" />
-              Recently Generated Reports
-            </h5>
-            <Button variant="outline-success" size="sm">
-              View All Reports
-            </Button>
-          </div>
-        </Card.Header>
-        <Card.Body>
-          <Table responsive hover className="mb-0">
-            <thead>
-              <tr>
-                <th className="border-0 text-muted fw-semibold">Report Name</th>
-                <th className="border-0 text-muted fw-semibold">Generated By</th>
-                <th className="border-0 text-muted fw-semibold">Date</th>
-                <th className="border-0 text-muted fw-semibold">Format</th>
-                <th className="border-0 text-muted fw-semibold">Size</th>
-                <th className="border-0 text-muted fw-semibold">Downloads</th>
-                <th className="border-0 text-muted fw-semibold">Status</th>
-                <th className="border-0 text-muted fw-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentReports.map((report) => (
-                <tr key={report.id}>
-                  <td className="border-0">
-                    <div>
-                      <div className="fw-semibold">{report.name}</div>
-                      <small className="text-muted">{report.id}</small>
+      <div className="mb-4">
+        <h5 className="fw-bold mb-3 d-flex align-items-center">
+          <BarChart size={20} className="me-2 text-success" />
+          Available Report Templates
+        </h5>
+        <div className="reports-templates-grid-2x3">
+          {reportTemplates.map((report) => {
+            // Determine color class for icon and badge
+            let colorClass = 'blue';
+            if (report.category === 'Daily') colorClass = 'blue';
+            else if (report.category === 'Monthly') colorClass = 'green';
+            else if (report.category === 'Analytics') colorClass = 'info';
+            else if (report.category === 'Customer') colorClass = 'yellow';
+            else if (report.category === 'Compliance') colorClass = 'red';
+            else colorClass = 'gray';
+            return (
+              <div key={report.id} className="report-template-card">
+                <div className="p-4 d-flex flex-column h-100">
+                  <div className="template-header">
+                    <div className={`template-icon-bg ${colorClass}`}>{report.icon}</div>
+                    <div className="template-header-content">
+                      <div className="template-title">{report.name}</div>
+                      <div className="template-desc">{report.description}</div>
+                      <div className="template-badges">
+                        <span className={`template-badge-category ${colorClass}`}>{report.category}</span>
+                        <span className="template-badge-freq">{report.frequency}</span>
+                      </div>
                     </div>
-                  </td>
-                  <td className="border-0">
-                    <span className="text-muted">{report.generatedBy}</span>
-                  </td>
-                  <td className="border-0">
-                    <small className="text-muted">{formatDate(report.generatedDate)}</small>
-                  </td>
-                  <td className="border-0">
-                    <div className="d-flex align-items-center">
-                      {getFormatIcon(report.format)}
-                      {report.format}
-                    </div>
-                  </td>
-                  <td className="border-0">
-                    <span className="text-muted">{report.size}</span>
-                  </td>
-                  <td className="border-0">
-                    <Badge bg="info">{report.downloadCount}</Badge>
-                  </td>
-                  <td className="border-0">
-                    <Badge bg="success">
-                      <CheckCircle size={12} className="me-1" />
-                      {report.status}
-                    </Badge>
-                  </td>
-                  <td className="border-0">
-                    <div className="d-flex gap-1">
-                      <Button variant="outline-info" size="sm" className="p-2" title="Preview">
-                        <Eye size={14} />
-                      </Button>
-                      <Button variant="outline-success" size="sm" className="p-2" title="Download">
-                        <Download size={14} />
-                      </Button>
-                      <Button variant="outline-primary" size="sm" className="p-2" title="Send">
-                        <Send size={14} />
-                      </Button>
-                    </div>
-                  </td>
+                  </div>
+                  <hr className="template-divider" />
+                  <div className="template-formats">
+                    {report.format.map((fmt, index) => (
+                      <span key={index} className="template-format-badge">
+                        {getFormatIcon(fmt)}
+                        {fmt}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="template-fields">
+                    {report.fields.slice(0, 2).join(', ')}
+                    {report.fields.length > 2 && ` + ${report.fields.length - 2} more`}
+                  </div>
+                  <div className="template-footer mt-auto">
+                    <span className="template-last">Last: {formatDate(report.lastGenerated)}</span>
+                    <Button 
+                      className="template-generate-btn"
+                      onClick={() => handleGenerateReport(report)}
+                    >
+                      <Download size={14} className="me-1" />
+                      Generate
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Recent Reports Table */}
+      <div className="reports-table-card">
+        <div className="px-4 pt-4 pb-0 d-flex justify-content-between align-items-center">
+          <h5 className="fw-bold mb-0 d-flex align-items-center">
+            <Clock size={20} className="me-2 text-success" />
+            Recently Generated Reports
+          </h5>
+          <Button variant="outline-success" size="sm">
+            View All Reports
+          </Button>
+        </div>
+        <div className="pt-3 px-4">
+          <div className="table-responsive">
+            <table className="table reports-table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th className="border-0">Report Name</th>
+                  <th className="border-0">Generated By</th>
+                  <th className="border-0">Date</th>
+                  <th className="border-0">Format</th>
+                  <th className="border-0">Size</th>
+                  <th className="border-0">Downloads</th>
+                  <th className="border-0">Status</th>
+                  <th className="border-0">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Card.Body>
-      </Card>
+              </thead>
+              <tbody>
+                {recentReports.map((report) => (
+                  <tr key={report.id}>
+                    <td className="border-0">
+                      <a href="#" className="report-name-link">{report.name}</a>
+                      <span className="report-id">{report.id}</span>
+                    </td>
+                    <td className="border-0">
+                      <span className="text-muted">{report.generatedBy}</span>
+                    </td>
+                    <td className="border-0">
+                      <small className="text-muted">{formatDate(report.generatedDate)}</small>
+                    </td>
+                    <td className="border-0">
+                      <div className="d-flex align-items-center">
+                        {getFormatIcon(report.format)}
+                        {report.format}
+                      </div>
+                    </td>
+                    <td className="border-0">
+                      <span className="text-muted">{report.size}</span>
+                    </td>
+                    <td className="border-0">
+                      <Badge bg="info">{report.downloadCount}</Badge>
+                    </td>
+                    <td className="border-0">
+                      <span className={`status-badge completed`}>{report.status}</span>
+                    </td>
+                    <td className="border-0">
+                      <Button variant="link" size="sm" className="p-2" title="Preview">
+                        <Eye size={16} />
+                      </Button>
+                      <Button variant="link" size="sm" className="p-2" title="Download">
+                        <Download size={16} />
+                      </Button>
+                      <Button variant="link" size="sm" className="p-2" title="Send">
+                        <Send size={16} />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       {/* Generate Report Modal */}
       <Modal show={showGenerateModal} onHide={() => setShowGenerateModal(false)} size="lg" centered>
@@ -550,64 +506,6 @@ const ReportsManagement = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Custom Styles */}
-      <style>{`
-        .report-stat-card {
-          border-radius: 12px;
-          transition: all 0.3s ease;
-        }
-
-        .report-stat-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .report-card {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 16px;
-          box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-          transition: all 0.3s ease;
-        }
-
-        .report-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
-        }
-
-        .report-template-card {
-          transition: all 0.3s ease;
-          border-radius: 12px;
-        }
-
-        .report-template-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-          border-color: #28a745;
-        }
-
-        .table tbody tr:hover {
-          background-color: rgba(40, 167, 69, 0.05) !important;
-        }
-
-        .btn-outline-success:hover {
-          background-color: #28a745;
-          border-color: #28a745;
-        }
-
-        .btn-outline-info:hover {
-          background-color: #17a2b8;
-          border-color: #17a2b8;
-        }
-
-        .btn-outline-primary:hover {
-          background-color: #007bff;
-          border-color: #007bff;
-        }
-      `}</style>
     </Container>
   )
 }

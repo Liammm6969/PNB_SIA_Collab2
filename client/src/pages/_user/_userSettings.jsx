@@ -46,7 +46,7 @@ import {
   GearFill,
   FileEarmarkText
 } from 'react-bootstrap-icons';
-import '../../styles/UserSettings.css';
+import '../../styles/userStyles/UserSettings.css';
 import UserService from '../../services/user.Service';
 
 const _userSettings = () => {

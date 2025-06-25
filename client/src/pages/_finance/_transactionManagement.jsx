@@ -1,28 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Table, Badge, Modal, Form, Alert, InputGroup, Tabs, Tab, Spinner } from 'react-bootstrap'
+import { Container, Button, Table, Badge, Modal, Form, Alert, InputGroup, Spinner } from 'react-bootstrap'
 import { 
   Cash, 
   Search, 
-  Filter, 
   Eye, 
   Download, 
-  Upload,
   FileText,
-  Calendar,
-  Building,
-  CreditCard,
+  PersonCircle,
   ArrowUpCircle,
   ArrowDownCircle,
   Clock,
   CheckCircle,
   XCircle,
-  GraphUp,
-  Printer,
-  Send,
-  Flag,
-  PersonCircle
+  Send
 } from 'react-bootstrap-icons'
 import TransactionService from '../../services/transaction.Service'
+import '../../styles/financeStyles/transactionManagement.css'
 
 const TransactionManagement = () => {
   const [transactions, setTransactions] = useState([])
@@ -105,7 +98,7 @@ const TransactionManagement = () => {
       Deposit: { bg: 'success', icon: <ArrowDownCircle size={12} className="me-1" />, text: 'Deposit' },
       Transfer: { bg: 'primary', icon: <Send size={12} className="me-1" />, text: 'Transfer' },
       Withdrawal: { bg: 'warning', icon: <ArrowUpCircle size={12} className="me-1" />, text: 'Withdrawal' },
-      Payment: { bg: 'info', icon: <CreditCard size={12} className="me-1" />, text: 'Payment' }
+      Payment: { bg: 'info', icon: <ArrowDownCircle size={12} className="me-1" />, text: 'Payment' }
     }
 
     const config = typeConfig[type] || { bg: 'secondary', icon: <FileText size={12} className="me-1" />, text: type }
@@ -181,50 +174,82 @@ const TransactionManagement = () => {
     )
   }
 
+  // Stat values
+  const totalTransactions = filteredTransactions.length;
+  const totalVolume = filteredTransactions.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  const completedCount = filteredTransactions.filter(t => t.status === 'Completed').length;
+  const failedCount = filteredTransactions.filter(t => t.status === 'Failed').length;
+
   return (
     <Container fluid className="p-4">
-      <Row className="mb-4">
-        <Col>
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <h2 className="mb-1">
-                <Cash className="me-2" />
-                Transaction Management
-              </h2>
-              <p className="text-muted mb-0">Monitor and manage all financial transactions</p>
-            </div>
-            <div className="d-flex gap-2">
-              <Button variant="outline-primary" onClick={exportTransactions}>
-                <Download className="me-1" />
-                Export
-              </Button>
-            </div>
+      {/* Professional Header Card */}
+      <div className="transaction-header-card">
+        <div className="transaction-header-left">
+          <div className="transaction-header-icon">
+            <Cash size={32} className="text-white" />
           </div>
-        </Col>
-      </Row>
+          <div>
+            <div className="transaction-header-title">Transaction Management</div>
+            <div className="transaction-header-subtitle">Monitor and manage all financial transactions</div>
+          </div>
+        </div>
+        <div className="transaction-header-actions">
+          <Button variant="outline-primary" onClick={exportTransactions}>
+            <Download className="me-1" />
+            Export
+          </Button>
+        </div>
+      </div>
 
-      {error && (
-        <Row className="mb-3">
-          <Col>
-            <Alert variant="danger" dismissible onClose={() => setError('')}>
-              {error}
-            </Alert>
-          </Col>
-        </Row>
-      )}
+      {/* Stat Cards */}
+      <div className="transaction-stat-grid">
+        <div className="transaction-stat-card transaction-stat-card-blue">
+          <div className="stat-icon"><FileText size={28} className="text-white" /></div>
+          <div className="stat-label">Total Transactions</div>
+          <div className="stat-value">{totalTransactions}</div>
+        </div>
+        <div className="transaction-stat-card transaction-stat-card-green">
+          <div className="stat-icon"><CheckCircle size={28} className="text-white" /></div>
+          <div className="stat-label">Completed</div>
+          <div className="stat-value">{completedCount}</div>
+        </div>
+        <div className="transaction-stat-card transaction-stat-card-yellow">
+          <div className="stat-icon"><Clock size={28} className="text-white" /></div>
+          <div className="stat-label">Total Volume</div>
+          <div className="stat-value">{formatCurrency(totalVolume)}</div>
+        </div>
+        <div className="transaction-stat-card transaction-stat-card-red">
+          <div className="stat-icon"><XCircle size={28} className="text-white" /></div>
+          <div className="stat-label">Failed</div>
+          <div className="stat-value">{failedCount}</div>
+        </div>
+      </div>
 
       {/* Filters and Search */}
-      <Row className="mb-4">
-        <Col lg={3} md={6} className="mb-3">
+      <div className="transaction-filter-card mb-4">
+        <div className="transaction-search">
+          <InputGroup>
+            <InputGroup.Text>
+              <Search size={16} />
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Search by transaction ID, description, or user..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </InputGroup>
+        </div>
+        <div className="transaction-type">
           <Form.Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
             <option value="All">All Types</option>
-            <option value="Deposit">Deposits</option>
-            <option value="Transfer">Transfers</option>
-            <option value="Withdrawal">Withdrawals</option>
-            <option value="Payment">Payments</option>
+            <option value="Deposit">Deposit</option>
+            <option value="Transfer">Transfer</option>
+            <option value="Withdrawal">Withdrawal</option>
+            <option value="Payment">Payment</option>
           </Form.Select>
-        </Col>
-        <Col lg={3} md={6} className="mb-3">
+        </div>
+        <div className="transaction-status">
           <Form.Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
             <option value="All">All Status</option>
             <option value="Completed">Completed</option>
@@ -232,173 +257,77 @@ const TransactionManagement = () => {
             <option value="Failed">Failed</option>
             <option value="Pending">Pending</option>
           </Form.Select>
-        </Col>
-        <Col lg={6} className="mb-3">
-          <InputGroup>
-            <InputGroup.Text>
-              <Search />
-            </InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Search by transaction ID, description, or user ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </InputGroup>
-        </Col>
-      </Row>
+        </div>
+        <div className="transaction-count">
+          Showing {filteredTransactions.length} of {transactions.length} transactions
+        </div>
+      </div>
 
-      {/* Transaction Summary */}
-      <Row className="mb-4">
-        <Col md={3} className="mb-3">
-          <Card className="border-0 shadow-sm">
-            <Card.Body>
-              <div className="d-flex align-items-center">
-                <div className="flex-shrink-0">
-                  <div className="bg-primary bg-opacity-10 p-3 rounded">
-                    <FileText className="text-primary" size={24} />
-                  </div>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <h6 className="text-muted mb-1">Total Transactions</h6>
-                  <h4 className="mb-0">{filteredTransactions.length}</h4>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={3} className="mb-3">
-          <Card className="border-0 shadow-sm">
-            <Card.Body>
-              <div className="d-flex align-items-center">
-                <div className="flex-shrink-0">
-                  <div className="bg-success bg-opacity-10 p-3 rounded">
-                    <CheckCircle className="text-success" size={24} />
-                  </div>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <h6 className="text-muted mb-1">Completed</h6>
-                  <h4 className="mb-0">{filteredTransactions.filter(t => t.status === 'Completed').length}</h4>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={3} className="mb-3">
-          <Card className="border-0 shadow-sm">
-            <Card.Body>
-              <div className="d-flex align-items-center">
-                <div className="flex-shrink-0">
-                  <div className="bg-warning bg-opacity-10 p-3 rounded">
-                    <Clock className="text-warning" size={24} />
-                  </div>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <h6 className="text-muted mb-1">Processing</h6>
-                  <h4 className="mb-0">{filteredTransactions.filter(t => t.status === 'Processing').length}</h4>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={3} className="mb-3">
-          <Card className="border-0 shadow-sm">
-            <Card.Body>
-              <div className="d-flex align-items-center">
-                <div className="flex-shrink-0">
-                  <div className="bg-info bg-opacity-10 p-3 rounded">
-                    <Cash className="text-info" size={24} />
-                  </div>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <h6 className="text-muted mb-1">Total Volume</h6>
-                  <h4 className="mb-0">{formatCurrency(filteredTransactions.reduce((sum, t) => sum + parseFloat(t.amount), 0))}</h4>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Transaction Table */}
-      <Card className="border-0 shadow-sm">
-        <Card.Header className="bg-white border-0 py-3">
-          <h5 className="mb-0">
-            <FileText className="me-2" />
-            Transaction History
+      {/* Transactions Table */}
+      <div className="transaction-table-card">
+        <div className="px-4 pt-4 pb-0">
+          <h5 className="fw-bold mb-0 d-flex align-items-center">
+            <FileText size={20} className="me-2 text-success" />
+            Transactions
           </h5>
-        </Card.Header>
-        <Card.Body className="p-0">
-          {filteredTransactions.length === 0 ? (
-            <div className="text-center py-5">
-              <FileText size={48} className="text-muted mb-3" />
-              <h5 className="text-muted">No transactions found</h5>
-              <p className="text-muted">No transactions match your current filters.</p>
-            </div>
-          ) : (
-            <Table responsive className="mb-0">
-              <thead className="bg-light">
+        </div>
+        <div className="pt-3 px-4">
+          <div className="table-responsive">
+            <table className="table transaction-table align-middle mb-0">
+              <thead>
                 <tr>
-                  <th>Transaction ID</th>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>From User</th>
-                  <th>To User</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th className="border-0">Transaction ID</th>
+                  <th className="border-0">Type</th>
+                  <th className="border-0">From</th>
+                  <th className="border-0">To</th>
+                  <th className="border-0">Amount</th>
+                  <th className="border-0">Status</th>
+                  <th className="border-0">Date</th>
+                  <th className="border-0">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td>
-                      <div className="fw-semibold">{transaction.id}</div>
+                {filteredTransactions.map((transaction, index) => (
+                  <tr key={transaction.id || `transaction-${index}`}>
+                    <td className="border-0 align-middle">
+                      <a href="#" className="transaction-id-link">{transaction.id}</a>
                     </td>
-                    <td>
-                      <div className="text-muted small">
-                        {formatDate(transaction.date)}
+                    <td className="border-0 align-middle">
+                      <span className={`type-badge ${transaction.type.toLowerCase()}`}>{getTypeBadge(transaction.type)}</span>
+                    </td>
+                    <td className="border-0 align-middle">
+                      <div className="user-info">
+                        <PersonCircle size={16} className="text-secondary" />
+                        {transaction.fromUser === 0 ? 'Finance' : `User ${transaction.fromUser}`}
                       </div>
                     </td>
-                    <td>
-                      {getTypeBadge(transaction.type)}
-                    </td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <PersonCircle className="me-2 text-muted" size={16} />
-                        {transaction.fromUser === 0 ? 'Bank' : transaction.fromUser}
+                    <td className="border-0 align-middle">
+                      <div className="user-info">
+                        <PersonCircle size={16} className="text-secondary" />
+                        {transaction.toUser === 0 ? 'Finance' : `User ${transaction.toUser}`}
                       </div>
                     </td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <PersonCircle className="me-2 text-muted" size={16} />
-                        {transaction.toUser === 0 ? 'Bank' : transaction.toUser}
-                      </div>
+                    <td className="border-0 align-middle">
+                      <span className="amount">{formatCurrency(transaction.amount)}</span>
                     </td>
-                    <td>
-                      <div className="fw-semibold">
-                        {formatCurrency(transaction.amount)}
-                      </div>
+                    <td className="border-0 align-middle">
+                      <span className={`status-badge completed`}>{getStatusBadge(transaction.status)}</span>
                     </td>
-                    <td>
-                      {getStatusBadge(transaction.status)}
+                    <td className="border-0 align-middle">
+                      <span className="text-muted">{formatDate(transaction.date)}</span>
                     </td>
-                    <td>
-                      <Button
-                        size="sm"
-                        variant="outline-primary"
-                        onClick={() => handleShowDetails(transaction)}
-                      >
+                    <td className="border-0 align-middle">
+                      <Button variant="link" size="sm" className="p-2" title="View Details" onClick={() => handleShowDetails(transaction)}>
                         <Eye size={16} />
                       </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
-            </Table>
-          )}
-        </Card.Body>
-      </Card>
+            </table>
+          </div>
+        </div>
+      </div>
 
       {/* Transaction Detail Modal */}
       <Modal show={showDetailModal} onHide={handleCloseDetailModal} size="lg">
