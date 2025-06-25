@@ -119,14 +119,13 @@ const _userDepositRequest = () => {
       setError('');
 
       const userData = UserService.getUserData();
-      
-      const result = await DepositRequestService.createDepositRequest(
+        const result = await DepositRequestService.createDepositRequest(
         userData.userId,
         parseFloat(formData.amount),
-        formData.note
-      );
+        formData.note      );
 
       setSuccess('Deposit request submitted successfully!');
+      
       setShowRequestModal(false);
       setFormData({ amount: '', note: '' });
       

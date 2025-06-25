@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { Navbar, Nav, Container, Dropdown, Badge, Offcanvas } from 'react-bootstrap'
+import { Navbar, Nav, Container, Dropdown, Offcanvas } from 'react-bootstrap'
 import { 
   PersonCircle, 
-  Bell, 
   BoxArrowRight, 
   CreditCard, 
   PiggyBank, 
@@ -171,43 +170,8 @@ const FinanceLayout = () => {
                 {item.title}
               </Nav.Link>
             ))}
-          </Nav>
-
-          {/* Right Side Items */}
+          </Nav>          {/* Right Side Items */}
           <div className="d-flex align-items-center">
-            {/* Notifications */}
-            <Dropdown className="me-3">
-              <Dropdown.Toggle variant="link" className="notification-toggle p-2 border-0">
-                <Bell size={20} />
-                <Badge bg="danger" pill className="notification-badge">5</Badge>
-              </Dropdown.Toggle>
-              <Dropdown.Menu align="end" className="notification-dropdown">
-                <Dropdown.Header>Finance Notifications</Dropdown.Header>
-                <Dropdown.Item>
-                  <div className="notification-item">
-                    <strong>New Deposit Request</strong>
-                    <small className="d-block text-muted">₱50,000 pending approval</small>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Item>
-                  <div className="notification-item">
-                    <strong>Monthly Report Ready</strong>
-                    <small className="d-block text-muted">December financial summary</small>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Item>
-                  <div className="notification-item">
-                    <strong>System Alert</strong>
-                    <small className="d-block text-muted">Backup completed successfully</small>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item className="text-center text-primary">
-                  View All Notifications
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-
             {/* Staff Profile Dropdown */}
             <Dropdown>
               <Dropdown.Toggle variant="link" className="staff-dropdown d-flex align-items-center text-decoration-none border-0">
@@ -359,46 +323,12 @@ const FinanceLayout = () => {
 
         .staff-dropdown::after {
           display: none;
-        }
-
-        .staff-dropdown-menu {
+        }        .staff-dropdown-menu {
           min-width: 250px;
           border: none;
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
           border-radius: 12px;
           overflow: hidden;
-        }
-
-        .notification-toggle {
-          color: #495057 !important;
-          transition: all 0.3s ease;
-          border-radius: 8px;
-          position: relative;
-        }
-
-        .notification-toggle:hover {
-          background: rgba(40, 167, 69, 0.1) !important;
-          color: #28a745 !important;
-        }
-
-        .notification-badge {
-          position: absolute;
-          top: -5px;
-          right: -5px;
-          font-size: 0.7rem;
-          animation: pulse 2s infinite;
-        }
-
-        .notification-dropdown {
-          min-width: 320px;
-          border: none;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-          border-radius: 12px;
-          overflow: hidden;
-        }
-
-        .notification-item {
-          padding: 0.25rem 0;
         }
 
         .main-content {

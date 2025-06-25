@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Spinner, Alert } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { 
   PersonCircle, 
   CreditCard2Front, 
@@ -14,6 +15,7 @@ import UserService from '../../services/user.Service';
 import TransactionService from '../../services/transaction.Service';
 
 const _userDashboard = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(0);
   const [recentTransactions, setRecentTransactions] = useState([]);
@@ -126,6 +128,19 @@ const _userDashboard = () => {
     }
   };
 
+  // Navigation functions for Quick Actions
+  const handleSendMoney = () => {
+    navigate('/user/transfer');
+  };
+
+  const handleAddMoney = () => {
+    navigate('/user/deposit-request');
+  };
+
+  const handleViewAllTransactions = () => {
+    navigate('/user/statements');
+  };
+
   if (loading) {
     return (
       <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
@@ -199,11 +214,19 @@ const _userDashboard = () => {
             <Card.Body>
               <h6 className="text-muted mb-3">Quick Actions</h6>
               <div className="d-grid gap-2">
-                <Button variant="primary" className="d-flex align-items-center justify-content-center">
+                <Button 
+                  variant="primary" 
+                  className="d-flex align-items-center justify-content-center"
+                  onClick={handleSendMoney}
+                >
                   <ArrowUpRight className="me-2" />
                   Send Money
                 </Button>
-                <Button variant="outline-primary" className="d-flex align-items-center justify-content-center">
+                <Button 
+                  variant="outline-primary" 
+                  className="d-flex align-items-center justify-content-center"
+                  onClick={handleAddMoney}
+                >
                   <Plus className="me-2" />
                   Add Money
                 </Button>
@@ -262,7 +285,7 @@ const _userDashboard = () => {
             <Card.Header className="bg-transparent border-0">
               <div className="d-flex justify-content-between align-items-center">
                 <h5 className="mb-0">Recent Transactions</h5>
-                <Button variant="link" className="p-0">View All</Button>
+                <Button variant="link" className="p-0" onClick={handleViewAllTransactions}>View All</Button>
               </div>
             </Card.Header>            <Card.Body className="p-0">
               {recentTransactions.length === 0 ? (
@@ -272,8 +295,7 @@ const _userDashboard = () => {
                   <p className="text-muted mb-0">Your transaction history will appear here</p>
                 </div>
               ) : (
-                <div className="list-group list-group-flush">
-                  {recentTransactions.slice(0, 5).map((transaction) => (
+                <div className="list-group list-group-flush">                  {recentTransactions.slice(0, 5).map((transaction) => (
                     <div key={transaction.id} className="list-group-item border-0 px-4 py-3">
                       <div className="d-flex align-items-center">
                         <div className="me-3">
@@ -306,13 +328,6 @@ const _userDashboard = () => {
                       </div>
                     </div>
                   ))}
-                  {recentTransactions.length > 5 && (
-                    <div className="text-center py-3">
-                      <Button variant="outline-primary" size="sm">
-                        View All {recentTransactions.length} Transactions
-                      </Button>
-                    </div>
-                  )}
                 </div>
               )}
             </Card.Body>

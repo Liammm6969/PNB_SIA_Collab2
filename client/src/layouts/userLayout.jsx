@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { Navbar, Nav, Container, Dropdown, Badge, Offcanvas } from 'react-bootstrap'
+import { Navbar, Nav, Container, Dropdown, Offcanvas } from 'react-bootstrap'
 import { 
   PersonCircle, 
-  Bell, 
   BoxArrowRight, 
-  CreditCard, 
-  PiggyBank, 
   ArrowLeftRight, 
   FileText, 
-  Gear,
   House,
-  List
+  List,
+  PiggyBank
 } from 'react-bootstrap-icons'
 import UserService from '../services/user.Service'
 
@@ -68,7 +65,6 @@ const UserLayout = () => {
         : 'Personal User'
     }
   }
-
   // Helper function to format account number for display
   const getDisplayAccountNumber = () => {
     if (!user || !user.accountNumber) return '****0000'
@@ -99,12 +95,13 @@ const UserLayout = () => {
       icon: <FileText className="me-2" />
     }
   ]
+
   const handleLogout = () => {
     // Clear user session/token using UserService
     UserService.logout()
     navigate('/login')
   }
-  const handleNavigation = (path) => {
+    const handleNavigation = (path) => {
     navigate(path)
     setShowOffcanvas(false)
   }
@@ -160,45 +157,10 @@ const UserLayout = () => {
                 {item.title}
               </Nav.Link>
             ))}
-          </Nav>
-
-          {/* Right Side Items */}
+          </Nav>          {/* Right Side Items */}
           <div className="d-flex align-items-center">
-            {/* Notifications */}
-            <Dropdown className="me-3">
-              <Dropdown.Toggle variant="link" className="notification-toggle p-2 border-0">
-                <Bell size={20} />
-                <Badge bg="danger" pill className="notification-badge">3</Badge>
-              </Dropdown.Toggle>
-              <Dropdown.Menu align="end" className="notification-dropdown">
-                <Dropdown.Header>Notifications</Dropdown.Header>
-                <Dropdown.Item>
-                  <div className="notification-item">
-                    <strong>Transfer Completed</strong>
-                    <small className="d-block text-muted">2 minutes ago</small>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Item>
-                  <div className="notification-item">
-                    <strong>New Statement Available</strong>
-                    <small className="d-block text-muted">1 hour ago</small>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Item>
-                  <div className="notification-item">
-                    <strong>Account Update</strong>
-                    <small className="d-block text-muted">2 hours ago</small>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item className="text-center text-primary">
-                  View All Notifications
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-
             {/* User Profile Dropdown */}
-            <Dropdown>              <Dropdown.Toggle variant="link" className="user-dropdown d-flex align-items-center text-decoration-none border-0">
+            <Dropdown><Dropdown.Toggle variant="link" className="user-dropdown d-flex align-items-center text-decoration-none border-0">
                 <PersonCircle size={32} className="me-2" />
                 <div className="d-none d-md-block text-start">
                   <div className="fw-semibold">{getUserDisplayName()}</div>

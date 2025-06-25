@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Navbar, Nav, Button, Dropdown } from 'react-bootstrap'
-import { Bell, PersonCircle, Search, MenuButtonWideFill } from 'react-bootstrap-icons'
+import { PersonCircle, Search, MenuButtonWideFill } from 'react-bootstrap-icons'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/sidebar'
 import StaffService from '../services/staff.Service'
@@ -102,51 +102,8 @@ const AdminLayout = ({ children }) => {
                   height: '40px'
                 }}
               />
-            </div>
-
-            {/* Right Side Actions */}
+            </div>            {/* Right Side Actions */}
             <Nav className="d-flex align-items-center">
-              {/* Notifications */}
-              <Dropdown align="end">
-                <Dropdown.Toggle
-                  variant="link"
-                  className="p-2 text-dark border-0 position-relative"
-                  style={{ textDecoration: 'none' }}
-                >
-                  <Bell size={18} />
-                  {/* Notification Badge */}
-                  <span
-                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                    style={{ fontSize: '10px' }}
-                  >
-                    3
-                  </span>
-                </Dropdown.Toggle>
-                <Dropdown.Menu style={{ width: '300px' }}>
-                  <Dropdown.Header>Notifications</Dropdown.Header>
-                  <Dropdown.Item>
-                    <div className="d-flex">
-                      <div className="flex-grow-1">
-                        <div className="fw-semibold">New user registration</div>
-                        <small className="text-muted">John Doe registered 2 minutes ago</small>
-                      </div>
-                    </div>
-                  </Dropdown.Item>
-                  <Dropdown.Item>
-                    <div className="d-flex">
-                      <div className="flex-grow-1">
-                        <div className="fw-semibold">Transaction alert</div>
-                        <small className="text-muted">Large transaction detected</small>
-                      </div>
-                    </div>
-                  </Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item className="text-center text-primary">
-                    View all notifications
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-
               {/* User Menu */}
               <Dropdown align="end">
                 <Dropdown.Toggle

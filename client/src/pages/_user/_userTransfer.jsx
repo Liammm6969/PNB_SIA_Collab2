@@ -252,13 +252,12 @@ const _userTransfer = () => {
         toUser: formData.recipientAccount,
         amount: parseFloat(formData.amount),
         details: formData.description || `Transfer to ${recipient.name}`
-      };
-
-      console.log('Transfer Data:', transferData); // Debug log      // Call the real transfer API
+      };      console.log('Transfer Data:', transferData); // Debug log      // Call the real transfer API
       const result = await TransactionService.transferMoney(transferData);
       
       setSuccess(`Transfer of ${TransactionService.formatCurrency(transferData.amount)} to ${recipient.name} completed successfully!`);
-        // Handle beneficiary saving if requested
+
+      // Handle beneficiary saving if requested
       if (formData.saveAsBeneficiary && formData.beneficiaryNickname) {
         try {
           const userData = UserService.getUserData();
