@@ -1,54 +1,29 @@
-import React, { useState, useCallback } from 'react'
+import React from 'react'
 import { Container, Row, Col, Form, Button, Alert, InputGroup, Card } from 'react-bootstrap'
 import { Eye, EyeSlash, Person, Building } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service.js'
 
-const Register = () => {
-  const navigate = useNavigate()
+// Custom hook for register form logic
+function useRegisterForm(getInitialFormState, navigate) {
+  const [formData, setFormData] = React.useState(getInitialFormState())
+  const [showPassword, setShowPassword] = React.useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
+  const [errors, setErrors] = React.useState({})
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [showAlert, setShowAlert] = React.useState({ show: false, message: '', variant: '' })
 
-  const getInitialFormState = useCallback(() => ({
-    accountType: 'personal',
-    firstName: '',
-    lastName: '',
-    email: '',
-    businessName: '',
-    password: '',
-    confirmPassword: ''
-  }), [])
-
-  const [formData, setFormData] = useState(getInitialFormState())
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [showAlert, setShowAlert] = useState({ show: false, message: '', variant: '' })
-
-  const styles = {
-    input: { fontSize: '13px', height: '30px' },
-    label: { fontSize: '12px' },
-    feedback: { fontSize: '11px' },
-    eyeToggle: {
-      cursor: 'pointer',
-      height: '30px',
-      display: 'flex',
-      alignItems: 'center'
-    }
-  }
-
-  const clearError = useCallback((fieldName) => {
-    if (errors[fieldName]) {
-      setErrors(prev => ({ ...prev, [fieldName]: '' }))
-    }
+  const clearError = React.useCallback((fieldName) => {
+    if (errors[fieldName]) setErrors(prev => ({ ...prev, [fieldName]: '' }))
   }, [errors])
 
-  const handleChange = useCallback((e) => {
+  const handleChange = React.useCallback((e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     clearError(name)
   }, [clearError])
 
-  const handleAccountTypeChange = useCallback((accountType) => {
+  const handleAccountTypeChange = React.useCallback((accountType) => {
     setFormData(prev => ({
       ...prev,
       accountType,
@@ -56,17 +31,19 @@ const Register = () => {
       lastName: accountType === 'business' ? '' : prev.lastName,
       businessName: accountType === 'personal' ? '' : prev.businessName
     }))
-    const newErrors = { ...errors }
-    if (accountType === 'business') {
-      delete newErrors.firstName
-      delete newErrors.lastName
-    } else {
-      delete newErrors.businessName
-    }
-    setErrors(newErrors)
-  }, [errors])
+    setErrors(prev => {
+      const newErrors = { ...prev }
+      if (accountType === 'business') {
+        delete newErrors.firstName
+        delete newErrors.lastName
+      } else {
+        delete newErrors.businessName
+      }
+      return newErrors
+    })
+  }, [])
 
-  const validatePassword = useCallback((password) => {
+  const validatePassword = React.useCallback((password) => {
     if (!password) return 'Password is required'
     if (password.length < 8) return 'Password must be at least 8 characters'
     if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter'
@@ -75,7 +52,7 @@ const Register = () => {
     return ''
   }, [])
 
-  const validateForm = useCallback(() => {
+  const validateForm = React.useCallback(() => {
     const newErrors = {}
     if (formData.accountType === 'personal') {
       if (!formData.firstName.trim()) newErrors.firstName = 'First name is required'
@@ -99,7 +76,7 @@ const Register = () => {
     return Object.keys(newErrors).length === 0
   }, [formData, validatePassword])
 
-  const handleSubmit = useCallback(async (e) => {
+  const handleSubmit = React.useCallback(async (e) => {
     e.preventDefault()
     if (!validateForm()) return
     setIsLoading(true)
@@ -125,7 +102,6 @@ const Register = () => {
       setFormData(getInitialFormState())
       setTimeout(() => navigate('/login'), 2000)
     } catch (error) {
-      console.error('Registration error:', error)
       setShowAlert({
         show: true,
         message: error.message || 'Registration failed. Please try again.',
@@ -136,47 +112,103 @@ const Register = () => {
     }
   }, [formData, getInitialFormState, navigate, validateForm])
 
-  const FormField = useCallback(({ label, name, type = 'text', placeholder, size = 'sm' }) => (
+  return {
+    formData,
+    setFormData,
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
+    errors,
+    isLoading,
+    showAlert,
+    setShowAlert,
+    handleChange,
+    handleAccountTypeChange,
+    handleSubmit
+  }
+}
+
+const styles = {
+  input: { fontSize: '13px', height: '30px' },
+  label: { fontSize: '12px' },
+  feedback: { fontSize: '11px' },
+  eyeToggle: { cursor: 'pointer', height: '30px', display: 'flex', alignItems: 'center' }
+}
+
+function Field({ label, name, type = 'text', placeholder, value, onChange, error, ...rest }) {
+  return (
     <Form.Group className="mb-2">
       <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
       <Form.Control
-        size={size}
+        size="sm"
         type={type}
         name={name}
-        value={formData[name]}
-        onChange={handleChange}
+        value={value}
+        onChange={onChange}
         placeholder={placeholder}
-        isInvalid={!!errors[name]}
+        isInvalid={!!error}
         style={styles.input}
+        {...rest}
       />
       <Form.Control.Feedback type="invalid" style={styles.feedback}>
-        {errors[name]}
+        {error}
       </Form.Control.Feedback>
     </Form.Group>
-  ), [formData, errors, handleChange, styles])
+  )
+}
 
-  const PasswordField = useCallback(({ label, name, placeholder, showPassword, toggleShow }) => (
+function PasswordField({ label, name, placeholder, value, onChange, error, show, toggleShow }) {
+  return (
     <Form.Group className="mb-2">
       <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
       <InputGroup size="sm">
         <Form.Control
-          type={showPassword ? 'text' : 'password'}
+          type={show ? 'text' : 'password'}
           name={name}
-          value={formData[name]}
-          onChange={handleChange}
+          value={value}
+          onChange={onChange}
           placeholder={placeholder}
-          isInvalid={!!errors[name]}
+          isInvalid={!!error}
           style={styles.input}
         />
         <InputGroup.Text style={styles.eyeToggle} onClick={toggleShow}>
-          {showPassword ? <EyeSlash className="text-muted" size={14} /> : <Eye className="text-muted" size={14} />}
+          {show ? <EyeSlash className="text-muted" size={14} /> : <Eye className="text-muted" size={14} />}
         </InputGroup.Text>
       </InputGroup>
       <Form.Control.Feedback type="invalid" style={styles.feedback}>
-        {errors[name]}
+        {error}
       </Form.Control.Feedback>
     </Form.Group>
-  ), [formData, errors, handleChange, styles])
+  )
+}
+
+const Register = () => {
+  const navigate = useNavigate()
+  const getInitialFormState = React.useCallback(() => ({
+    accountType: 'personal',
+    firstName: '',
+    lastName: '',
+    email: '',
+    businessName: '',
+    password: '',
+    confirmPassword: ''
+  }), [])
+
+  const {
+    formData,
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
+    errors,
+    isLoading,
+    showAlert,
+    setShowAlert,
+    handleChange,
+    handleAccountTypeChange,
+    handleSubmit
+  } = useRegisterForm(getInitialFormState, navigate)
 
   return (
     <div className="register-page" style={{ height: '100vh', overflow: 'hidden' }}>
@@ -291,43 +323,39 @@ const Register = () => {
 
               {/* Register Form */}
               <Form onSubmit={handleSubmit}>
-                {/* Personal Account Fields */}
                 {formData.accountType === 'personal' && (
                   <Row className="g-2">
                     <Col xs={6}>
-                      <FormField label="First Name" name="firstName" placeholder="First name" />
+                      <Field label="First Name" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} error={errors.firstName} />
                     </Col>
                     <Col xs={6}>
-                      <FormField label="Last Name" name="lastName" placeholder="Last name" />
+                      <Field label="Last Name" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} error={errors.lastName} />
                     </Col>
                   </Row>
                 )}
-
-                {/* Business Account Fields */}
                 {formData.accountType === 'business' && (
                   <Row className="g-2">
                     <Col xs={12}>
-                      <FormField label="Business Name" name="businessName" placeholder="Enter business name" />
+                      <Field label="Business Name" name="businessName" placeholder="Enter business name" value={formData.businessName} onChange={handleChange} error={errors.businessName} />
                     </Col>
                   </Row>
                 )}
-
-                {/* Email Field */}
                 <Row className="g-2">
                   <Col xs={12}>
-                    <FormField label="Email Address" name="email" type="email" placeholder="Enter your email" />
+                    <Field label="Email Address" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} error={errors.email} />
                   </Col>
                 </Row>
-
-                {/* Password Fields */}
                 <Row className="g-2">
                   <Col xs={6}>
                     <PasswordField 
                       label="Password" 
                       name="password" 
                       placeholder="Create password"
-                      showPassword={showPassword}
-                      toggleShow={() => setShowPassword(!showPassword)}
+                      value={formData.password}
+                      onChange={handleChange}
+                      error={errors.password}
+                      show={showPassword}
+                      toggleShow={() => setShowPassword(v => !v)}
                     />
                   </Col>
                   <Col xs={6}>
@@ -335,8 +363,11 @@ const Register = () => {
                       label="Confirm Password" 
                       name="confirmPassword" 
                       placeholder="Confirm password"
-                      showPassword={showConfirmPassword}
-                      toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      error={errors.confirmPassword}
+                      show={showConfirmPassword}
+                      toggleShow={() => setShowConfirmPassword(v => !v)}
                     />
                   </Col>
                 </Row>
@@ -362,7 +393,6 @@ const Register = () => {
                     'Create Account'
                   )}
                 </Button>
-
                 <div className="text-center">
                   <span className="text-muted" style={{ fontSize: '12px' }}>
                     Already have an account?{' '}
