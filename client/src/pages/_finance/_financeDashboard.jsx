@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Table, Badge, ProgressBar, Form } from 'react-bootstrap'
+import { Container, Row, Col, Card, Button, Table, Badge, Modal, Form, ProgressBar } from 'react-bootstrap'
 import { 
   Cash, 
   GraphUp, 
   GraphDown, 
   People, 
-  CreditCard, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
   Eye, 
   Download, 
+  Calendar,
+  Building,
+  ExclamationTriangle,
+  Info,
+  FileText,
+  ArrowUpCircle,
+  CreditCard,
   Filter,
   BarChart,
-  Clock,
-  CheckCircle,
-  XCircle,
-  ExclamationTriangle,
-  FileText,
-  Calculator,
-  Building
+  Calculator
 } from 'react-bootstrap-icons'
 
 const FinanceDashboard = () => {
@@ -84,17 +87,16 @@ const FinanceDashboard = () => {
       priority: 'Medium'
     }
   ])
-
   const [departmentMetrics, setDepartmentMetrics] = useState([
-    { metric: 'Processing Efficiency', value: 94, target: 95, trend: 'up' },
-    { metric: 'Approval Rate', value: 89, target: 90, trend: 'down' },
-    { metric: 'Average Processing Time', value: '2.4 hrs', target: '2.0 hrs', trend: 'up' },
-    { metric: 'Customer Satisfaction', value: 96, target: 95, trend: 'up' }
+    { metric: 'Number of Deposits', value: 234, target: 250, trend: 'up' },
+    { metric: 'Transactions Processed', value: 189, target: 200, trend: 'up' },
+    { metric: 'Reports Generated', value: 47, target: 50, trend: 'down' },
+    { metric: 'Active Accounts', value: 1247, target: 1200, trend: 'up' }
   ])
-
-  const getStatusBadge = (status) => {    const statusConfig = {
+  const getStatusBadge = (status) => {
+    const statusConfig = {
       Pending: { bg: 'warning', icon: <Clock size={12} className="me-1" />, text: 'Pending' },
-      Processing: { bg: 'primary', icon: <BarChart size={12} className="me-1" />, text: 'Processing' },
+      Processing: { bg: 'primary', icon: <ArrowUpCircle size={12} className="me-1" />, text: 'Processing' },
       Approved: { bg: 'success', icon: <CheckCircle size={12} className="me-1" />, text: 'Approved' },
       Rejected: { bg: 'danger', icon: <XCircle size={12} className="me-1" />, text: 'Rejected' }
     }
@@ -225,7 +227,7 @@ const FinanceDashboard = () => {
                     23 deposits completed
                   </small>
                 </div>                <div className="p-3 bg-dark bg-opacity-20 rounded-circle">
-                  <BarChart size={24} />
+                  <CheckCircle size={24} />
                 </div>
               </div>
             </Card.Body>
@@ -244,9 +246,8 @@ const FinanceDashboard = () => {
                     <GraphUp size={12} className="me-1" />
                     +22% processing fees
                   </small>
-                </div>
-                <div className="p-3 bg-white bg-opacity-20 rounded-circle">
-                  <Calculator size={24} className="text-white" />
+                </div>                <div className="p-3 bg-white bg-opacity-20 rounded-circle">
+                  <CreditCard size={24} className="text-white" />
                 </div>
               </div>
             </Card.Body>
@@ -259,7 +260,7 @@ const FinanceDashboard = () => {
         <Col>
           <Card className="border-0 finance-card">
             <Card.Header className="bg-transparent border-bottom-0 pb-0">              <h5 className="fw-bold mb-0 d-flex align-items-center">
-                <BarChart size={20} className="me-2 text-success" />
+                <GraphUp size={20} className="me-2 text-success" />
                 Department Performance Metrics
               </h5>
             </Card.Header>
