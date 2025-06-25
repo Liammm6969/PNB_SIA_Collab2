@@ -27,7 +27,7 @@ import {
 } from 'react-bootstrap-icons';
 import UserService from '../../services/user.Service';
 import TransactionService from '../../services/transaction.Service';
-import '../../styles/_userStatements.css'
+import '../../styles/userStyles/_userStatements.css'
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 

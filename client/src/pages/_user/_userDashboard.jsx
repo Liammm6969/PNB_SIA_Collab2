@@ -15,7 +15,7 @@ import {
 } from 'react-bootstrap-icons';
 import UserService from '../../services/user.Service';
 import TransactionService from '../../services/transaction.Service';
-import '../../styles/_userDashboard.css'
+import '../../styles/userStyles/_userDashboard.css'
 
 const _userDashboard = () => {
   const navigate = useNavigate();

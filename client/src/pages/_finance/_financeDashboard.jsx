@@ -24,10 +24,13 @@ import {
   PersonCircle,
   PiggyBank,
   ExclamationTriangle,
+  ShieldLock,
+  BarChart,
 } from "react-bootstrap-icons";
 import DepositRequestService from "../../services/depositRequest.Service";
 import TransactionService from "../../services/transaction.Service";
 import BankReserveService from "../../services/bankReserve.Service";
+import "../../styles/financeStyles/financeDashboard.css";
 
 // Create service instances
 const bankReserveService = new BankReserveService();
@@ -136,6 +139,12 @@ const FinanceDashboard = () => {
       setRefreshing(false);
     }
   };
+
+  const handleExport = () => {
+    // Placeholder for export functionality
+    alert("Exporting report...");
+  };
+
   const getStatusBadge = (status) => {
     const statusConfig = {
       Pending: {
@@ -199,518 +208,318 @@ const FinanceDashboard = () => {
     });
   };
 
+  // Stat cards config
+  const statCards = [
+    {
+      title: "Total Approved",
+      amount: formatCurrency(stats.approved.totalAmount),
+      subtitle: `${stats.approved.count} requests approved`,
+      icon: CheckCircle,
+      colorClass: "finance-stat-card-success",
+      iconBg: "bg-success bg-opacity-25",
+    },
+    {
+      title: "Pending Approval",
+      amount: formatCurrency(stats.pending.totalAmount),
+      subtitle: `${stats.pending.count} requests pending`,
+      icon: Clock,
+      colorClass: "finance-stat-card-warning",
+      iconBg: "bg-warning bg-opacity-25",
+    },
+    {
+      title: "Rejected",
+      amount: formatCurrency(stats.rejected.totalAmount),
+      subtitle: `${stats.rejected.count} requests rejected`,
+      icon: XCircle,
+      colorClass: "finance-stat-card-danger",
+      iconBg: "bg-danger bg-opacity-25",
+    },
+    {
+      title: "Bank Reserve",
+      amount: bankReserve ? BankReserveService.formatCurrency(bankReserve.total_balance) : "Loading...",
+      subtitle: bankReserve ? `${BankReserveService.getReserveStatusText(bankReserve.total_balance)} Level` : "Fetching data...",
+      icon: ShieldLock,
+      colorClass: bankReserve ? `finance-stat-card-${BankReserveService.getReserveStatusColor(bankReserve.total_balance)}` : "finance-stat-card-info",
+      iconBg: "bg-info bg-opacity-25",
+    },
+  ];
+
+  // Analytics config
+  const analyticsData = [
+    { label: "Today's Requests", value: analytics.todayRequests, icon: BarChart },
+    { label: "Monthly Approved", value: formatCurrency(analytics.monthlyApproved), icon: GraphUp },
+    { label: "Success Ratio", value: `${analytics.successRatio}%`, icon: BarChart },
+  ];
+
   if (loading) {
     return (
-      <Container fluid className="px-4 py-5">
-        <div className="text-center">
-          <Spinner animation="border" role="status" className="mb-3">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-          <p>Loading dashboard data...</p>
-        </div>
-      </Container>
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <Spinner animation="border" role="status" className="mb-3">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+        <p className="ms-3">Loading dashboard data...</p>
+      </div>
     );
   }
 
   return (
-    <Container fluid className="px-4">
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h1 className="h3 fw-bold text-dark mb-1">
-            <Building size={28} className="me-2 text-success" />
-            Finance Dashboard
-          </h1>
-          <p className="text-muted mb-0">
-            Monitor and manage all deposit operations and financial metrics
-          </p>
+    <div className="finance-dashboard-bg p-3 p-md-4">
+      <div className="container-xl">
+        {/* Header */}
+        <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4 mb-4">
+          <div className="d-flex align-items-center gap-3">
+            <div className="rounded-3 d-flex align-items-center justify-content-center shadow finance-header-icon">
+              <BarChart size={32} className="text-primary" />
+            </div>
+            <div>
+              <h1 className="fw-bold text-dark mb-1 fs-2">Finance Dashboard</h1>
+              <p className="text-muted mb-0">Monitor and manage all deposit operations and financial metrics</p>
+            </div>
+          </div>
+          <div className="d-flex gap-3">
+            <Button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="d-flex align-items-center gap-2 px-4 py-2 bg-white border border-0 rounded-lg shadow-sm finance-dashboard-btn refresh"
+            >
+              <ArrowRepeat className={`me-2 ${refreshing ? 'spin' : ''}`} size={18} />
+              <span>Refresh</span>
+            </Button>
+            <Button
+              onClick={handleExport}
+              className="d-flex align-items-center gap-2 px-4 py-2 finance-dashboard-btn export"
+            >
+              <Download className="me-2" size={18} />
+              <span>Export Report</span>
+            </Button>
+          </div>
         </div>
-        <div className="d-flex gap-2">
-          <Button
-            variant="outline-primary"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            <ArrowRepeat
-              className={`me-1 ${refreshing ? "spin" : ""}`}
-              size={16}
-            />
-            {refreshing ? "Refreshing..." : "Refresh"}
-          </Button>
-          <Button variant="success" className="d-flex align-items-center">
-            <Download size={16} className="me-2" />
-            Export Report
-          </Button>
+
+        {/* Stats Cards */}
+        <div className="row g-4 mb-4">
+          {statCards.map((stat, idx) => (
+            <div key={idx} className="col-12 col-md-6 col-lg-3">
+              <div className={`rounded-3 p-4 shadow finance-stat-card ${stat.colorClass} h-100 d-flex flex-column justify-content-between`}>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                  <div className={`rounded-3 d-flex align-items-center justify-content-center ${stat.iconBg} finance-stat-icon`}>
+                    <stat.icon size={28} className="text-white" />
+                  </div>
+                  <div className="rounded-circle bg-white bg-opacity-10 d-flex align-items-center justify-content-center" style={{ width: 32, height: 32 }}>
+                    <div className="rounded-circle bg-white bg-opacity-50" style={{ width: 12, height: 12 }}></div>
+                  </div>
+                </div>
+                <h3 className="text-white text-opacity-90 fs-6 mb-2">{stat.title}</h3>
+                <p className="text-white fs-3 fw-bold mb-2">{stat.amount}</p>
+                <p className="text-white-50 mb-0">{stat.subtitle}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Analytics Overview */}
+        <div className="bg-white rounded-3 shadow p-4 mb-4 border finance-analytics-section">
+          <div className="d-flex align-items-center gap-3 mb-4">
+            <div className="rounded-2 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style={{ width: 36, height: 36 }}>
+              <GraphUp size={20} className="text-primary" />
+            </div>
+            <h2 className="fs-5 fw-bold text-dark mb-0">Analytics Overview</h2>
+          </div>
+          <div className="row g-4 mb-4">
+            {analyticsData.map((item, idx) => (
+              <div key={idx} className="col-12 col-md-4">
+                <div className="text-center p-3 bg-light rounded-3 h-100">
+                  <div className="d-flex justify-content-center mb-2">
+                    <div className="rounded-2 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                      <item.icon size={20} className="text-primary" />
+                    </div>
+                  </div>
+                  <div className="text-muted small mb-1">{item.label}</div>
+                  <div className="fs-4 fw-bold text-dark">{item.value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center py-5 text-muted">
+            <div className="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style={{ width: 64, height: 64 }}>
+              <BarChart size={32} className="text-secondary" />
+            </div>
+            <p className="small fst-italic">Analytics chart coming soon...</p>
+          </div>
+        </div>
+
+        {/* Pending Deposit Requests */}
+        <div className="bg-white rounded-3 shadow p-4 mb-4 border finance-card">
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div className="d-flex align-items-center gap-3">
+              <div className="rounded-2 bg-success bg-opacity-10 d-flex align-items-center justify-content-center" style={{ width: 36, height: 36 }}>
+                <FileText size={20} className="text-success" />
+              </div>
+              <div>
+                <h2 className="fs-5 fw-bold text-dark mb-0">Pending Deposit Requests</h2>
+                <p className="text-muted small mb-0">Recent deposit requests awaiting approval</p>
+              </div>
+            </div>
+            <Button
+              variant="link"
+              className="text-primary fw-medium text-decoration-underline"
+              onClick={() => (window.location.href = "/finance/deposits")}
+            >
+              View All
+            </Button>
+          </div>
+          {recentDeposits.length === 0 ? (
+            <div className="text-center py-5">
+              <div className="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style={{ width: 80, height: 80 }}>
+                <FileText size={40} className="text-secondary" />
+              </div>
+              <p className="text-muted">No pending requests at the moment</p>
+            </div>
+          ) : (
+            <Table responsive hover className="mb-0 finance-table">
+              <thead>
+                <tr>
+                  <th className="border-0 text-muted fw-semibold">Request ID</th>
+                  <th className="border-0 text-muted fw-semibold">Customer</th>
+                  <th className="border-0 text-muted fw-semibold">Amount</th>
+                  <th className="border-0 text-muted fw-semibold">Status</th>
+                  <th className="border-0 text-muted fw-semibold">Date</th>
+                  <th className="border-0 text-muted fw-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentDeposits.map((deposit) => (
+                  <tr key={deposit.id}>
+                    <td className="border-0">
+                      <code className="text-primary">{deposit.id}</code>
+                    </td>
+                    <td className="border-0">
+                      <div>
+                        <div className="fw-semibold">{deposit.customerName}</div>
+                        <small className="text-muted">{deposit.accountNumber}</small>
+                      </div>
+                    </td>
+                    <td className="border-0">
+                      <div className="fw-bold text-success fs-6">{formatCurrency(deposit.amount)}</div>
+                    </td>
+                    <td className="border-0">
+                      <Badge bg="warning" className="d-flex align-items-center" style={{ fontSize: "0.85rem", width: "fit-content" }}>
+                        <Clock size={12} className="me-1" /> Pending
+                      </Badge>
+                    </td>
+                    <td className="border-0">
+                      <small className="text-muted">{new Date(deposit.createdAt).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</small>
+                    </td>
+                    <td className="border-0">
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        className="p-2"
+                        title="View Details"
+                        onClick={() => (window.location.href = `/finance/deposits`)}
+                      >
+                        <Eye size={14} />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </div>
+
+        {/* Recent Transactions */}
+        <div className="bg-white rounded-3 shadow p-4 mb-4 border finance-card recent-transactions-card">
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div className="d-flex align-items-center gap-3">
+              <div className="rounded-2 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style={{ width: 36, height: 36 }}>
+                <Cash size={20} className="text-primary" />
+              </div>
+              <div>
+                <h2 className="fs-5 fw-bold text-dark mb-0">Recent Transactions</h2>
+                <p className="text-muted small mb-0">Latest financial transactions across all accounts</p>
+              </div>
+            </div>
+            <Button
+              variant="link"
+              className="text-primary fw-medium text-decoration-underline recent-transactions-viewall"
+              onClick={() => (window.location.href = "/finance/transactions")}
+            >
+              View All
+            </Button>
+          </div>
+          {recentTransactions.length === 0 ? (
+            <div className="text-center py-5">
+              <div className="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style={{ width: 80, height: 80 }}>
+                <Cash size={40} className="text-secondary" />
+              </div>
+              <p className="text-muted">No recent transactions</p>
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table recent-transactions-table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th className="border-0 text-dark fw-semibold">Transaction ID</th>
+                    <th className="border-0 text-dark fw-semibold">Type</th>
+                    <th className="border-0 text-dark fw-semibold">From</th>
+                    <th className="border-0 text-dark fw-semibold">To</th>
+                    <th className="border-0 text-dark fw-semibold">Amount</th>
+                    <th className="border-0 text-dark fw-semibold">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentTransactions.map((transaction, index) => (
+                    <tr key={transaction.paymentStringId || transaction.paymentId || transaction.id || `transaction-${index}` }>
+                      <td className="border-0">
+                        <a href="#" className="fw-semibold text-primary text-decoration-none recent-transactions-id">{transaction.paymentStringId || transaction.paymentId || transaction.id}</a>
+                      </td>
+                      <td className="border-0">
+                        {transaction.fromUser === 0 ? (
+                          <span className="badge recent-badge-deposit">Deposit</span>
+                        ) : (
+                          <span className="badge recent-badge-transfer">Transfer</span>
+                        )}
+                      </td>
+                      <td className="border-0">
+                        <div className="d-flex align-items-center gap-2">
+                          {transaction.fromUser === 0 ? (
+                            <span className="recent-transactions-finance-icon">$</span>
+                          ) : (
+                            <PersonCircle size={18} className="text-secondary" />
+                          )}
+                          <span className="recent-transactions-user">{transaction.fromUser === 0 ? 'Finance' : (transaction.fromUserDetails?.name || `User ${transaction.fromUser}`)}</span>
+                        </div>
+                      </td>
+                      <td className="border-0">
+                        <div className="d-flex align-items-center gap-2">
+                          <PersonCircle size={18} className="text-secondary" />
+                          <span className="recent-transactions-user">{transaction.toUserDetails?.name || `User ${transaction.toUser}`}</span>
+                        </div>
+                      </td>
+                      <td className="border-0">
+                        <span className="fw-bold text-dark recent-transactions-amount">{formatCurrency(transaction.amount)}</span>
+                      </td>
+                      <td className="border-0">
+                        <div className="d-flex align-items-center gap-2">
+                          <Clock size={16} className="text-secondary" />
+                          <span className="recent-transactions-date">{new Date(transaction.createdAt || transaction.date).toLocaleDateString("en-PH", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
-
-      {error && (
-        <Alert variant="danger" dismissible onClose={() => setError("")}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Stats Cards */}
-      <Row className="g-4 mb-4">
-        <Col xl={3} md={6}>
-          <Card className="border-0 finance-stat-card h-100">
-            <Card.Body className="p-4">
-              <div className="d-flex align-items-center justify-content-between">
-                <div>
-                  <h6 className="text-white-50 mb-1">Total Approved</h6>
-                  <h3 className="fw-bold mb-0 text-white">
-                    {formatCurrency(stats.approved.totalAmount)}
-                  </h3>
-                  <small className="text-white-50">
-                    <CheckCircle size={12} className="me-1" />
-                    {stats.approved.count} requests approved
-                  </small>
-                </div>
-                <div className="p-3 bg-white bg-opacity-20 rounded-circle">
-                  <CheckCircle size={24} className="text-white" />
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        <Col xl={3} md={6}>
-          <Card className="border-0 finance-stat-card-warning h-100">
-            <Card.Body className="p-4">
-              <div className="d-flex align-items-center justify-content-between">
-                <div>
-                  <h6 className="text-white-50 mb-1">Pending Approval</h6>
-                  <h3 className="fw-bold mb-0 text-white">
-                    {formatCurrency(stats.pending.totalAmount)}
-                  </h3>
-                  <small className="text-white-50">
-                    <Clock size={12} className="me-1" />
-                    {stats.pending.count} requests pending
-                  </small>
-                </div>
-                <div className="p-3 bg-white bg-opacity-20 rounded-circle">
-                  <Clock size={24} className="text-white" />
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        <Col xl={3} md={6}>
-          <Card className="border-0 finance-stat-card-danger h-100">
-            <Card.Body className="p-4">
-              <div className="d-flex align-items-center justify-content-between">
-                <div>
-                  <h6 className="text-white-50 mb-1">Rejected</h6>
-                  <h3 className="fw-bold mb-0 text-white">
-                    {formatCurrency(stats.rejected.totalAmount)}
-                  </h3>
-                  <small className="text-white-50">
-                    <XCircle size={12} className="me-1" />
-                    {stats.rejected.count} requests rejected
-                  </small>
-                </div>
-                <div className="p-3 bg-white bg-opacity-20 rounded-circle">
-                  <XCircle size={24} className="text-white" />
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        <Col xl={3} md={6}>
-          <Card
-            className={`border-0 h-100 ${
-              bankReserve
-                ? `finance-stat-card-${BankReserveService.getReserveStatusColor(
-                    bankReserve.total_balance
-                  )}`
-                : "finance-stat-card-info"
-            }`}
-          >
-            <Card.Body className="p-4">
-              <div className="d-flex align-items-center justify-content-between">
-                <div>
-                  <h6 className="text-white-50 mb-1">Bank Reserve</h6>
-                  <h3 className="fw-bold mb-0 text-white">
-                    {bankReserve
-                      ? BankReserveService.formatCurrency(
-                          bankReserve.total_balance
-                        )
-                      : "Loading..."}
-                  </h3>
-                  <small className="text-white-50">
-                    <PiggyBank size={12} className="me-1" />
-                    {bankReserve
-                      ? `${BankReserveService.getReserveStatusText(
-                          bankReserve.total_balance
-                        )} Level`
-                      : "Fetching data..."}
-                  </small>
-                </div>
-                <div className="p-3 bg-white bg-opacity-20 rounded-circle">
-                  {bankReserve && bankReserve.total_balance < 500000 ? (
-                    <ExclamationTriangle size={24} className="text-white" />
-                  ) : (
-                    <PiggyBank size={24} className="text-white" />
-                  )}
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Recent Deposit Requests */}
-      <Row className="mb-4">
-        <Col>
-          <Card className="finance-card border-0 shadow-sm">
-            <Card.Header className="bg-white border-0 pt-4 px-4">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h5 className="fw-bold mb-0 d-flex align-items-center">
-                    <FileText size={20} className="me-2 text-success" />
-                    Pending Deposit Requests
-                  </h5>
-                  <p className="text-muted mb-0 mt-1">
-                    Recent deposit requests awaiting approval
-                  </p>
-                </div>
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  onClick={() => (window.location.href = "/finance/deposits")}
-                >
-                  View All
-                </Button>
-              </div>
-            </Card.Header>
-            <Card.Body className="pt-3">
-              {recentDeposits.length === 0 ? (
-                <div className="text-center py-5">
-                  <FileText size={48} className="text-muted mb-3" />
-                  <p className="text-muted">No pending deposit requests</p>
-                  <small className="text-muted">
-                    All deposit requests have been processed
-                  </small>
-                </div>
-              ) : (
-                <Table responsive hover className="mb-0">
-                  <thead>
-                    <tr>
-                      <th className="border-0 text-muted fw-semibold">
-                        Request ID
-                      </th>
-                      <th className="border-0 text-muted fw-semibold">
-                        Customer
-                      </th>
-                      <th className="border-0 text-muted fw-semibold">
-                        Amount
-                      </th>
-                      <th className="border-0 text-muted fw-semibold">
-                        Status
-                      </th>
-                      <th className="border-0 text-muted fw-semibold">Date</th>
-                      <th className="border-0 text-muted fw-semibold">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentDeposits.map((deposit) => (
-                      <tr key={deposit.id}>
-                        <td className="border-0">
-                          <code className="text-primary">{deposit.id}</code>
-                        </td>
-                        <td className="border-0">
-                          <div>
-                            <div className="fw-semibold">
-                              {deposit.customerName}
-                            </div>
-                            <small className="text-muted">
-                              {deposit.accountNumber}
-                            </small>
-                          </div>
-                        </td>
-                        <td className="border-0">
-                          <div className="fw-bold text-success fs-6">
-                            {formatCurrency(deposit.amount)}
-                          </div>
-                        </td>
-                        <td className="border-0">
-                          {getStatusBadge(deposit.status)}
-                        </td>
-                        <td className="border-0">
-                          <small className="text-muted">
-                            {formatDate(deposit.createdAt)}
-                          </small>
-                        </td>
-                        <td className="border-0">
-                          <div className="d-flex gap-1">
-                            <Button
-                              variant="outline-primary"
-                              size="sm"
-                              className="p-2"
-                              title="View Details"
-                              onClick={() =>
-                                (window.location.href = `/finance/deposits`)
-                              }
-                            >
-                              <Eye size={14} />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}{" "}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Recent Transactions */}
-      <Row className="mb-4">
-        <Col>
-          <Card className="finance-card border-0 shadow-sm">
-            <Card.Header className="bg-white border-0 pt-4 px-4">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h5 className="fw-bold mb-0 d-flex align-items-center">
-                    <Cash size={20} className="me-2 text-success" />
-                    Recent Transactions
-                  </h5>
-                  <p className="text-muted mb-0 mt-1">
-                    Latest financial transactions across all accounts
-                  </p>
-                </div>
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  onClick={() =>
-                    (window.location.href = "/finance/transactions")
-                  }
-                >
-                  View All
-                </Button>
-              </div>
-            </Card.Header>
-            <Card.Body className="pt-3">
-              {recentTransactions.length === 0 ? (
-                <div className="text-center py-5">
-                  <Cash size={48} className="text-muted mb-3" />
-                  <p className="text-muted">No recent transactions</p>
-                  <small className="text-muted">
-                    Transaction data will appear here once available
-                  </small>
-                </div>
-              ) : (
-                <Table responsive hover className="mb-0">
-                  <thead>
-                    <tr>
-                      <th className="border-0 text-muted fw-semibold">
-                        Transaction ID
-                      </th>
-                      <th className="border-0 text-muted fw-semibold">Type</th>
-                      <th className="border-0 text-muted fw-semibold">From</th>
-                      <th className="border-0 text-muted fw-semibold">To</th>
-                      <th className="border-0 text-muted fw-semibold">
-                        Amount
-                      </th>
-                      <th className="border-0 text-muted fw-semibold">Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentTransactions.map((transaction, index) => (
-                      <tr
-                        key={
-                          transaction.paymentStringId ||
-                          transaction.paymentId ||
-                          transaction.id ||
-                          `transaction-${index}`
-                        }
-                      >
-                        <td className="border-0">
-                          <code className="text-primary">
-                            {transaction.paymentStringId ||
-                              transaction.paymentId ||
-                              transaction.id}
-                          </code>
-                        </td>
-                        <td className="border-0">
-                          <Badge
-                            bg={
-                              getTransactionTypeBadge(
-                                transaction.fromUser === 0
-                                  ? "deposit"
-                                  : "transfer"
-                              ).bg
-                            }
-                          >
-                            {transaction.fromUser === 0
-                              ? "Deposit"
-                              : "Transfer"}
-                          </Badge>
-                        </td>
-                        <td className="border-0">
-                          <span className="text-muted">
-                            {transaction.fromUser === 0
-                              ? "Finance"
-                              : transaction.fromUserDetails?.name ||
-                                `User ${transaction.fromUser}`}
-                          </span>
-                        </td>
-                        <td className="border-0">
-                          <div className="d-flex align-items-center">
-                            <PersonCircle
-                              size={16}
-                              className="me-2 text-muted"
-                            />
-                            <span>
-                              {transaction.toUserDetails?.name ||
-                                `User ${transaction.toUser}`}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="border-0">
-                          <div className="fw-bold text-success fs-6">
-                            {formatCurrency(transaction.amount)}
-                          </div>
-                        </td>
-                        <td className="border-0">
-                          <small className="text-muted">
-                            {formatDate(
-                              transaction.createdAt || transaction.date
-                            )}
-                          </small>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Custom Styles */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .finance-stat-card {
-          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-          border-radius: 16px;
-          color: white;
-          transition: all 0.3s ease;
-        }
-
-        .finance-stat-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);
-        }
-
-        .finance-stat-card-warning {
-          background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-          border-radius: 16px;
-          color: white;
-        }
-
-        .finance-stat-card-warning:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(255, 193, 7, 0.3);
-        }
-
-        .finance-stat-card-danger {
-          background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
-          border-radius: 16px;
-          color: white;
-        }
-
-        .finance-stat-card-danger:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
-        }        .finance-stat-card-info {
-          background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
-          border-radius: 16px;
-          color: white;
-        }
-
-        .finance-stat-card-info:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(23, 162, 184, 0.3);
-        }
-
-        .finance-stat-card-success {
-          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-          border-radius: 16px;
-          color: white;
-        }
-
-        .finance-stat-card-success:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);
-        }
-
-        .finance-stat-card-success {
-          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-          border-radius: 16px;
-          color: white;
-        }
-
-        .finance-stat-card-success:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);
-        }
-
-        .finance-card {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 16px;
-          box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-          transition: all 0.3s ease;
-        }
-
-        .finance-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 16px 40px rgba(31, 38, 135, 0.2);
-        }
-
-        .table tbody tr:hover {
-          background-color: rgba(40, 167, 69, 0.05) !important;
-        }
-
-        .btn-outline-success:hover {
-          background-color: #28a745;
-          border-color: #28a745;
-        }
-
-        .btn-outline-primary:hover {
-          background-color: #007bff;
-          border-color: #007bff;
-        }
-
-        .btn-outline-danger:hover {
-          background-color: #dc3545;
-          border-color: #dc3545;
-        }
-
-        .spin {
-          animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `,
-        }}
-      />
-    </Container>
+    </div>
   );
 };
 
