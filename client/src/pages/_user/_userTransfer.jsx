@@ -50,7 +50,6 @@ const _userTransfer = () => {
     loadBeneficiaries();
     loadRecentTransfers();
   }, []);
-
   const loadUserData = async () => {
     try {
       const userData = UserService.getUserData();
@@ -60,8 +59,14 @@ const _userTransfer = () => {
       }
 
       const userProfile = await UserService.getUserProfile(userData.userId);
-      setUser(userProfile.user || userProfile);
-      setBalance(userProfile.user?.balance || userProfile.balance || 25000.50);
+      const user = userProfile.user || userProfile;
+      setUser(user);
+      setBalance(user?.balance || 25000.50);
+      
+      // Store account number in localStorage if not already stored
+      if (user?.accountNumber && !userData.accountNumber) {
+        UserService.setUserData({ accountNumber: user.accountNumber });
+      }
     } catch (err) {
       setError(err.message || 'Failed to load user data');
     }
@@ -197,20 +202,29 @@ const _userTransfer = () => {
     }
 
     setShowConfirmModal(true);
-  };
-  const confirmTransfer = async () => {
+  };  const confirmTransfer = async () => {
     try {
       setLoading(true);
       setShowConfirmModal(false);
       setError('');
 
+      // Get account number from user object or localStorage
       const userData = UserService.getUserData();
+      const fromAccount = user?.accountNumber || userData.accountNumber;
+      
+      if (!fromAccount) {
+        setError('Unable to get sender account information');
+        return;
+      }
+
       const transferData = {
-        fromUser: userData.accountNumber, // Use account number
+        fromUser: fromAccount,
         toUser: formData.recipientAccount,
         amount: parseFloat(formData.amount),
         details: formData.description || `Transfer to ${recipient.name}`
       };
+
+      console.log('Transfer Data:', transferData); // Debug log
 
       // Call the real transfer API
       const result = await TransactionService.transferMoney(transferData);

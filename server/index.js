@@ -13,7 +13,7 @@ app.use(express.json());
 
 // CORS configuration for credentials support
 const corsOptions = {
-  origin: 'http://192.168.9.23:5173', // Your React app's URL
+  origin: 'http://192.168.88.244:5173', // Your React app's URL
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

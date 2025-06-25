@@ -198,8 +198,7 @@ class TransactionService {
       hour: '2-digit',
       minute: '2-digit',
     });
-  }
-  /**
+  }  /**
    * Transfer money between accounts
    * @param {Object} transferData - Transfer data
    * @param {string} transferData.fromUser - Sender account (userId or accountNumber)
