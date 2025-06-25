@@ -78,13 +78,12 @@ const _manageBankBalance = () => {
       setRefreshing(false);
     }
   };
-
   const handleInitializeReserve = async () => {
     try {
       setInitializing(true);
       setError('');
 
-      const result = await BankReserveService.initializeBankReserve(initializeAmount);
+      const result = await bankReserveService.initializeBankReserve(initializeAmount);
       
       setSuccess(`Bank reserve initialized with ${BankReserveService.formatCurrency(initializeAmount)}`);
       setShowInitializeModal(false);
