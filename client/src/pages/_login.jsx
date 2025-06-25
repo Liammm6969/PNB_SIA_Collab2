@@ -1,65 +1,36 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Container, Row, Col, Form, Button, Alert, InputGroup, Badge } from 'react-bootstrap'
-import { Eye, EyeSlash, Bank, PersonBadge, Person } from 'react-bootstrap-icons'
+import { Eye, EyeSlash, PersonBadge, Person } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service.js'
 import StaffService from '../services/staff.Service.js'
 
-const Login = () => {
-  const navigate = useNavigate()
-  
-  const [formData, setFormData] = useState({
-    identifier: '', // Can be email for users or staffStringId for staff
-    password: ''
-  })
-  const [rememberMe, setRememberMe] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [showAlert, setShowAlert] = useState({ show: false, message: '', variant: '' })
-  const [detectedType, setDetectedType] = useState(null) // 'user' or 'staff'
+// Custom hook for login form logic
+function useLoginForm(navigate) {
+  const [formData, setFormData] = React.useState({ identifier: '', password: '' })
+  const [rememberMe, setRememberMe] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false)
+  const [errors, setErrors] = React.useState({})
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [showAlert, setShowAlert] = React.useState({ show: false, message: '', variant: '' })
+  const [detectedType, setDetectedType] = React.useState(null)
 
-  // Common styles
-  const styles = {
-    input: { fontSize: '16px', height: '48px' },
-    label: { fontSize: '16px' },
-    feedback: { fontSize: '14px' },
-    eyeToggle: { 
-      cursor: 'pointer',
-      height: '48px',
-      display: 'flex',
-      alignItems: 'center'
-    }
-  }
-  // Auto-detect account type based on input
-  const detectAccountType = (identifier) => {
+  const detectAccountType = React.useCallback((identifier) => {
     const emailPattern = /\S+@\S+\.\S+/
-    if (emailPattern.test(identifier)) {
-      return 'user'
-    } else if (identifier.startsWith('STAFF_') || identifier.toLowerCase().includes('staff')) {
-      return 'staff'
-    }
+    if (emailPattern.test(identifier)) return 'user'
+    if (identifier.startsWith('STAFF_') || identifier.toLowerCase().includes('staff')) return 'staff'
     return null
-  }
+  }, [])
 
-  const handleChange = (e) => {
+  const handleChange = React.useCallback((e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    
-    // Auto-detect account type for identifier field
-    if (name === 'identifier') {
-      const type = detectAccountType(value)
-      setDetectedType(type)
-    }
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
-    }
-  }
-  const validateForm = () => {
+    if (name === 'identifier') setDetectedType(detectAccountType(value))
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
+  }, [detectAccountType, errors])
+
+  const validateForm = React.useCallback(() => {
     const newErrors = {}
-    
     if (!formData.identifier.trim()) {
       newErrors.identifier = 'Email or Staff ID is required'
     } else {
@@ -72,92 +43,69 @@ const Login = () => {
         newErrors.identifier = 'Please enter a valid email address or Staff ID (e.g., STAFF_3000)'
       }
     }
-    
     if (!formData.password) {
       newErrors.password = 'Password is required'
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters'
     }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
-  }
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!validateForm()) return
+  }, [formData, detectAccountType])
 
+  const handleSubmit = React.useCallback(async (e) => {
+    e.preventDefault()
+    if (!validateForm()) return
     setIsLoading(true)
-    
     try {
       let loginResponse
       const accountType = detectAccountType(formData.identifier)
-      
       if (accountType === 'staff') {
-        // Staff login
         const result = await StaffService.loginStaff(formData.identifier, formData.password)
-        
         if (result.success) {
           loginResponse = result.data
-          
-          // Store staff data in localStorage
           localStorage.setItem('staffId', loginResponse.staffId)
           localStorage.setItem('staffEmail', loginResponse.email)
           localStorage.setItem('staffDepartment', loginResponse.department)
           localStorage.setItem('staffFirstName', loginResponse.firstName)
           localStorage.setItem('staffLastName', loginResponse.lastName)
           localStorage.setItem('staffStringId', loginResponse.staffStringId)
-          
           setShowAlert({
             show: true,
             message: `Welcome ${loginResponse.firstName}! Redirecting to ${loginResponse.department} dashboard...`,
             variant: 'success'
           })
-          
-          // Route based on department
           setTimeout(() => {
             switch (loginResponse.department.toLowerCase()) {
               case 'admin':
                 navigate('/admin/dashboard')
                 break
               case 'finance':
-                navigate('/admin/dashboard') // Redirect finance to admin dashboard for now
+                navigate('/admin/dashboard')
                 break
               case 'loan':
-                navigate('/loan/dashboard') // Redirect loan to admin dashboard for now
+                navigate('/loan/dashboard')
                 break
             }
           }, 1500)
-          
         } else {
           throw new Error(result.error)
         }
       } else if (accountType === 'user') {
-        // User login
         loginResponse = await UserService.loginUser(formData.identifier, formData.password)
-        
         if (loginResponse.userId) {
-          UserService.setUserData({
-            userId: loginResponse.userId,
-            email: formData.identifier
-          })
+          UserService.setUserData({ userId: loginResponse.userId, email: formData.identifier })
         }
-        
         setShowAlert({
           show: true,
           message: 'Login successful! Redirecting to dashboard...',
           variant: 'success'
         })
-        
         setTimeout(() => navigate('/dashboard'), 1500)
       } else {
         throw new Error('Unable to determine account type. Please check your credentials.')
       }
-      
       setFormData({ identifier: '', password: '' })
-      
     } catch (error) {
-      console.error('Login error:', error)
       setShowAlert({
         show: true,
         message: error.message || 'Login failed. Please check your credentials.',
@@ -166,7 +114,94 @@ const Login = () => {
     } finally {
       setIsLoading(false)
     }
+  }, [formData, detectAccountType, navigate, validateForm])
+
+  return {
+    formData,
+    setFormData,
+    rememberMe,
+    setRememberMe,
+    showPassword,
+    setShowPassword,
+    errors,
+    isLoading,
+    showAlert,
+    setShowAlert,
+    detectedType,
+    handleChange,
+    handleSubmit
   }
+}
+
+const styles = {
+  input: { fontSize: '16px', height: '48px' },
+  label: { fontSize: '16px' },
+  feedback: { fontSize: '14px' },
+  eyeToggle: { cursor: 'pointer', height: '48px', display: 'flex', alignItems: 'center' }
+}
+
+function Field({ label, name, type = 'text', placeholder, value, onChange, error, style, ...rest }) {
+  return (
+    <Form.Group className="mb-4">
+      <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
+      <Form.Control
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        isInvalid={!!error}
+        style={{ ...styles.input, ...style }}
+        {...rest}
+      />
+      <Form.Control.Feedback type="invalid" style={styles.feedback}>
+        {error}
+      </Form.Control.Feedback>
+    </Form.Group>
+  )
+}
+
+function PasswordField({ label, name, placeholder, value, onChange, error, show, toggleShow }) {
+  return (
+    <Form.Group className="mb-4">
+      <Form.Label className="fw-semibold" style={styles.label}>{label}</Form.Label>
+      <InputGroup>
+        <Form.Control
+          type={show ? 'text' : 'password'}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          isInvalid={!!error}
+          style={styles.input}
+        />
+        <InputGroup.Text style={styles.eyeToggle} onClick={toggleShow}>
+          {show ? <EyeSlash className="text-muted" size={20} /> : <Eye className="text-muted" size={20} />}
+        </InputGroup.Text>
+      </InputGroup>
+      <Form.Control.Feedback type="invalid" style={styles.feedback}>
+        {error}
+      </Form.Control.Feedback>
+    </Form.Group>
+  )
+}
+
+const Login = () => {
+  const navigate = useNavigate()
+  const {
+    formData,
+    rememberMe,
+    setRememberMe,
+    showPassword,
+    setShowPassword,
+    errors,
+    isLoading,
+    showAlert,
+    setShowAlert,
+    detectedType,
+    handleChange,
+    handleSubmit
+  } = useLoginForm(navigate)
 
   return (
     <div className="login-page" style={{ height: '100vh', overflow: 'hidden' }}>
@@ -267,59 +302,33 @@ const Login = () => {
                 >
                   {showAlert.message}
                 </Alert>
-              )}              {/* Login Form */}
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-4">
-                  <Form.Label className="fw-semibold" style={styles.label}>
-                    Email or Staff ID
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="identifier"
-                    value={formData.identifier}
-                    onChange={handleChange}
-                    placeholder="Enter your email address or Staff ID (e.g., user@example.com or STAFF_3000)"
-                    isInvalid={!!errors.identifier}                    style={{
-                      ...styles.input,
-                      borderColor: detectedType === 'staff' ? '#6366f1' : detectedType === 'user' ? '#1e3a8a' : ''
-                    }}
-                  />
-                  <Form.Control.Feedback type="invalid" style={styles.feedback}>
-                    {errors.identifier}
-                  </Form.Control.Feedback>
-                </Form.Group>
-
-                <Form.Group className="mb-4">
-                  <Form.Label className="fw-semibold" style={styles.label}>Password</Form.Label>
-                  <InputGroup>
-                    <Form.Control
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder="Enter your password"
-                      isInvalid={!!errors.password}
-                      style={styles.input}
-                    />
-                    <InputGroup.Text 
-                      style={styles.eyeToggle}
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeSlash className="text-muted" size={20} /> : <Eye className="text-muted" size={20} />}
-                    </InputGroup.Text>
-                  </InputGroup>
-                  <Form.Control.Feedback type="invalid" style={styles.feedback}>
-                    {errors.password}
-                  </Form.Control.Feedback>
-                </Form.Group>
-
+              )}              <Form onSubmit={handleSubmit}>
+                <Field
+                  label="Email or Staff ID"
+                  name="identifier"
+                  placeholder="Enter your email address or Staff ID (e.g., user@example.com or STAFF_3000)"
+                  value={formData.identifier}
+                  onChange={handleChange}
+                  error={errors.identifier}
+                  style={{ borderColor: detectedType === 'staff' ? '#6366f1' : detectedType === 'user' ? '#1e3a8a' : '' }}
+                />
+                <PasswordField
+                  label="Password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  error={errors.password}
+                  show={showPassword}
+                  toggleShow={() => setShowPassword(v => !v)}
+                />
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <Form.Check 
                     type="checkbox" 
                     label="Remember me" 
                     className="text-muted"
                     checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
+                    onChange={e => setRememberMe(e.target.checked)}
                     style={{ fontSize: '15px' }}
                   />
                   <Button 
@@ -330,12 +339,12 @@ const Login = () => {
                     Forgot Password?
                   </Button>
                 </div>
-
                 <Button
                   variant="primary"
                   type="submit"
                   className="w-100 fw-semibold mb-4"
-                  disabled={isLoading}                  style={{ 
+                  disabled={isLoading}
+                  style={{ 
                     background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
                     border: 'none',
                     borderRadius: '8px',
@@ -352,7 +361,6 @@ const Login = () => {
                     'Sign In'
                   )}
                 </Button>
-
                 <div className="text-center">
                   <span className="text-muted" style={{ fontSize: '15px' }}>
                     Don't have an account?{' '}
