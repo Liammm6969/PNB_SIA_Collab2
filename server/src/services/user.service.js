@@ -102,10 +102,19 @@ class UserService {
     } catch (err) {
       throw err;
     }
-  }
-  async getUserProfile(userId) {
+  }  async getUserProfile(userId) {
     try {
       const user = await User.findOne({ userId }).select('-password');
+      if (!user) throw new UserNotFoundError('User not found');
+      return user;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getUserByUserIdSeq(userIdSeq) {
+    try {
+      const user = await User.findOne({ userIdSeq }).select('-password');
       if (!user) throw new UserNotFoundError('User not found');
       return user;
     } catch (err) {

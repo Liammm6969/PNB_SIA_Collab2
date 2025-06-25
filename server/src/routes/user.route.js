@@ -31,6 +31,9 @@ router.get('/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSch
 
 router.get('/', userController.listUsers);
 
+// Get user by userIdSeq
+router.get('/seq/:userIdSeq', userController.getUserByUserIdSeq);
+
 
 
 

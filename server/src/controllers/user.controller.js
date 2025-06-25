@@ -58,3 +58,18 @@ exports.verifyOTP = async (req, res) => {
     res.status(401).json({ error: err.message });
   }
 };
+
+// Get user by userIdSeq
+exports.getUserByUserIdSeq = async (req, res) => {
+  try {
+    const { userIdSeq } = req.params;
+    const user = await UserService.getUserByUserIdSeq(parseInt(userIdSeq));
+    res.status(StatusCodes.OK).json(user);
+  } catch (error) {
+    if (error.message === 'User not found') {
+      res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+    } else {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+  }
+};

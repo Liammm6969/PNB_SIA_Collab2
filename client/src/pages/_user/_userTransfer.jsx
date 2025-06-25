@@ -25,6 +25,7 @@ import {
 import UserService from '../../services/user.Service';
 import TransferService from '../../services/transfer.Service';
 import TransactionService from '../../services/transaction.Service';
+import BeneficiaryService from '../../services/beneficiary.Service';
 
 const _userTransfer = () => {
   const [formData, setFormData] = useState({
@@ -40,17 +41,17 @@ const _userTransfer = () => {
   const [loading, setLoading] = useState(false);
   const [validatingRecipient, setValidatingRecipient] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [success, setSuccess] = useState('');  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [recentTransfers, setRecentTransfers] = useState([]);
+  const [loadingBeneficiaries, setLoadingBeneficiaries] = useState(false);
+  const [loadingTransfers, setLoadingTransfers] = useState(false);
 
   useEffect(() => {
     loadUserData();
     loadBeneficiaries();
     loadRecentTransfers();
-  }, []);
-  const loadUserData = async () => {
+  }, []);  const loadUserData = async () => {
     try {
       const userData = UserService.getUserData();
       if (!userData.userId) {
@@ -61,72 +62,93 @@ const _userTransfer = () => {
       const userProfile = await UserService.getUserProfile(userData.userId);
       const user = userProfile.user || userProfile;
       setUser(user);
-      setBalance(user?.balance || 25000.50);
+      setBalance(user?.balance || 0); // Use real balance, default to 0
       
       // Store account number in localStorage if not already stored
       if (user?.accountNumber && !userData.accountNumber) {
-        UserService.setUserData({ accountNumber: user.accountNumber });
+        UserService.setUserData({ ...userData, accountNumber: user.accountNumber });
       }
     } catch (err) {
       setError(err.message || 'Failed to load user data');
     }
-  };
-
-  const loadBeneficiaries = async () => {
+  };  const loadBeneficiaries = async () => {
     try {
+      setLoadingBeneficiaries(true);
       const userData = UserService.getUserData();
       if (userData.userId) {
-        // Mock beneficiaries data for now
-        const mockBeneficiaries = [
-          {
-            id: '1',
-            accountNumber: '123-4567-890-1234',
-            name: 'John Doe',
-            nickname: 'John',
-            isFavorite: true
-          },
-          {
-            id: '2',
-            accountNumber: '234-5678-901-2345',
-            name: 'Jane Smith',
-            nickname: 'Jane',
-            isFavorite: false
-          }
-        ];
-        setBeneficiaries(mockBeneficiaries);
+        // Get real beneficiaries from backend
+        const realBeneficiaries = await BeneficiaryService.getBeneficiaries(userData.userId);
+        
+        // Transform backend data to match frontend expectations
+        const transformedBeneficiaries = realBeneficiaries.map(beneficiary => ({
+          id: beneficiary.beneficiaryId,
+          accountNumber: beneficiary.accountNumber,
+          name: beneficiary.name,
+          nickname: beneficiary.nickname,
+          isFavorite: beneficiary.isFavorite,
+          accountType: beneficiary.accountType,
+          lastUsed: beneficiary.lastUsed
+        }));
+        
+        setBeneficiaries(transformedBeneficiaries);
       }
     } catch (err) {
       console.error('Failed to load beneficiaries:', err);
+      // Set empty array on error
+      setBeneficiaries([]);
+    } finally {
+      setLoadingBeneficiaries(false);
     }
-  };
-
-  const loadRecentTransfers = async () => {
+  };  const loadRecentTransfers = async () => {
     try {
+      setLoadingTransfers(true);
       const userData = UserService.getUserData();
       if (userData.userId) {
-        // Mock recent transfers data
-        const mockTransfers = [
-          {
-            id: '1',
-            recipientName: 'John Doe',
-            recipientAccount: '123-4567-890-1234',
-            amount: 5000,
-            date: new Date().toISOString(),
-            status: 'completed'
-          },
-          {
-            id: '2',
-            recipientName: 'Jane Smith',
-            recipientAccount: '234-5678-901-2345',
-            amount: 3000,
-            date: new Date(Date.now() - 86400000).toISOString(),
-            status: 'completed'
-          }
-        ];
-        setRecentTransfers(mockTransfers);
+        // Get real recent transfers from backend
+        const userIdSeq = userData.userId.includes('-') 
+          ? userData.userId.split('-')[1] 
+          : userData.userId;
+        
+        const realTransfers = await TransactionService.getUserPayments(userIdSeq, { limit: 10 });
+        
+        // Transform backend data and enhance with recipient info
+        const transformedTransfers = await Promise.all(
+          realTransfers
+            .filter(transfer => transfer.fromUser == userIdSeq) // Only outgoing transfers
+            .map(async (transfer) => {
+              let recipientName = 'Unknown Recipient';
+              let recipientAccount = 'N/A';
+              
+              try {
+                // Try to get recipient details from user records
+                const recipientUser = await UserService.getUserByUserIdSeq(transfer.toUser);
+                if (recipientUser) {
+                  recipientName = recipientUser.displayName?.fullName || 'Unknown User';
+                  recipientAccount = recipientUser.accountNumber || 'N/A';
+                }
+              } catch (err) {
+                console.warn('Could not fetch recipient details:', err);
+              }
+              
+              return {
+                id: transfer.paymentId || transfer.transactionId,
+                recipientName: recipientName,
+                recipientAccount: recipientAccount,
+                amount: Math.abs(transfer.amount),
+                date: transfer.createdAt || transfer.date,
+                status: 'completed'
+              };
+            })
+        );
+        
+        setRecentTransfers(transformedTransfers);
       }
     } catch (err) {
       console.error('Failed to load recent transfers:', err);
+      // Set empty array on error
+      setRecentTransfers([]);
+    } finally {
+      setLoadingTransfers(false);
     }
   };
 
@@ -141,8 +163,7 @@ const _userTransfer = () => {
     if (name === 'recipientAccount') {
       setRecipient(null);
     }
-  };
-  const validateRecipient = async () => {
+  };  const validateRecipient = async () => {
     if (!formData.recipientAccount) return;
 
     const validation = TransferService.validateAccountNumber(formData.recipientAccount);
@@ -155,19 +176,16 @@ const _userTransfer = () => {
       setValidatingRecipient(true);
       setError('');
       
-      // For now, we'll use a simple validation since we don't have a dedicated recipient validation endpoint
-      // In a real implementation, you would call an API to validate the recipient account
-      // Example: const result = await TransferService.validateRecipient(formData.recipientAccount);
+      // Use real backend validation
+      const recipientData = await BeneficiaryService.validateRecipient(formData.recipientAccount);
       
-      // Mock recipient validation - in a real app, this would come from the API
-      const mockRecipient = {
-        accountNumber: formData.recipientAccount,
-        name: 'Account Holder', // This would come from the API
-        accountType: 'personal',
-        isActive: true
-      };
-      
-      setRecipient(mockRecipient);
+      setRecipient({
+        accountNumber: recipientData.accountNumber,
+        name: recipientData.name,
+        accountType: recipientData.accountType,
+        isActive: recipientData.isActive,
+        userId: recipientData.userId
+      });
     } catch (err) {
       setError(err.response?.data?.error || err.message || 'Failed to validate recipient');
       setRecipient(null);
@@ -224,12 +242,37 @@ const _userTransfer = () => {
         details: formData.description || `Transfer to ${recipient.name}`
       };
 
-      console.log('Transfer Data:', transferData); // Debug log
-
-      // Call the real transfer API
+      console.log('Transfer Data:', transferData); // Debug log      // Call the real transfer API
       const result = await TransactionService.transferMoney(transferData);
       
       setSuccess(`Transfer of ${TransactionService.formatCurrency(transferData.amount)} to ${recipient.name} completed successfully!`);
+        // Handle beneficiary saving if requested
+      if (formData.saveAsBeneficiary && formData.beneficiaryNickname) {
+        try {
+          const userData = UserService.getUserData();
+          const userIdSeq = userData.userId.includes('-') 
+            ? userData.userId.split('-')[1] 
+            : userData.userId;
+          
+          await BeneficiaryService.addBeneficiary({
+            userId: userIdSeq,
+            accountNumber: formData.recipientAccount,
+            nickname: formData.beneficiaryNickname,
+            name: recipient.name,
+            accountType: recipient.accountType,
+            isFavorite: false
+          });
+          
+          setSuccess(`Transfer completed and ${formData.beneficiaryNickname} saved as beneficiary!`);
+          
+          // Reload beneficiaries to show the new one
+          await loadBeneficiaries();
+        } catch (beneficiaryError) {
+          console.warn('Failed to save beneficiary:', beneficiaryError);
+          // Still show success for transfer, but mention beneficiary save failed
+          setSuccess(`Transfer completed successfully! (Note: Could not save beneficiary: ${beneficiaryError.message})`);
+        }
+      }
       
       // Reset form
       setFormData({
@@ -251,7 +294,6 @@ const _userTransfer = () => {
       setLoading(false);
     }
   };
-
   const selectBeneficiary = (beneficiary) => {
     setFormData(prev => ({
       ...prev,
@@ -260,9 +302,36 @@ const _userTransfer = () => {
     setRecipient({
       accountNumber: beneficiary.accountNumber,
       name: beneficiary.name,
-      accountType: 'personal',
+      accountType: beneficiary.accountType || 'personal',
       isActive: true
     });
+  };
+  const toggleBeneficiaryFavorite = async (beneficiaryId, currentFavorite) => {
+    try {
+      await BeneficiaryService.toggleFavorite(beneficiaryId, !currentFavorite);
+      // Reload beneficiaries to reflect the change
+      await loadBeneficiaries();
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err);
+    }
+  };
+
+  const quickTransferFromRecent = (transfer) => {
+    setFormData(prev => ({
+      ...prev,
+      recipientAccount: transfer.recipientAccount,
+      description: `Repeat transfer to ${transfer.recipientName}`
+    }));
+    
+    // If we have the account number, validate it
+    if (transfer.recipientAccount && transfer.recipientAccount !== 'N/A') {
+      setRecipient({
+        accountNumber: transfer.recipientAccount,
+        name: transfer.recipientName,
+        accountType: 'personal', // Default
+        isActive: true
+      });
+    }
   };
 
   const formatAccountNumberInput = (value) => {
@@ -446,9 +515,13 @@ const _userTransfer = () => {
           <Card className="glass-card mb-4">
             <Card.Header className="bg-transparent border-0">
               <h6 className="mb-0">Saved Beneficiaries</h6>
-            </Card.Header>
-            <Card.Body className="p-0">
-              {beneficiaries.length === 0 ? (
+            </Card.Header>            <Card.Body className="p-0">
+              {loadingBeneficiaries ? (
+                <div className="text-center py-3">
+                  <Spinner size="sm" className="me-2" />
+                  <small className="text-muted">Loading beneficiaries...</small>
+                </div>
+              ) : beneficiaries.length === 0 ? (
                 <div className="text-center py-3">
                   <p className="text-muted mb-0 small">No saved beneficiaries</p>
                 </div>
@@ -461,13 +534,23 @@ const _userTransfer = () => {
                       onClick={() => selectBeneficiary(beneficiary)}
                       style={{ cursor: 'pointer' }}
                     >
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div>
+                      <div className="d-flex justify-content-between align-items-center">                        <div>
                           <div className="d-flex align-items-center">
                             <strong className="small">{beneficiary.nickname}</strong>
-                            {beneficiary.isFavorite && (
-                              <StarFill className="text-warning ms-1" size={12} />
-                            )}
+                            <button
+                              className="btn btn-link p-0 ms-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleBeneficiaryFavorite(beneficiary.id, beneficiary.isFavorite);
+                              }}
+                              style={{ border: 'none', background: 'none' }}
+                            >
+                              {beneficiary.isFavorite ? (
+                                <StarFill className="text-warning" size={12} />
+                              ) : (
+                                <Star className="text-muted" size={12} />
+                              )}
+                            </button>
                           </div>
                           <div className="text-muted" style={{ fontSize: '0.75rem' }}>
                             {beneficiary.accountNumber}
@@ -495,16 +578,19 @@ const _userTransfer = () => {
           <Card className="glass-card">
             <Card.Header className="bg-transparent border-0">
               <h6 className="mb-0">Recent Transfers</h6>
-            </Card.Header>
-            <Card.Body className="p-0">
-              {recentTransfers.length === 0 ? (
+            </Card.Header>            <Card.Body className="p-0">
+              {loadingTransfers ? (
+                <div className="text-center py-3">
+                  <Spinner size="sm" className="me-2" />
+                  <small className="text-muted">Loading transfers...</small>
+                </div>
+              ) : recentTransfers.length === 0 ? (
                 <div className="text-center py-3">
                   <p className="text-muted mb-0 small">No recent transfers</p>
                 </div>
               ) : (
                 <ListGroup variant="flush">
-                  {recentTransfers.slice(0, 5).map((transfer) => (
-                    <ListGroup.Item key={transfer.id} className="border-0 px-3 py-2">
+                  {recentTransfers.slice(0, 5).map((transfer) => (                    <ListGroup.Item key={transfer.id} className="border-0 px-3 py-2">
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="flex-grow-1">
                           <div className="small fw-bold">{transfer.recipientName}</div>
@@ -522,6 +608,18 @@ const _userTransfer = () => {
                           <Badge bg={TransactionService.getStatusColorClass(transfer.status)} className="small">
                             {transfer.status}
                           </Badge>
+                          {transfer.recipientAccount !== 'N/A' && (
+                            <div className="mt-1">
+                              <Button 
+                                variant="outline-primary" 
+                                size="sm"
+                                onClick={() => quickTransferFromRecent(transfer)}
+                                style={{ fontSize: '0.7rem', padding: '2px 6px' }}
+                              >
+                                Repeat
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </ListGroup.Item>

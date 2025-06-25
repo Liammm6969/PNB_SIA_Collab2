@@ -9,6 +9,9 @@ const registerUserSchema = require('./user/register-user.schema');
 const updateTransactionSchema = require('./transaction/update-transaction.schema');
 const addStaffSchema = require('./staff/add-staff.schema');
 const validateStaffIdSchema = require('./staff/validate-staff-id.schema');
+const addBeneficiarySchema = require('./beneficiary/add-beneficiary.schema');
+const validateBeneficiaryIdSchema = require('./beneficiary/validate-beneficiary-id.schema');
+const validateAccountNumberSchema = require('./beneficiary/validate-account-number.schema');
 
 
 module.exports = {
@@ -22,5 +25,8 @@ module.exports = {
   addStaffSchema,
   validateStaffIdSchema,
   validateTransactionIdSchema,
-  validatePaymentIdSchema
+  validatePaymentIdSchema,
+  addBeneficiarySchema,
+  validateBeneficiaryIdSchema,
+  validateAccountNumberSchema
 };

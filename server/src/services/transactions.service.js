@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-const { Transaction, User,Payment } = require("../models/index.js");
+const { Transaction, User, Payment } = require("../models/index.js");
 const { TransactionNotFoundError, UserNotFoundError } = require("../errors/index.js");
+const BeneficiaryService = require("./beneficiary.service.js");
 class TransactionService {
   constructor() {
     this.createTransaction = this.createTransaction.bind(this);
@@ -162,13 +163,29 @@ class TransactionService {
         amount,
         details,
         balanceAfterPayment: sender.balance
-      });
-      await payment.save({ session });
+      });      await payment.save({ session });
+      
+      // Update beneficiary last used if exists
+      try {
+        await BeneficiaryService.updateLastUsed(senderDoc.userIdSeq, receiverDoc.accountNumber);
+      } catch (beneficiaryError) {
+        console.warn('Could not update beneficiary last used:', beneficiaryError.message);
+      }
+      
       await session.commitTransaction();
       return {
         message: 'Transfer successful',
-        payment
-      };    } catch (err) {
+        payment,
+        sender: {
+          name: senderDoc.displayName?.fullName || 'Unknown',
+          accountNumber: senderDoc.accountNumber,
+          newBalance: sender.balance
+        },
+        receiver: {
+          name: receiverDoc.displayName?.fullName || 'Unknown',
+          accountNumber: receiverDoc.accountNumber
+        }
+      };} catch (err) {
       await session.abortTransaction();
       throw err;
     } finally {

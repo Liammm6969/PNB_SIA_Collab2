@@ -46,7 +46,6 @@ class UserService {
       throw error;
     }
   }
-
   /**
    * Get user profile by user ID
    * @param {string} userId - User ID
@@ -67,6 +66,30 @@ class UserService {
       return response.data;
     } catch (error) {
       console.error('Get user profile error:', error);
+      throw error;
+    }
+  }
+  /**
+   * Get user by userIdSeq (for internal lookups)
+   * @param {string|number} userIdSeq - User ID sequence number
+   * @param {string} [accessToken] - Access token for authentication
+   * @returns {Promise<Object>} User profile data
+   */
+  static async getUserByUserIdSeq(userIdSeq, accessToken = null) {
+    try {
+      const config = {};
+      
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
+      }
+
+      const response = await api.get(`${USER_ENDPOINT}/seq/${userIdSeq}`, config);
+
+      return response.data;
+    } catch (error) {
+      console.error('Get user by userIdSeq error:', error);
       throw error;
     }
   }
