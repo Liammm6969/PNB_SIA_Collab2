@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Button, Table, Badge, Modal, Form, Alert, InputGroup, Spinner } from 'react-bootstrap'
+import { Container, Button, Table, Badge, Modal, Form, Alert, InputGroup, Spinner, Row, Col, Card } from 'react-bootstrap'
 import { 
   Cash, 
   Search, 
@@ -12,8 +12,16 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Send
+  Send,
+  GraphUp,
+  Building,
+  ArrowRepeat,
+  PiggyBank,
+  ExclamationTriangle,
+  ShieldLock,
+  BarChart
 } from 'react-bootstrap-icons'
+import { TextField } from '@mui/material'
 import TransactionService from '../../services/transaction.Service'
 import '../../styles/financeStyles/transactionManagement.css'
 
@@ -228,17 +236,38 @@ const TransactionManagement = () => {
       {/* Filters and Search */}
       <div className="transaction-filter-card mb-4">
         <div className="transaction-search">
-          <InputGroup>
-            <InputGroup.Text>
-              <Search size={16} />
-            </InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Search by transaction ID, description, or user..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </InputGroup>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search by transaction ID, description, or user..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: <Search size={16} style={{ marginRight: 8, color: '#6b7280' }} />,
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+                backgroundColor: '#f9fafb',
+                '&:hover': {
+                  backgroundColor: '#f3f4f6',
+                },
+                '&.Mui-focused': {
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
+                },
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#e5e7eb',
+              },
+              '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+              },
+              '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+              },
+            }}
+          />
         </div>
         <div className="transaction-type">
           <Form.Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
