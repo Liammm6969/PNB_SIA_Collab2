@@ -30,35 +30,35 @@ const express = require('express');
 
 const router = express.Router();
 
-// router.use(verifyAccessToken);
+router.use(verifyAccessToken);
 // Create a new payment
 // router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), createPayment);
 
-router.post('/', createPayment);
+router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addPaymentSchema), createPayment);
 
 // Get all payments (Finance/Admin only)
 router.get('/', getAllPayments);
 
 // Get payments for specific user
 // router.get('/user-payments/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPayments);
-router.get('/user-payments/:userId', getPayments);
+router.get('/user-payments/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), getPayments);
 
 // Get user statements
-router.get('/user-statements/:userId', getUserStatements);
+router.get('/user-statements/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), getUserStatements);
 
 // Create withdrawal
-router.post('/withdraw', createWithdrawal);
+router.post('/withdraw', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(withdrawSchema), createWithdrawal);
 
 // Create deposit
-router.post('/deposit', createDeposit);
+router.post('/deposit', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(depositSchema), createDeposit);
 
 // Get a payment by ID
 // router.get('/:paymentId', ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), getPaymentById);
-router.get('/:paymentId', getPaymentById);
+router.get('/:paymentId', ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), getPaymentById);
 // Update a payment by ID
 // router.put('/:paymentId', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transferPayment);
 
-router.put('/:paymentId', transferPayment);
+router.put('/:paymentId', ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), transferPayment);
 
 // Delete a payment by ID
 // router.delete('/:paymentId', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validatePaymentIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), deletePayment);
