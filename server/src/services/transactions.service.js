@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Transaction, User, Payment } = require("../models/index.js");
 const { TransactionNotFoundError, UserNotFoundError } = require("../errors/index.js");
 const BeneficiaryService = require("./beneficiary.service.js");
+const BankReserveService = require('./bankReserve.service');
 class TransactionService {
   constructor() {
     this.createTransaction = this.createTransaction.bind(this);
@@ -128,7 +129,6 @@ class TransactionService {
       throw err;
     }
   }
-
   async transferMoney(transferData) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -154,6 +154,21 @@ class TransactionService {
       if (!receiverDoc) throw new Error('Receiver not found');
       if (!senderDoc) throw new Error('Sender not found');
       if (senderDoc.balance < amount) throw new Error('Sender does not have enough balance');
+
+      // Validate that bank has sufficient total reserves
+      // (This is an optional check - transfers don't change total bank reserves 
+      // but we want to ensure the system is within safe limits)
+      const bankReserve = await BankReserveService.getBankReserve();
+      const totalUserBalances = await User.aggregate([
+        { $group: { _id: null, total: { $sum: '$balance' } } }
+      ]);
+      const currentTotalUserBalance = totalUserBalances[0]?.total || 0;
+      
+      if (currentTotalUserBalance > bankReserve.total_balance) {
+        console.warn('Warning: Total user balances exceed bank reserves!');
+        // For now we'll allow it but log the warning
+        // In a real system, you might want to block this
+      }
 
       // Use the actual _id for updates to ensure we update the correct user
       const sender = await User.findOneAndUpdate({

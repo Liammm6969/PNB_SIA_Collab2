@@ -17,6 +17,7 @@ import FinanceDashboard from './pages/_finance/_financeDashboard'
 import DepositManagement from './pages/_finance/_depositManagement'
 import ReportsManagement from './pages/_finance/_reportsManagement'
 import TransactionManagement from './pages/_finance/_transactionManagement'
+import ManageBankBalance from './pages/_finance/_manageBankBalance'
 
 const App = () => {
   return (
@@ -37,10 +38,11 @@ const App = () => {
           {/* Admin Routes */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/manage/users" element={<ManageUsers />} />
-        <Route path="/admin/manage/staff" element={<ManageStaff />} />          {/* Finance Routes with Layout */}
+        <Route path="/admin/manage/staff" element={<ManageStaff />} />        {/* Finance Routes with Layout */}
         <Route path="/finance" element={<FinanceLayout />}>
           <Route path="dashboard" element={<FinanceDashboard />} />
           <Route path="deposits" element={<DepositManagement />} />
+          <Route path="bank-balance" element={<ManageBankBalance />} />
           <Route path="reports" element={<ReportsManagement />} />
           <Route path="transactions" element={<TransactionManagement />} />
           <Route index element={<Navigate to="dashboard" replace />} />

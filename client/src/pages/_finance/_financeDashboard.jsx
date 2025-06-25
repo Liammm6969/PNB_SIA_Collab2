@@ -11,15 +11,21 @@ import {
   Building,
   FileText,
   ArrowRepeat,
-  PersonCircle
+  PersonCircle,
+  PiggyBank,
+  ExclamationTriangle
 } from 'react-bootstrap-icons'
 import DepositRequestService from '../../services/depositRequest.Service'
 import TransactionService from '../../services/transaction.Service'
+import BankReserveService from '../../services/bankReserve.Service'
 
 const FinanceDashboard = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [refreshing, setRefreshing] = useState(false)
+  
+  // Bank Reserve Data
+  const [bankReserve, setBankReserve] = useState(null)
   
   // Real data from API
   const [stats, setStats] = useState({
@@ -39,7 +45,6 @@ const FinanceDashboard = () => {
   useEffect(() => {
     loadDashboardData()
   }, [])
-
   const loadDashboardData = async () => {
     try {
       setLoading(true)
@@ -48,6 +53,15 @@ const FinanceDashboard = () => {
       // Load deposit request statistics
       const statsData = await DepositRequestService.getDepositRequestStats()
       setStats(statsData)
+
+      // Load bank reserve data
+      try {
+        const bankReserveData = await BankReserveService.getBankReserve()
+        setBankReserve(bankReserveData.data)
+      } catch (bankError) {
+        console.warn('Could not load bank reserve:', bankError.message)
+        setBankReserve(null)
+      }
       
       // Load recent deposit requests (pending ones first)
       const pendingRequests = await DepositRequestService.getAllDepositRequests('Pending', 10)
@@ -264,21 +278,31 @@ const FinanceDashboard = () => {
         </Col>
 
         <Col xl={3} md={6}>
-          <Card className="border-0 finance-stat-card-info h-100">
+          <Card className={`border-0 h-100 ${bankReserve ? 
+            `finance-stat-card-${BankReserveService.getReserveStatusColor(bankReserve.total_balance)}` : 
+            'finance-stat-card-info'}`}>
             <Card.Body className="p-4">
               <div className="d-flex align-items-center justify-content-between">
                 <div>
-                  <h6 className="text-white-50 mb-1">Total Requests</h6>
+                  <h6 className="text-white-50 mb-1">Bank Reserve</h6>
                   <h3 className="fw-bold mb-0 text-white">
-                    {stats.pending.count + stats.approved.count + stats.rejected.count}
+                    {bankReserve ? 
+                      BankReserveService.formatCurrency(bankReserve.total_balance) : 
+                      'Loading...'}
                   </h3>
                   <small className="text-white-50">
-                    <FileText size={12} className="me-1" />
-                    All deposit requests
+                    <PiggyBank size={12} className="me-1" />
+                    {bankReserve ? 
+                      `${BankReserveService.getReserveStatusText(bankReserve.total_balance)} Level` : 
+                      'Fetching data...'}
                   </small>
                 </div>
                 <div className="p-3 bg-white bg-opacity-20 rounded-circle">
-                  <FileText size={24} className="text-white" />
+                  {bankReserve && bankReserve.total_balance < 500000 ? (
+                    <ExclamationTriangle size={24} className="text-white" />
+                  ) : (
+                    <PiggyBank size={24} className="text-white" />
+                  )}
                 </div>
               </div>
             </Card.Body>
@@ -478,9 +502,7 @@ const FinanceDashboard = () => {
         .finance-stat-card-danger:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
-        }
-
-        .finance-stat-card-info {
+        }        .finance-stat-card-info {
           background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
           border-radius: 16px;
           color: white;
@@ -489,6 +511,17 @@ const FinanceDashboard = () => {
         .finance-stat-card-info:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 32px rgba(23, 162, 184, 0.3);
+        }
+
+        .finance-stat-card-success {
+          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+          border-radius: 16px;
+          color: white;
+        }
+
+        .finance-stat-card-success:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);
         }
 
         .finance-card {

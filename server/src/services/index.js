@@ -4,6 +4,7 @@ const UserService = require('./user.service');
 const TransferService = require('./transfer.service');
 const StaffService = require('./staff.service');
 const BeneficiaryService = require('./beneficiary.service');
+const BankReserveService = require('./bankReserve.service');
 
 module.exports = {
   PaymentService,
@@ -11,5 +12,6 @@ module.exports = {
   UserService,
   TransferService,
   StaffService,
-  BeneficiaryService
+  BeneficiaryService,
+  BankReserveService
 };

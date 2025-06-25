@@ -1,5 +1,6 @@
 const { DepositRequest, User, Payment } = require('../models');
 const mongoose = require('mongoose');
+const BankReserveService = require('./bankReserve.service');
 
 class DepositRequestService {
   constructor() {
@@ -162,7 +163,6 @@ class DepositRequestService {
       throw new Error(`Failed to get deposit request: ${error.message}`);
     }
   }
-
   // Approve deposit request
   async approveDepositRequest(depositRequestId, staffId) {
     const session = await mongoose.startSession();
@@ -180,6 +180,12 @@ class DepositRequestService {
 
       if (depositRequest.status !== 'Pending') {
         throw new Error('Deposit request has already been processed');
+      }
+
+      // Check if bank has sufficient funds for this deposit
+      const hasSufficientFunds = await BankReserveService.checkSufficientFunds(depositRequest.amount);
+      if (!hasSufficientFunds) {
+        throw new Error('Insufficient bank reserve funds for this deposit');
       }
 
       // Get user
@@ -215,6 +221,13 @@ class DepositRequestService {
           processedAt: new Date()
         },
         { session }
+      );
+
+      // Update bank reserve (decrease by deposit amount)
+      await BankReserveService.updateReserveBalance(
+        -depositRequest.amount, 
+        'deposit', 
+        payment.paymentStringId || depositRequestId
       );
 
       await session.commitTransaction();

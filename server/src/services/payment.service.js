@@ -1,5 +1,6 @@
 const { Payment, User } = require("../models/index.js");
 const {PaymentNotFoundError} = require("../errors/index.js");
+const BankReserveService = require('./bankReserve.service');
 class PaymentService {
   constructor() {
     this.createPayment = this.createPayment.bind(this);
@@ -203,7 +204,6 @@ class PaymentService {
       throw err;
     }
   }
-
   async createWithdrawal(userId, amount, details = 'ATM Withdrawal') {
     try {
       let numericUserId;
@@ -247,7 +247,16 @@ class PaymentService {
         balanceAfterPayment: updatedUser.balance
       });
 
-      await payment.save();      return {
+      await payment.save();
+
+      // Update bank reserve (increase by withdrawal amount - money goes back to bank)
+      await BankReserveService.updateReserveBalance(
+        amount, 
+        'withdrawal', 
+        payment.paymentStringId || `PAY_${payment.paymentId}`
+      );
+
+      return {
         payment,
         newBalance: updatedUser.balance,
         message: 'Withdrawal successful'
@@ -256,7 +265,6 @@ class PaymentService {
       throw err;
     }
   }
-
   async createDeposit(userId, amount, details = 'Account Deposit') {
     try {
       let numericUserId;
@@ -272,6 +280,12 @@ class PaymentService {
         }
       } else {
         throw new Error('Invalid user ID format');
+      }
+
+      // Check if bank has sufficient funds for this deposit
+      const hasSufficientFunds = await BankReserveService.checkSufficientFunds(amount);
+      if (!hasSufficientFunds) {
+        throw new Error('Insufficient bank reserve funds for this deposit');
       }
 
       // Get user
@@ -297,6 +311,13 @@ class PaymentService {
       });
 
       await payment.save();
+
+      // Update bank reserve (decrease by deposit amount - money goes from bank to user)
+      await BankReserveService.updateReserveBalance(
+        -amount, 
+        'deposit', 
+        payment.paymentStringId || `PAY_${payment.paymentId}`
+      );
 
       return {
         payment,

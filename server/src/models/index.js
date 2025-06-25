@@ -4,6 +4,7 @@ const UserModel = require('./user.model');
 const StaffModel = require('./staff.model');
 const BeneficiaryModel = require('./beneficiary.model');
 const DepositRequestModel = require('./depositRequest.model');
+const BankReserveModel = require('./bankReserve.model');
 
 module.exports = {
   Payment: PaymentModel,
@@ -11,5 +12,6 @@ module.exports = {
   User: UserModel,
   Staff: StaffModel,
   Beneficiary: BeneficiaryModel,
-  DepositRequest: DepositRequestModel
+  DepositRequest: DepositRequestModel,
+  BankReserve: BankReserveModel
 };

@@ -79,8 +79,7 @@ const FinanceLayout = () => {
     // Show only last 4 characters for security
     return `****${staffId.slice(-4)}`
   }
-  
-  const navigationItems = [
+    const navigationItems = [
     {
       title: "Dashboard",
       path: "/finance/dashboard",
@@ -92,6 +91,12 @@ const FinanceLayout = () => {
       path: "/finance/deposits",
       icon: <Cash className="me-2" />,
       description: "Process User Deposits"
+    },
+    {
+      title: "Bank Balance",
+      path: "/finance/bank-balance",
+      icon: <PiggyBank className="me-2" />,
+      description: "Manage Bank Reserve"
     },
     {
       title: "Reports",
