@@ -415,16 +415,15 @@ const FinanceDashboard = () => {
                           <Badge bg={getTransactionTypeBadge(transaction.fromUser === 0 ? 'deposit' : 'transfer').bg}>
                             {transaction.fromUser === 0 ? 'Deposit' : 'Transfer'}
                           </Badge>
-                        </td>
-                        <td className="border-0">
+                        </td>                        <td className="border-0">
                           <span className="text-muted">
-                            {transaction.fromUser === 0 ? 'System' : `User ${transaction.fromUser}`}
+                            {transaction.fromUser === 0 ? 'Finance' : (transaction.fromUserDetails?.name || `User ${transaction.fromUser}`)}
                           </span>
                         </td>
                         <td className="border-0">
                           <div className="d-flex align-items-center">
                             <PersonCircle size={16} className="me-2 text-muted" />
-                            <span>User {transaction.toUser}</span>
+                            <span>{transaction.toUserDetails?.name || `User ${transaction.toUser}`}</span>
                           </div>
                         </td>
                         <td className="border-0">

@@ -15,7 +15,6 @@ import UserProfileSettings from './pages/_user/_userSettings'
 
 import FinanceDashboard from './pages/_finance/_financeDashboard'
 import DepositManagement from './pages/_finance/_depositManagement'
-import DepositProcessing from './pages/_finance/_depositProcessing'
 import ReportsManagement from './pages/_finance/_reportsManagement'
 import TransactionManagement from './pages/_finance/_transactionManagement'
 
@@ -42,7 +41,6 @@ const App = () => {
         <Route path="/finance" element={<FinanceLayout />}>
           <Route path="dashboard" element={<FinanceDashboard />} />
           <Route path="deposits" element={<DepositManagement />} />
-          <Route path="processing" element={<DepositProcessing />} />
           <Route path="reports" element={<ReportsManagement />} />
           <Route path="transactions" element={<TransactionManagement />} />
           <Route index element={<Navigate to="dashboard" replace />} />

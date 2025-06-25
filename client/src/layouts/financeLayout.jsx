@@ -95,12 +95,6 @@ const FinanceLayout = () => {
       description: "Process User Deposits"
     },
     {
-      title: "Deposit Processing",
-      path: "/finance/processing",
-      icon: <Send className="me-2" />,
-      description: "Credit Approved Deposits"
-    },
-    {
       title: "Reports",
       path: "/finance/reports",
       icon: <BarChart className="me-2" />,

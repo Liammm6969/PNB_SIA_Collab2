@@ -307,7 +307,6 @@ class PaymentService {
       throw err;
     }
   }
-
   async getAllPayments() {
     try {
       const payments = await Payment.find({})
@@ -315,7 +314,47 @@ class PaymentService {
         .limit(100)
         .lean();
       
-      return payments;
+      // Enrich payments with user details
+      const enrichedPayments = await Promise.all(payments.map(async (payment) => {
+        let fromUserDetails = null;
+        let toUserDetails = null;
+        
+        // Get sender details
+        if (payment.fromUser === 0) {
+          fromUserDetails = {
+            accountNumber: 'SYSTEM',
+            name: 'System',
+            accountType: 'system'
+          };
+        } else {
+          const fromUser = await User.findOne({ userIdSeq: payment.fromUser }).select('accountNumber firstName lastName businessName accountType').lean();
+          if (fromUser) {
+            fromUserDetails = {
+              accountNumber: fromUser.accountNumber,
+              name: fromUser.accountType === 'business' ? fromUser.businessName : `${fromUser.firstName} ${fromUser.lastName}`,
+              accountType: fromUser.accountType
+            };
+          }
+        }
+        
+        // Get receiver details
+        const toUser = await User.findOne({ userIdSeq: payment.toUser }).select('accountNumber firstName lastName businessName accountType').lean();
+        if (toUser) {
+          toUserDetails = {
+            accountNumber: toUser.accountNumber,
+            name: toUser.accountType === 'business' ? toUser.businessName : `${toUser.firstName} ${toUser.lastName}`,
+            accountType: toUser.accountType
+          };
+        }
+        
+        return {
+          ...payment,
+          fromUserDetails,
+          toUserDetails
+        };
+      }));
+      
+      return enrichedPayments;
     } catch (err) {
       throw err;
     }
