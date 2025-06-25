@@ -17,16 +17,27 @@ class PaymentService {
     } catch (err) {
       throw err;
     }
-  }
-  async getPaymentsByUser(userId) {
+  }  async getPaymentsByUser(userId) {
     try {
-      // First find the user to get their userIdSeq
-      const user = await User.findOne({ userId }).select('userIdSeq');
-      if (!user) {
-        return []; // Return empty array if user not found
+      let numericUserId;
+      
+      // Handle both numeric userIdSeq and full userId string
+      if (typeof userId === 'number') {
+        numericUserId = userId;
+      } else if (typeof userId === 'string') {
+        if (userId.includes('-')) {
+          // Extract userIdSeq from full userId (e.g., "USER-1000" -> 1000)
+          numericUserId = parseInt(userId.split('-')[1]);
+        } else {
+          // Parse string number
+          numericUserId = parseInt(userId);
+        }
+      } else {
+        return []; // Return empty array if invalid format
       }
       
-      const numericUserId = user.userIdSeq;
+      console.log('Looking for payments with userIdSeq:', numericUserId);
+      
       const payments = await Payment.find({
         $or: [
           { fromUser: numericUserId },
@@ -34,8 +45,11 @@ class PaymentService {
         ]
       }).sort({ createdAt: -1 });
       
+      console.log('Found payments:', payments?.length || 0);
+      
       return payments || [];
     } catch (err) {
+      console.error('Error in getPaymentsByUser:', err);
       throw err;
     }
   }

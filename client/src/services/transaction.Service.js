@@ -157,11 +157,10 @@ class TransactionService {
       if (accessToken) {
         config.headers = {
           'Authorization': `Bearer ${accessToken}`
-        };
-      }
+        };      }
 
       // Convert string userId to number for the API
-      const numericUserId = userId.includes('-') ? userId : userId;
+      const numericUserId = typeof userId === 'string' && userId.includes('-') ? userId : userId;
       
       const response = await api.get(`/payments/user-payments/${numericUserId}`, config);
 

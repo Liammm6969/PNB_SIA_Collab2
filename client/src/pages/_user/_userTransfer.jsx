@@ -104,30 +104,41 @@ const _userTransfer = () => {
       setLoadingTransfers(true);
       const userData = UserService.getUserData();
       if (userData.userId) {
-        // Get real recent transfers from backend
-        const userIdSeq = userData.userId.includes('-') 
-          ? userData.userId.split('-')[1] 
-          : userData.userId;
+        // Get userIdSeq - handle both string and numeric IDs
+        let userIdSeq;
+        if (typeof userData.userId === 'string' && userData.userId.includes('-')) {
+          userIdSeq = parseInt(userData.userId.split('-')[1]);
+        } else {
+          userIdSeq = parseInt(userData.userId);
+        }
+          console.log('Loading transfers for userIdSeq:', userIdSeq);
         
         const realTransfers = await TransactionService.getUserPayments(userIdSeq, { limit: 10 });
+        console.log('Raw transfers from backend:', realTransfers);
+        
+        if (!realTransfers || realTransfers.length === 0) {
+          console.log('No transfers found for user:', userIdSeq);
+          setRecentTransfers([]);
+          return;
+        }
         
         // Transform backend data and enhance with recipient info
         const transformedTransfers = await Promise.all(
           realTransfers
-            .filter(transfer => transfer.fromUser == userIdSeq) // Only outgoing transfers
+            .filter(transfer => parseInt(transfer.fromUser) === userIdSeq) // Only outgoing transfers
             .map(async (transfer) => {
-              let recipientName = 'Unknown Recipient';
+              let recipientName = transfer.details || 'Unknown Recipient';
               let recipientAccount = 'N/A';
               
               try {
                 // Try to get recipient details from user records
                 const recipientUser = await UserService.getUserByUserIdSeq(transfer.toUser);
                 if (recipientUser) {
-                  recipientName = recipientUser.displayName?.fullName || 'Unknown User';
+                  recipientName = recipientUser.displayName?.fullName || recipientUser.firstName + ' ' + recipientUser.lastName || recipientUser.businessName || 'Unknown User';
                   recipientAccount = recipientUser.accountNumber || 'N/A';
                 }
               } catch (err) {
-                console.warn('Could not fetch recipient details:', err);
+                console.warn('Could not fetch recipient details for user:', transfer.toUser, err);
               }
               
               return {
@@ -141,6 +152,7 @@ const _userTransfer = () => {
             })
         );
         
+        console.log('Transformed transfers:', transformedTransfers);
         setRecentTransfers(transformedTransfers);
       }
     } catch (err) {
