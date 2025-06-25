@@ -5,19 +5,20 @@ const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, 
 const { addStaffSchema,
   validateStaffIdSchema, } = require("../schema/index.js");
 
+  router.use(verifyAccessToken);
 
-router.post('/login', staffController.loginStaff);
+router.post('/login', ValidateRequestBodyMiddleware(loginStaffSchema), staffController.loginStaff);
 
-router.post('/', staffController.createStaff);
+router.post('/', ValidateRequestBodyMiddleware(addStaffSchema), staffController.createStaff);
 
-router.get('/:staffId', staffController.getStaffById);
+router.get('/:staffId', ValidateRequestRouteParameterMiddleware(validateStaffIdSchema), staffController.getStaffById);
 
-router.put('/:staffId', staffController.updateStaff);
+router.put('/:staffId', ValidateRequestRouteParameterMiddleware(validateStaffIdSchema), ValidateRequestBodyMiddleware(addStaffSchema), staffController.updateStaff);
 
-router.delete('/:staffId', staffController.deleteStaff);
+router.delete('/:staffId', ValidateRequestRouteParameterMiddleware(validateStaffIdSchema), staffController.deleteStaff);
 
 router.get('/', staffController.getAllStaff);
 
-router.get('/department/:department', staffController.getStaffByDepartment);
+router.get('/department/:department',  staffController.getStaffByDepartment);
 
 module.exports = router;
