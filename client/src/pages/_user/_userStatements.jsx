@@ -304,88 +304,52 @@ const _userStatements = () => {
         </Button>
       </div>
 
-      {/* Statements Table */}
-      <div className="statements-table mb-4">
-        <div className="table-responsive">
-          <Table hover className="mb-0">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Balance</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-5">
-                    <FileEarmarkText size={48} className="text-muted mb-3" />
-                    <h5 className="text-muted">No transactions found</h5>
-                    <p className="text-muted">Try adjusting your filters or date range</p>
-                  </td>
-                </tr>
-              ) : (
-                currentItems.map((statement) => (
-                  <tr key={statement.id} className="fade-in-row">
-                    <td>
-                      <div className="d-flex align-items-center">
-                        {getTransactionIcon(statement.type)}
-                        <div className="ms-2">
-                          <div className="small fw-bold">
-                            {TransactionService.formatDate(statement.date)}
-                          </div>
-                          <div className="text-muted small">
-                            {statement.reference}
-                          </div>
-                        </div>
+      {/* Statements Table (replaced with card list) */}
+      <div className="transactions-card mb-4">
+        <div className="transactions-header">
+          <h5 className="transactions-title">All Transactions</h5>
+        </div>
+        <div className="transactions-content">
+          {currentItems.length === 0 ? (
+            <div className="empty-transactions">
+              <FileEarmarkText size={48} className="empty-icon" />
+              <h6 className="empty-title">No Transactions Found</h6>
+              <p className="empty-subtitle">Your transaction history will appear here</p>
+            </div>
+          ) : (
+            <div className="transactions-list">
+              {currentItems.map((statement) => (
+                <div key={statement.id} className="transaction-item">
+                  <div className="transaction-icon">
+                    {getTransactionIcon(statement.type)}
+                  </div>
+                  <div className="transaction-details">
+                    <div className="transaction-main">
+                      <h6 className="transaction-description">{statement.description}</h6>
+                      <div className="transaction-meta">
+                        <span className="transaction-date">
+                          {TransactionService.formatDate(statement.date)}
+                        </span>
+                        <span className="transaction-separator">•</span>
+                        <span className="transaction-type text-capitalize">
+                          {statement.type}
+                        </span>
                       </div>
-                    </td>
-                    <td>
-                      <div>
-                        <div className="fw-bold">{statement.description}</div>
-                        <div className="text-muted small">{statement.category}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <Badge bg="secondary" className="text-capitalize">
-                        {statement.type}
-                      </Badge>
-                    </td>
-                    <td>
-                      <span className={`fw-bold ${statement.amount > 0 ? 'text-credit' : 'text-debit'}`}>
-                        {statement.amount > 0 ? '+' : ''}
-                        {TransactionService.formatCurrency(Math.abs(statement.amount))}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="fw-bold">
-                        {TransactionService.formatCurrency(statement.balance)}
-                      </span>
-                    </td>
-                    <td>
-                      <Badge bg={TransactionService.getStatusColorClass(statement.status)}>
+                    </div>
+                    <div className="transaction-amount-section">
+                      <span className={`transaction-amount ${statement.amount > 0 ? 'success' : 'danger'}`}>{statement.amount > 0 ? '+' : ''}{TransactionService.formatCurrency(Math.abs(statement.amount))}</span>
+                      <Badge bg={TransactionService.getStatusColorClass(statement.status)} className="transaction-status">
                         {statement.status}
                       </Badge>
-                    </td>
-                    <td>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => handleViewDetails(statement)}
-                      >
-                        <Eye size={14} className="me-1" />
-                        View
+                      <Button variant="outline-primary" size="sm" onClick={() => handleViewDetails(statement)} className="ms-2">
+                        <Eye size={14} className="me-1" /> View
                       </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </Table>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         {/* Pagination */}
         {totalPages > 1 && (
