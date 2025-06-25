@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { Transaction, User,Payment } = require("../models/index.js");
 const { TransactionNotFoundError, UserNotFoundError } = require("../errors/index.js");
 class TransactionService {
@@ -114,24 +115,35 @@ class TransactionService {
     }
   }
 
-
   async transferMoney(transferData) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
       const { fromUser, toUser, amount, details } = transferData;
       console.log(transferData);
-      const senderDoc = await User.findOne({ userId: fromUser }).session(session);
-      const receiverDoc = await User.findOne({ userId: toUser }).session(session);
+      
+      // Search by either userId or accountNumber
+      const senderDoc = await User.findOne({ 
+        $or: [
+          { userId: fromUser },
+          { accountNumber: fromUser }
+        ]
+      }).session(session);
+      
+      const receiverDoc = await User.findOne({ 
+        $or: [
+          { userId: toUser },
+          { accountNumber: toUser }
+        ]
+      }).session(session);
+      
       if (!receiverDoc) throw new Error('Receiver not found');
-
       if (!senderDoc) throw new Error('Sender not found');
-
       if (senderDoc.balance < amount) throw new Error('Sender does not have enough balance');
 
-
+      // Use the actual _id for updates to ensure we update the correct user
       const sender = await User.findOneAndUpdate({
-        userId: fromUser,
+        _id: senderDoc._id,
         balance: { $gte: amount }
       }, {
         $inc: { balance: -amount }
@@ -141,15 +153,12 @@ class TransactionService {
       });
 
       await User.findOneAndUpdate(
-        { userId: toUser },
+        { _id: receiverDoc._id },
         { $inc: { balance: amount } },
         { new: true, session }
-      );
-
-
-      const payment = new Payment({
-        fromUser,
-        toUser,
+      );      const payment = new Payment({
+        fromUser: senderDoc.userIdSeq,
+        toUser: receiverDoc.userIdSeq,
         amount,
         details,
         balanceAfterPayment: sender.balance
@@ -159,10 +168,9 @@ class TransactionService {
       return {
         message: 'Transfer successful',
         payment
-      };
-    } catch (err) {
+      };    } catch (err) {
       await session.abortTransaction();
-      return err;
+      throw err;
     } finally {
       session.endSession();
     }

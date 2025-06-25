@@ -84,8 +84,9 @@ exports.withdrawMoney = async (req, res) => {
 
 exports.transferMoney = async (req, res) => {
   try {
-    const { fromUser, toUser, amount, details, recipientType, identifier } = req.body;
-    const transaction = await TransactionService.transferMoney(fromUser, toUser, amount, details, recipientType, identifier);
+    const { fromUser, toUser, amount, details } = req.body;
+    const transferData = { fromUser, toUser, amount, details };
+    const transaction = await TransactionService.transferMoney(transferData);
     res.status(StatusCodes.CREATED).json(transaction);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
