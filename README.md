@@ -94,27 +94,6 @@
 | 🔄 **Pull Requests** | [View PRs](https://github.com/Buchi-dev/PNB_SIA_Collab/pulls) | Code reviews |
 | 📊 **Insights** | [Repository Insights](https://github.com/Buchi-dev/PNB_SIA_Collab/pulse) | Analytics & metrics |
 
-### 🚀 Quick Repository Commands
-
-```bash
-# Clone the repository
-git clone https://github.com/Buchi-dev/PNB_SIA_Collab.git
-
-# Navigate to project
-cd PNB_SIA_Collab
-
-# Install dependencies
-cd server && npm install
-cd ../client && npm install
-
-# Start the banking system
-# Terminal 1: Backend server
-cd server && npm start    # Runs on http://localhost:4000
-
-# Terminal 2: Frontend client  
-cd client && npm run dev  # Runs on http://localhost:5173
-```
-
 </div>
 
 ---
