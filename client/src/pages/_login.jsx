@@ -109,9 +109,13 @@ function useLoginForm(navigate) {
       }
       setFormData({ identifier: '', password: '' })
     } catch (error) {
+      let errorMsg = error.message || 'Login failed. Please check your credentials.';
+      if (errorMsg.toLowerCase().includes('invalid password')) {
+        errorMsg = 'Incorrect Password';
+      }
       setShowAlert({
         show: true,
-        message: error.message || 'Login failed. Please check your credentials.',
+        message: errorMsg,
         variant: 'error'
       })
     } finally {
@@ -190,18 +194,6 @@ const Login = () => {
           <div className="grid-layout">
             {/* Left side - Branding */}
             <div className="branding-section">
-              <div className="logo-container">
-                <div className="logo-icon">
-                  <div className="logo-badge">
-                    <span className="logo-letter">P</span>
-                  </div>
-                  <div className="logo-glow"></div>
-                </div>
-                <div className="logo-text">
-                  <h1>PNB</h1>
-                  <p>Banking System</p>
-                </div>
-              </div>
               <div className="main-heading">
                 <h2>
                   Banking
@@ -233,19 +225,23 @@ const Login = () => {
             {/* Right side - Login form */}
             <div className="form-section">
               <div className="login-form">
+                {/* Logo above the form header */}
+                <img src="/Logo.png" alt="PNB Logo" className="login-logo" />
                 <div className="form-header">
-                  <h3>Welcome Back</h3>
-                  <p>Access your account securely</p>
-                  {/* Account type detection */}
-                  {detectedType && (
-                    <div className={`account-type-badge ${detectedType}`}>
-                      {detectedType === 'staff' ? (
-                        <><PersonBadge className="account-type-icon" size={16} /> Staff Account Detected</>
-                      ) : (
-                        <><Person className="account-type-icon" size={16} /> Customer Account Detected</>
-                      )}
-                    </div>
-                  )}
+                  <div className="form-header-centered">
+                    <h3>Welcome Back</h3>
+                    <p>Access your account securely</p>
+                    {/* Account type detection */}
+                    {detectedType && (
+                      <div className={`account-type-badge ${detectedType}`}>
+                        {detectedType === 'staff' ? (
+                          <><PersonBadge className="account-type-icon" size={16} /> Staff Account Detected</>
+                        ) : (
+                          <><Person className="account-type-icon" size={16} /> Customer Account Detected</>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {/* Alert */}
                 <Alert

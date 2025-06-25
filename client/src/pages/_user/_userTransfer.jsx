@@ -20,12 +20,21 @@ import {
   CheckCircle,
   XCircle,
   Star,
-  StarFill
+  StarFill,
+  Send,
+  CreditCard,
+  Check,
+  Plus,
+  Repeat,
+  Search,
+  X,
+  ArrowRight
 } from 'react-bootstrap-icons';
 import UserService from '../../services/user.Service';
 import TransferService from '../../services/transfer.Service';
 import TransactionService from '../../services/transaction.Service';
 import BeneficiaryService from '../../services/beneficiary.Service';
+import '../../styles/_userTransfer.css';
 
 const _userTransfer = () => {
   const [formData, setFormData] = useState({
@@ -41,17 +50,22 @@ const _userTransfer = () => {
   const [loading, setLoading] = useState(false);
   const [validatingRecipient, setValidatingRecipient] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [recentTransfers, setRecentTransfers] = useState([]);
   const [loadingBeneficiaries, setLoadingBeneficiaries] = useState(false);
   const [loadingTransfers, setLoadingTransfers] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('beneficiaries');
 
   useEffect(() => {
     loadUserData();
     loadBeneficiaries();
     loadRecentTransfers();
-  }, []);  const loadUserData = async () => {
+  }, []);
+
+  const loadUserData = async () => {
     try {
       const userData = UserService.getUserData();
       if (!userData.userId) {
@@ -71,7 +85,9 @@ const _userTransfer = () => {
     } catch (err) {
       setError(err.message || 'Failed to load user data');
     }
-  };  const loadBeneficiaries = async () => {
+  };
+
+  const loadBeneficiaries = async () => {
     try {
       setLoadingBeneficiaries(true);
       const userData = UserService.getUserData();
@@ -99,7 +115,9 @@ const _userTransfer = () => {
     } finally {
       setLoadingBeneficiaries(false);
     }
-  };  const loadRecentTransfers = async () => {
+  };
+
+  const loadRecentTransfers = async () => {
     try {
       setLoadingTransfers(true);
       const userData = UserService.getUserData();
@@ -175,7 +193,9 @@ const _userTransfer = () => {
     if (name === 'recipientAccount') {
       setRecipient(null);
     }
-  };  const validateRecipient = async () => {
+  };
+
+  const validateRecipient = async () => {
     if (!formData.recipientAccount) return;
 
     const validation = TransferService.validateAccountNumber(formData.recipientAccount);
@@ -232,7 +252,9 @@ const _userTransfer = () => {
     }
 
     setShowConfirmModal(true);
-  };  const confirmTransfer = async () => {
+  };
+
+  const confirmTransfer = async () => {
     try {
       setLoading(true);
       setShowConfirmModal(false);
@@ -305,6 +327,7 @@ const _userTransfer = () => {
       setLoading(false);
     }
   };
+
   const selectBeneficiary = (beneficiary) => {
     setFormData(prev => ({
       ...prev,
@@ -317,6 +340,7 @@ const _userTransfer = () => {
       isActive: true
     });
   };
+
   const toggleBeneficiaryFavorite = async (beneficiaryId, currentFavorite) => {
     try {
       await BeneficiaryService.toggleFavorite(beneficiaryId, !currentFavorite);
@@ -362,363 +386,310 @@ const _userTransfer = () => {
     return formatted;
   };
 
+  const filteredBeneficiaries = beneficiaries.filter(b => 
+    b.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    b.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <Container fluid className="py-4">
-      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
-      {success && <Alert variant="success" className="mb-4">{success}</Alert>}
-
-      <Row>
-        {/* Transfer Form */}
-        <Col lg={8}>
-          <Card className="glass-card mb-4">
-            <Card.Header className="bg-transparent border-0">
-              <div className="d-flex align-items-center">
-                <ArrowUpRight className="text-primary me-2" size={24} />
-                <h5 className="mb-0">Send Money</h5>
-              </div>
-            </Card.Header>
-            <Card.Body>
-              <Form onSubmit={handleSubmit}>
-                <Row>
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Recipient Account Number</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="recipientAccount"
-                        value={formData.recipientAccount}
-                        onChange={(e) => {
-                          const formatted = formatAccountNumberInput(e.target.value);
-                          handleInputChange({
-                            target: { name: 'recipientAccount', value: formatted }
-                          });
-                        }}
-                        onBlur={validateRecipient}
-                        placeholder="XXX-XXXX-XXX-XXXX"
-                        className="glass-input"
-                        maxLength="17"
-                        required
-                      />
-                      {validatingRecipient && (
-                        <div className="mt-2">
-                          <Spinner size="sm" className="me-2" />
-                          <small className="text-muted">Validating recipient...</small>
-                        </div>
-                      )}
-                      {recipient && (
-                        <div className="mt-2 p-2 bg-light rounded">
-                          <div className="d-flex align-items-center">
-                            <PersonCheck className="text-success me-2" />
-                            <div>
-                              <strong>{recipient.name}</strong>
-                              <div className="text-muted small">
-                                {recipient.accountNumber} • {recipient.accountType}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Amount</Form.Label>
-                      <Form.Control
-                        type="number"
-                        name="amount"
-                        value={formData.amount}
-                        onChange={handleInputChange}
-                        placeholder="0.00"
-                        className="glass-input"
-                        min="1"
-                        step="0.01"
-                        required
-                      />
-                      <Form.Text className="text-muted">
-                        Available balance: {TransactionService.formatCurrency(balance)}
-                      </Form.Text>
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Description (Optional)</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder="What's this transfer for?"
-                    className="glass-input"
+    <div className="transfer-outer">
+      <div className="transfer-center">
+        <div className="transfer-main-card">
+          <div className="transfer-header">
+            <h1 className="transfer-title">Send Money</h1>
+            <p className="transfer-subtitle">Transfer funds instantly to anyone, anywhere</p>
+          </div>
+          <div className="transfer-balance-card">
+            <div className="balance-info">
+              <p className="balance-label">Available Balance</p>
+              <p className="balance-amount">₱{balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+            </div>
+            <div className="balance-icon">
+              <CreditCard className="icon-lg" />
+            </div>
+          </div>
+          <div className="transfer-main-row">
+            <form className="transfer-form" onSubmit={handleSubmit} autoComplete="off">
+              {/* Recipient Section */}
+              <div className="form-section">
+                <label className="form-label" htmlFor="recipientAccount">Recipient Account Number</label>
+                <div className="input-icon-group">
+                  <input
+                    type="text"
+                    id="recipientAccount"
+                    name="recipientAccount"
+                    value={formData.recipientAccount}
+                    onChange={(e) => {
+                      const formatted = formatAccountNumberInput(e.target.value);
+                      handleInputChange({ target: { name: 'recipientAccount', value: formatted } });
+                    }}
+                    onBlur={validateRecipient}
+                    placeholder="XXX-XXXX-XXX-XXXX"
+                    className="transfer-input"
+                    maxLength="17"
+                    autoComplete="off"
                   />
-                </Form.Group>
+                  <span className="input-icon"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/><path d="M4.5 19.5a7.5 7.5 0 0115 0v.25a.25.25 0 01-.25.25h-14.5a.25.25 0 01-.25-.25V19.5z"/></svg></span>
+                </div>
+                {recipient && (
+                  <div className="recipient-info">
+                    <div className="recipient-avatar"><Check className="icon-md" /></div>
+                    <div>
+                      <p className="recipient-name">{recipient.name}</p>
+                      <p className="recipient-details">{recipient.accountNumber} • {recipient.accountType}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                <Form.Check
+              {/* Amount Section */}
+              <div className="form-section">
+                <label className="form-label" htmlFor="amount">Amount</label>
+                <div className="input-icon-group">
+                  <span className="input-prefix">₱</span>
+                  <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleInputChange}
+                    placeholder="0.00"
+                    className="transfer-input input-amount"
+                    min="1"
+                    step="0.01"
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="form-section">
+                <label className="form-label" htmlFor="description">Description (Optional)</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="What's this transfer for?"
+                  rows={3}
+                  className="transfer-input textarea"
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* Save as Beneficiary */}
+              <div className="form-checkbox-group">
+                <input
                   type="checkbox"
+                  id="saveAsBeneficiary"
                   name="saveAsBeneficiary"
                   checked={formData.saveAsBeneficiary}
                   onChange={handleInputChange}
-                  label="Save as beneficiary for future transfers"
-                  className="mb-3"
+                  className="checkbox"
                 />
+                <label className="checkbox-label" htmlFor="saveAsBeneficiary">
+                  Save as beneficiary for future transfers
+                </label>
+              </div>
 
-                {formData.saveAsBeneficiary && (
-                  <Form.Group className="mb-3">
-                    <Form.Label>Beneficiary Nickname</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="beneficiaryNickname"
-                      value={formData.beneficiaryNickname}
-                      onChange={handleInputChange}
-                      placeholder="e.g., John, Mom, Work Account"
-                      className="glass-input"
-                    />
-                  </Form.Group>
+              {formData.saveAsBeneficiary && (
+                <div className="form-section">
+                  <input
+                    type="text"
+                    name="beneficiaryNickname"
+                    value={formData.beneficiaryNickname}
+                    onChange={handleInputChange}
+                    placeholder="e.g., John, Mom, Work Account"
+                    className="transfer-input"
+                    autoComplete="off"
+                  />
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="form-actions">
+                <button
+                  type="submit"
+                  disabled={!recipient || !formData.amount}
+                  className="btn-primary"
+                >
+                  <Send className="icon-lg" />
+                  <span>Send Money</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData({
+                      recipientAccount: '',
+                      amount: '',
+                      description: '',
+                      saveAsBeneficiary: false,
+                      beneficiaryNickname: ''
+                    });
+                    setRecipient(null);
+                  }}
+                  className="btn-secondary"
+                >
+                  Clear
+                </button>
+              </div>
+            </form>
+            <div className="transfer-sidebar">
+              <div className="sidebar-tabs">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('beneficiaries')}
+                  className={`sidebar-tab${activeTab === 'beneficiaries' ? ' active' : ''}`}
+                >
+                  Beneficiaries
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('recent')}
+                  className={`sidebar-tab${activeTab === 'recent' ? ' active' : ''}`}
+                >
+                  Recent
+                </button>
+              </div>
+              <div className="sidebar-content">
+                {activeTab === 'beneficiaries' && (
+                  <div>
+                    <div className="sidebar-search">
+                      <span className="sidebar-search-icon"><Search /></span>
+                      <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        placeholder="Search beneficiaries..."
+                        className="sidebar-search-input"
+                      />
+                    </div>
+                    <div className="sidebar-list">
+                      {filteredBeneficiaries.length === 0 ? (
+                        <div className="sidebar-empty">
+                          <span className="sidebar-empty-icon"><svg width="48" height="48" fill="none" stroke="#cbd5e1" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/><path d="M4.5 19.5a7.5 7.5 0 0115 0v.25a.25.25 0 01-.25.25h-14.5a.25.25 0 01-.25-.25V19.5z"/></svg></span>
+                          <p>No beneficiaries found</p>
+                        </div>
+                      ) : (
+                        filteredBeneficiaries.map((beneficiary) => (
+                          <div
+                            key={beneficiary.id}
+                            onClick={() => selectBeneficiary(beneficiary)}
+                            className="sidebar-list-item"
+                          >
+                            <div className="sidebar-list-item-main">
+                              <div className="sidebar-avatar">{beneficiary.nickname.charAt(0)}</div>
+                              <div>
+                                <div className="sidebar-list-item-title">
+                                  <span>{beneficiary.nickname}</span>
+                                  {beneficiary.isFavorite && <StarFill className="sidebar-favorite" />}
+                                </div>
+                                <span className="sidebar-list-item-account">{beneficiary.accountNumber}</span>
+                              </div>
+                            </div>
+                            <ArrowRight className="sidebar-list-arrow" />
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 )}
-
-                <div className="d-flex gap-3">
-                  <Button 
-                    type="submit" 
-                    variant="primary" 
-                    disabled={loading || !recipient}
-                    className="flex-grow-1"
-                  >
-                    {loading ? (
-                      <>
-                        <Spinner size="sm" className="me-2" />
-                        Processing...
-                      </>
+                {activeTab === 'recent' && (
+                  <div className="sidebar-list">
+                    {recentTransfers.length === 0 ? (
+                      <div className="sidebar-empty">
+                        <span className="sidebar-empty-icon"><svg width="48" height="48" fill="none" stroke="#cbd5e1" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+                        <p>No recent transfers</p>
+                      </div>
                     ) : (
-                      <>
-                        <ArrowUpRight className="me-2" />
-                        Send Money
-                      </>
-                    )}
-                  </Button>
-                  <Button 
-                    type="button" 
-                    variant="outline-secondary"
-                    onClick={() => {
-                      setFormData({
-                        recipientAccount: '',
-                        amount: '',
-                        description: '',
-                        saveAsBeneficiary: false,
-                        beneficiaryNickname: ''
-                      });
-                      setRecipient(null);
-                      setError('');
-                      setSuccess('');
-                    }}
-                  >
-                    Clear
-                  </Button>
-                </div>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Sidebar */}
-        <Col lg={4}>
-          {/* Saved Beneficiaries */}
-          <Card className="glass-card mb-4">
-            <Card.Header className="bg-transparent border-0">
-              <h6 className="mb-0">Saved Beneficiaries</h6>
-            </Card.Header>            <Card.Body className="p-0">
-              {loadingBeneficiaries ? (
-                <div className="text-center py-3">
-                  <Spinner size="sm" className="me-2" />
-                  <small className="text-muted">Loading beneficiaries...</small>
-                </div>
-              ) : beneficiaries.length === 0 ? (
-                <div className="text-center py-3">
-                  <p className="text-muted mb-0 small">No saved beneficiaries</p>
-                </div>
-              ) : (
-                <ListGroup variant="flush">
-                  {beneficiaries.slice(0, 5).map((beneficiary) => (
-                    <ListGroup.Item 
-                      key={beneficiary.id}
-                      className="border-0 px-3 py-2 cursor-pointer"
-                      onClick={() => selectBeneficiary(beneficiary)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <div className="d-flex justify-content-between align-items-center">                        <div>
-                          <div className="d-flex align-items-center">
-                            <strong className="small">{beneficiary.nickname}</strong>
+                      recentTransfers.map((transfer) => (
+                        <div key={transfer.id} className="sidebar-list-item">
+                          <div className="sidebar-list-item-main">
+                            <div>
+                              <span className="sidebar-list-item-title">{transfer.recipientName}</span>
+                              <span className="sidebar-list-item-account">{transfer.recipientAccount}</span>
+                              <span className="sidebar-list-item-date">{transfer.date.toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <div className="sidebar-list-item-actions">
+                            <span className="sidebar-list-item-amount">-₱{transfer.amount.toLocaleString()}</span>
+                            <span className="sidebar-list-item-status completed">completed</span>
                             <button
-                              className="btn btn-link p-0 ms-1"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleBeneficiaryFavorite(beneficiary.id, beneficiary.isFavorite);
-                              }}
-                              style={{ border: 'none', background: 'none' }}
+                              type="button"
+                              onClick={() => quickTransferFromRecent(transfer)}
+                              className="sidebar-repeat-btn"
                             >
-                              {beneficiary.isFavorite ? (
-                                <StarFill className="text-warning" size={12} />
-                              ) : (
-                                <Star className="text-muted" size={12} />
-                              )}
+                              <Repeat className="icon-xs" />
                             </button>
                           </div>
-                          <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                            {beneficiary.accountNumber}
-                          </div>
                         </div>
-                        <Button 
-                          variant="outline-primary" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            selectBeneficiary(beneficiary);
-                          }}
-                        >
-                          Select
-                        </Button>
-                      </div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )}
-            </Card.Body>
-          </Card>
-
-          {/* Recent Transfers */}
-          <Card className="glass-card">
-            <Card.Header className="bg-transparent border-0">
-              <h6 className="mb-0">Recent Transfers</h6>
-            </Card.Header>            <Card.Body className="p-0">
-              {loadingTransfers ? (
-                <div className="text-center py-3">
-                  <Spinner size="sm" className="me-2" />
-                  <small className="text-muted">Loading transfers...</small>
-                </div>
-              ) : recentTransfers.length === 0 ? (
-                <div className="text-center py-3">
-                  <p className="text-muted mb-0 small">No recent transfers</p>
-                </div>
-              ) : (
-                <ListGroup variant="flush">
-                  {recentTransfers.slice(0, 5).map((transfer) => (                    <ListGroup.Item key={transfer.id} className="border-0 px-3 py-2">
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div className="flex-grow-1">
-                          <div className="small fw-bold">{transfer.recipientName}</div>
-                          <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                            {transfer.recipientAccount}
-                          </div>
-                          <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                            {TransactionService.formatDate(transfer.date)}
-                          </div>
-                        </div>
-                        <div className="text-end">
-                          <div className="small fw-bold text-danger">
-                            -{TransactionService.formatCurrency(transfer.amount)}
-                          </div>
-                          <Badge bg={TransactionService.getStatusColorClass(transfer.status)} className="small">
-                            {transfer.status}
-                          </Badge>
-                          {transfer.recipientAccount !== 'N/A' && (
-                            <div className="mt-1">
-                              <Button 
-                                variant="outline-primary" 
-                                size="sm"
-                                onClick={() => quickTransferFromRecent(transfer)}
-                                style={{ fontSize: '0.7rem', padding: '2px 6px' }}
-                              >
-                                Repeat
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Confirmation Modal */}
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Transfer</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="text-center mb-4">
-            <ArrowUpRight size={48} className="text-primary mb-3" />
-            <h5>Transfer Summary</h5>
+      {showConfirmModal && (
+        <div className="transfer-modal-overlay">
+          <div className="transfer-modal">
+            <div className="modal-header">
+              <div className="modal-icon"><Send className="icon-lg" /></div>
+              <h3 className="modal-title">Confirm Transfer</h3>
+              <p className="modal-subtitle">Please review your transfer details</p>
+            </div>
+            <div className="modal-details">
+              <div className="modal-details-row">
+                <span className="modal-details-label">To:</span>
+                <div className="modal-details-value">
+                  <span className="modal-details-name">{recipient?.name}</span>
+                  <span className="modal-details-account">{formData.recipientAccount}</span>
+                </div>
+              </div>
+              <div className="modal-details-row">
+                <span className="modal-details-label">Amount:</span>
+                <span className="modal-details-amount">₱{parseFloat(formData.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div className="modal-details-row">
+                <span className="modal-details-label">Fee:</span>
+                <span className="modal-details-fee">Free</span>
+              </div>
+              {formData.description && (
+                <div className="modal-details-row">
+                  <span className="modal-details-label">Note:</span>
+                  <span className="modal-details-note">{formData.description}</span>
+                </div>
+              )}
+            </div>
+            <div className="modal-actions">
+              <button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmTransfer}
+                disabled={loading}
+                className="btn-primary"
+              >
+                {loading ? (
+                  <span className="modal-spinner"></span>
+                ) : (
+                  <Check className="icon-sm" />
+                )}
+                <span>{loading ? 'Processing...' : 'Confirm'}</span>
+              </button>
+            </div>
           </div>
-          
-          <div className="border rounded p-3 mb-3">
-            <Row>
-              <Col xs={4} className="text-muted">To:</Col>
-              <Col xs={8}>
-                <strong>{recipient?.name}</strong><br />
-                <small className="text-muted">{formData.recipientAccount}</small>
-              </Col>
-            </Row>
-            <hr className="my-2" />
-            <Row>
-              <Col xs={4} className="text-muted">Amount:</Col>
-              <Col xs={8}>
-                <strong className="text-primary">
-                  {TransactionService.formatCurrency(parseFloat(formData.amount || 0))}
-                </strong>
-              </Col>
-            </Row>
-            <hr className="my-2" />
-            <Row>
-              <Col xs={4} className="text-muted">Fee:</Col>
-              <Col xs={8}>
-                <strong>₱0.00</strong> <small className="text-success">(Free)</small>
-              </Col>
-            </Row>
-            <hr className="my-2" />
-            <Row>
-              <Col xs={4} className="text-muted">Total:</Col>
-              <Col xs={8}>
-                <strong className="text-primary">
-                  {TransactionService.formatCurrency(parseFloat(formData.amount || 0))}
-                </strong>
-              </Col>
-            </Row>
-            {formData.description && (
-              <>
-                <hr className="my-2" />
-                <Row>
-                  <Col xs={4} className="text-muted">Note:</Col>
-                  <Col xs={8}>{formData.description}</Col>
-                </Row>
-              </>
-            )}
-          </div>
-
-          <Alert variant="info" className="small">
-            <Clock className="me-2" size={16} />
-            This transfer will be processed immediately.
-          </Alert>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setShowConfirmModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={confirmTransfer} disabled={loading}>
-            {loading ? (
-              <>
-                <Spinner size="sm" className="me-2" />
-                Processing...
-              </>
-            ) : (
-              'Confirm Transfer'
-            )}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+        </div>
+      )}
+    </div>
   );
 };
 
