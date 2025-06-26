@@ -435,7 +435,6 @@ const _userDepositRequest = () => {
           <Modal.Body>
             <Form.Group className="mb-4">
               <Form.Label className="form-label">Amount to Deposit</Form.Label>
-              <TextField></TextField>
               <InputGroup className="amount-input">
                 <InputGroup.Text className="currency-symbol">₱</InputGroup.Text>
                 <Form.Control
