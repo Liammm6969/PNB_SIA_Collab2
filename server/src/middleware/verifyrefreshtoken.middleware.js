@@ -13,10 +13,10 @@ const verifyRefreshToken = (req, res, next) => {
 
     const jwtPayload = jsonwebtoken.verify(refreshToken, config.JWT_REFRESH_SECRET);
     req.user = {
-      _id: jwtPayload.id,
-      fullName: jwtPayload.fullName,
+      userId: jwtPayload.userId,
+      firstName: jwtPayload.firstName,
+      lastName: jwtPayload.lastName,
       email: jwtPayload.email,
-      role: jwtPayload.role
     };
     next();
   } catch (error) {
