@@ -5,10 +5,11 @@ const config = require("../lib/config.js");
 function generateAccessToken(user) {
   return jsonwebtoken.sign(
     {
-      id: user.userId,
-      fullName: user.fullName,
+      userId: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
-      role: user.role
+
     },
     config.JWT_SECRET,
     { expiresIn: '1h' }
@@ -18,8 +19,9 @@ function generateAccessToken(user) {
 function generateRefreshToken(user) {
   return jsonwebtoken.sign(
     {
-      id: user.userId,
-      fullName: user.fullName,
+      userId: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       role: user.role
     },
