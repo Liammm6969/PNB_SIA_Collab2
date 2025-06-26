@@ -5,9 +5,11 @@ const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, 
 const { addStaffSchema,
   validateStaffIdSchema, } = require("../schema/index.js");
 
-  router.use(verifyAccessToken);
+  
 
 router.post('/login',  staffController.loginStaff);
+
+// router.use(verifyAccessToken);
 
 router.post('/', ValidateRequestBodyMiddleware(addStaffSchema), staffController.createStaff);
 

@@ -31,7 +31,7 @@ const express = require('express');
 
 const router = express.Router();
 
-router.use(verifyAccessToken);
+// router.use(verifyAccessToken);
 // Create a new payment
 // router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), createPayment);
 

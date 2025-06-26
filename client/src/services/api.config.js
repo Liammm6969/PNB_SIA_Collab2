@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // Base API URL
-const BASE_API_URL = 'http://localhost:4000/api/Philippine-National-Bank';
+const BASE_API_URL = 'http://192.168.9.23:4000/api/Philippine-National-Bank';
 
 // Create Axios instance with default configuration
 const api = axios.create({
@@ -16,7 +16,7 @@ const api = axios.create({
 // Request interceptor to add auth token if available
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('pnb-token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

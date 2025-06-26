@@ -9,24 +9,24 @@ const { registerUserSchema,
 
 
 // Register a new user
-router.post('/register', ValidateRequestBodyMiddleware(registerUserSchema), userController.registerUser);
+// router.post('/register', ValidateRequestBodyMiddleware(registerUserSchema), userController.registerUser);
 
-// router.post('/register', userController.registerUser);
+router.post('/register', userController.registerUser);
 
 // Login user
-router.post('/login', ValidateRequestBodyMiddleware(loginUserSchema), LoginLimiter, userController.loginUser);
+// router.post('/login', ValidateRequestBodyMiddleware(loginUserSchema), LoginLimiter, userController.loginUser);
 
-// router.post('/login', userController.loginUser);
+router.post('/login', userController.loginUser);
 router.post('/verify-otp', userController.verifyOTP);
 
 
-router.use(verifyAccessToken);
+// router.use(verifyAccessToken);
 
 
 // Get user profile by ID
 // router.get('/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), userController.getUserProfile);
 
-router.get('/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), userController.getUserProfile);
+router.get('/:userId',  userController.getUserProfile);
 
 // List all users
 // router.get('/', PermissionMiddleware(Roles.ADMIN, Roles.FINANCE), userController.listUsers);
