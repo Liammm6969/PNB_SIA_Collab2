@@ -13,7 +13,8 @@ const addBeneficiarySchema = require('./beneficiary/add-beneficiary.schema');
 const validateBeneficiaryIdSchema = require('./beneficiary/validate-beneficiary-id.schema');
 const validateAccountNumberSchema = require('./beneficiary/validate-account-number.schema');
 const withdrawSchema = require('./transaction/withdraw.schema');
-
+const addDepositSchema = require('./deposit/add-deposit.schema');
+const depositRequestIdSchema = require('./deposit/validate-deposit-id.schema');
 module.exports = {
   addPaymentSchema,
   addTransactionSchema,
@@ -29,5 +30,7 @@ module.exports = {
   addBeneficiarySchema,
   validateBeneficiaryIdSchema,
   validateAccountNumberSchema,
-  withdrawSchema
+  withdrawSchema,
+  addDepositSchema,
+  depositRequestIdSchema
 };

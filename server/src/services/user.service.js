@@ -46,6 +46,7 @@ class UserService {
   async registerUser(userData) {
     try {
       let { firstName, lastName, businessName, email, password, accountType, balance } = userData;
+
       console.log(userData)
       const existingEmail = await User.findOne({ email });
       if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
@@ -99,7 +100,7 @@ class UserService {
       if (user.isActive) throw new Error("User account is already in use.");
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
-      user.isActive = true;
+
       if (!user.otp) {
         const otp = generateOTP();
         const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
@@ -109,7 +110,7 @@ class UserService {
         await sendOTPEmail(user.email, otp);
         return { message: 'OTP sent to email. Please verify to complete login.' };
       }
-
+      user.isActive = true;
       const { accessToken, refreshToken } = generateTokens(user);
 
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };

@@ -18,14 +18,8 @@ class DepositRequestService {
     try {
       // Get user data
       const user = await User.findOne({ userId });
-      if (!user) {
-        throw new UserNotFoundError('User not found');
-      }
-
-      // Validate amount
-      if (!amount || amount <= 0) throw new Error('Amount must be greater than 0');
+      if (!user) throw new UserNotFoundError('User not found');
       
-
       // Create deposit request
       const depositRequest = new DepositRequest({
         userId: user.userId,
