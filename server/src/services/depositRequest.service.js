@@ -1,6 +1,7 @@
 const { DepositRequest, User, Payment } = require('../models');
 const mongoose = require('mongoose');
 const BankReserveService = require('./bankReserve.service');
+const {UserNotFoundError} = require('../errors');
 
 class DepositRequestService {
   constructor() {
@@ -18,13 +19,12 @@ class DepositRequestService {
       // Get user data
       const user = await User.findOne({ userId });
       if (!user) {
-        throw new Error('User not found');
+        throw new UserNotFoundError('User not found');
       }
 
       // Validate amount
-      if (!amount || amount <= 0) {
-        throw new Error('Amount must be greater than 0');
-      }
+      if (!amount || amount <= 0) throw new Error('Amount must be greater than 0');
+      
 
       // Create deposit request
       const depositRequest = new DepositRequest({
@@ -58,7 +58,7 @@ class DepositRequestService {
       // Get user data
       const user = await User.findOne({ userId });
       if (!user) {
-        throw new Error('User not found');
+        throw new UserNotFoundError('User not found');
       }
 
       // Build query
