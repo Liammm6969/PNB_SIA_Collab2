@@ -12,10 +12,10 @@ const verifyAccessToken = (req, res, next) => {
 
     const jwtPayload = jwt.verify(accessToken, config.JWT_SECRET);
     req.user = {
-      _id: jwtPayload._id,
-      fullName: jwtPayload.fullName,
+      userId: jwtPayload.userId,
+      firstName: jwtPayload.firstName,
+      lastName: jwtPayload.lastName,
       email: jwtPayload.email,
-      role: jwtPayload.role
     };
     next();
   } catch (error) {
