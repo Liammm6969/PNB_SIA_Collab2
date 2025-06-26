@@ -74,3 +74,14 @@ exports.getUserByUserIdSeq = async (req, res) => {
     }
   }
 };
+
+exports.logoutUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    await UserService.logoutUser(userId);
+    res.clearCookie('refreshToken');
+    res.status(StatusCodes.OK).json({ message: 'User logged out successfully' });
+  } catch (err) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+  }
+};

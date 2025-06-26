@@ -22,6 +22,9 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   balance: { type: Number, default: 0 },
   accountNumber: { type: String, unique: true, required: true },
+  otp: { type: String, default: null },
+  otpExpires: { type: Date, default: null },
+  isActive: { type: Boolean, default: true },
 
 },
   { timestamps: true });

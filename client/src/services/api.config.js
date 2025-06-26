@@ -2,13 +2,15 @@
 import axios from 'axios';
 
 // Base API URL
-const BASE_API_URL = 'http://192.168.9.23:4000/api/Philippine-National-Bank';
+const BASE_API_URL = 'http://localhost:4000/api/Philippine-National-Bank';
+// const BASE_API_URL = 'http://192.168.9.23:4000/api/Philippine-National-Bank';
 
 // Create Axios instance with default configuration
 const api = axios.create({
   baseURL: BASE_API_URL,
   headers: {
     'Content-Type': 'application/json',
+    
   },
   timeout: 10000, // 10 second timeout
 });
@@ -18,7 +20,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('pnb-token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
@@ -36,9 +38,9 @@ api.interceptors.response.use(
     // Handle common error scenarios
     if (error.response) {
       // Server responded with error status
-      const errorMessage = error.response.data?.error || 
-                          error.response.data?.message || 
-                          `Request failed with status ${error.response.status}`;
+      const errorMessage = error.response.data?.error ||
+        error.response.data?.message ||
+        `Request failed with status ${error.response.status}`;
       error.message = errorMessage;
     } else if (error.request) {
       // Request was made but no response received

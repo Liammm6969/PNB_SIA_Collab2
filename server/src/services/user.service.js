@@ -11,9 +11,9 @@ function generateAccountNumber() {
   return `${randomatic('0', 3)}-${randomatic('0', 4)}-${randomatic('0', 3)}-${randomatic('0', 4)}`;
 }
 
-// function generateOTP() {
-//   return randomatic('0', 6);
-// }
+function generateOTP() {
+  return randomatic('0', 6);
+}
 
 class UserService {
   constructor() {
@@ -37,33 +37,33 @@ class UserService {
 
   async registerUser(userData) {
     try {
-      let { firstName, lastName, businessName, email, password, accountType, } = userData;
+      let { firstName, lastName, businessName, email, password, accountType, balance } = userData;
       console.log(userData)
       const existingEmail = await User.findOne({ email });
       if (existingEmail) throw new DuplicateUserEmailError('Email already exists');
 
-      // Optional: Check for duplicate business names for business accounts
-      // if (accountType === 'business' && businessName) {
-      //   const existingBusinessName = await User.findOne({ businessName });
-      //   if (existingBusinessName) throw new DuplicateCompanyNameError('Business name already exists');
-      // }
 
-      // const hashedPassword = await bcrypt.hash(password, 10);
+      if (accountType === 'business' && businessName) {
+        const existingBusinessName = await User.findOne({ businessName });
+        if (existingBusinessName) throw new DuplicateCompanyNameError('Business name already exists');
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       let randomAccountNumber;
       let ifAccountNumberExists;
-      // do {
-      //   randomAccountNumber = generateAccountNumber();
-      //   ifAccountNumberExists = await User.findOne({ accountNumber: randomAccountNumber });
-      // } while (ifAccountNumberExists);      // Create user object with conditional fields based on account type
+      do {
+        randomAccountNumber = generateAccountNumber();
+        ifAccountNumberExists = await User.findOne({ accountNumber: randomAccountNumber });
+      } while (ifAccountNumberExists);
 
 
       const userObj = {
         accountType,
         accountNumber: generateAccountNumber(),
         email,
-        // password: hashedPassword,
-        password,
+        password: hashedPassword,
+        balance: balance
       };
 
       // Add appropriate name fields based on account type
@@ -88,41 +88,22 @@ class UserService {
     try {
       const user = await User.findOne({ email });
       if (!user) throw new UserNotFoundError('User not found');
+      if (user.isActive) throw new Error("User account is already in use.");
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
 
-      if(user.isActive ) throw new Error("Ok");
-      // const isMatch = await bcrypt.compare(password, user.password);
-      // if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
-      // const otp = generateOTP();
-      // const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-      // user.otp = otp;
-      // user.otpExpires = otpExpires;
-      await user.save();
-      const accessToken = generateAccessToken({
-        userId: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
+      if (!user.otp) {
+        const otp = generateOTP();
+        const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+        user.otp = otp;
+        user.otpExpires = otpExpires;
+        await user.save();
+        await sendOTPEmail(user.email, otp);
+        return { message: 'OTP sent to email. Please verify to complete login.' };
+      }
 
-      });
-      const refreshToken = generateRefreshToken({
-        userId: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
+      return { message: 'User logged in successfully', user: user.toObject() };
 
-      });
-
-      // localStorage.setItem('accessToken', accessToken);
-      // res.cookie('refreshToken', refreshToken, {
-      //   httpOnly: true,
-      //   secure: false,
-      //   sameSite: 'strict',
-      //   maxAge: 7 * 24 * 60 * 60 * 1000
-      // });
-
-      // await sendOTPEmail(user.email, otp);
-      // return { message: 'OTP sent to email. Please verify to complete login.', userId: user.userId };
-      return { message: 'OTP verified. Login successful.', user: user.toObject() };
 
 
     } catch (err) {
@@ -176,17 +157,18 @@ class UserService {
       if (user.otpExpires < new Date()) throw new OTPError('OTP expired. Please login again.');
       user.otp = undefined;
       user.otpExpires = undefined
+
       const accessToken = generateAccessToken({
         userId: user.userId,
-        displayName: user.displayName,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
-        role: user.role,
       });
       const refreshToken = generateRefreshToken({
         userId: user.userId,
-        displayName: user.displayName,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
-        role: user.role,
       });
 
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
@@ -194,6 +176,21 @@ class UserService {
       throw err;
     }
   }
+
+  async logoutUser(userId) {
+    try {
+      const user = await User.findOne({ userId });
+      if (!user) throw new UserNotFoundError('User not found');
+      user.otp = undefined;
+      user.otpExpires = undefined;
+      user.isActive = false; 
+      await user.save();
+      return { message: 'User logged out successfully' };
+    } catch (err) {
+      throw err;
+    }
+  }
+
 }
 
 module.exports = new UserService();

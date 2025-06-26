@@ -23,7 +23,6 @@ function generateRefreshToken(user) {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      role: user.role
     },
     config.JWT_REFRESH_SECRET,
     { expiresIn: '7d' }
@@ -37,5 +36,5 @@ function generateRefreshToken(user) {
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
-  
+
 };
