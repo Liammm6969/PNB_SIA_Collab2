@@ -102,7 +102,20 @@ class UserService {
         return { message: 'OTP sent to email. Please verify to complete login.' };
       }
 
-      return { message: 'User logged in successfully', user: user.toObject() };
+      const accessToken = generateAccessToken({
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      });
+      const refreshToken = generateRefreshToken({
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      });
+
+      return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
 
 
 

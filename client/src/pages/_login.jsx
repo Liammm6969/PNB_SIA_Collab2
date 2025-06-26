@@ -69,6 +69,7 @@ function useLoginForm(navigate) {
           localStorage.setItem('staffFirstName', loginResponse.firstName)
           localStorage.setItem('staffLastName', loginResponse.lastName)
           localStorage.setItem('staffStringId', loginResponse.staffStringId)
+          localStorage.setItem('accessToken', loginResponse.accessToken)
           setShowAlert({
             show: true,
             message: `Welcome ${loginResponse.firstName}! Redirecting to ${loginResponse.department} dashboard...`,
@@ -92,10 +93,12 @@ function useLoginForm(navigate) {
           }, 1500)
         } else {
           throw new Error(result.error)
-        }      } else if (accountType === 'user') {
+        }
+      } else if (accountType === 'user') {
         loginResponse = await UserService.loginUser(formData.identifier, formData.password)
         if (loginResponse.user && loginResponse.user.userId) {
           UserService.setUserData({ userId: loginResponse.user.userId, email: formData.identifier })
+          localStorage.setItem('accessToken',loginResponse.accessToken)
           setShowAlert({
             show: true,
             message: 'Login successful! Redirecting to dashboard...',
@@ -264,15 +267,14 @@ const Login = () => {
                         value={formData.identifier}
                         onChange={handleChange}
                         placeholder="Enter your email or Staff ID"
-                        className={`input ${
-                          errors.identifier
+                        className={`input ${errors.identifier
                             ? 'error'
                             : detectedType
                               ? detectedType === 'staff'
                                 ? 'staff-detected'
                                 : 'user-detected'
                               : ''
-                        }`}
+                          }`}
                       />
                       {errors.identifier && (
                         <p className="error-message">{errors.identifier}</p>
