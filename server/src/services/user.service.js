@@ -22,17 +22,9 @@ class UserService {
     this.getUserProfile = this.getUserProfile.bind(this);
     this.listUsers = this.listUsers.bind(this);
     this.verifyOTP = this.verifyOTP.bind(this);
-  }
-  async businessRegister(userData) {
-    try {
-      let { businessName, email, password, accountType, } = userData;
-      const existingBusinessName = await User.findOne({ businessName });
-      if (existingBusinessName) throw new DuplicateCompanyNameError('Business name already exists');
+    this.logoutUser = this.logoutUser.bind(this);
+    this.getUserByUserIdSeq = this.getUserByUserIdSeq.bind(this);
 
-
-    } catch (error) {
-
-    }
   }
 
   async registerUser(userData) {
@@ -91,7 +83,7 @@ class UserService {
       if (user.isActive) throw new Error("User account is already in use.");
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
-
+      user.isActive = true;
       if (!user.otp) {
         const otp = generateOTP();
         const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
@@ -193,7 +185,7 @@ class UserService {
       if (!user) throw new UserNotFoundError('User not found');
       user.otp = undefined;
       user.otpExpires = undefined;
-      user.isActive = false; 
+      user.isActive = false;
       await user.save();
       return { message: 'User logged out successfully' };
     } catch (err) {

@@ -22,7 +22,7 @@ const {
 
 const {
   ValidateRequestBodyMiddleware,
-  ValidateRequestRouteParameterMiddleware, verifyAccessToken, PermissionMiddleware, ApiLimiterMiddleware
+  ValidateRequestRouteParameterMiddleware, verifyAccessToken, ApiLimiterMiddleware
 } = require('../middleware/index.js');
 const Roles = require('../lib/roles.js');
 const express = require('express');
@@ -31,7 +31,7 @@ const express = require('express');
 
 const router = express.Router();
 
-// router.use(verifyAccessToken);
+router.use(verifyAccessToken);
 // Create a new payment
 // router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addPaymentSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), createPayment);
 

@@ -16,6 +16,7 @@ exports.loginStaff = async (req, res) => {
 exports.createStaff = async (req, res) => {
   try {
     const staff = await StaffService.createStaff(req.body);
+    console.log(req.body);
     res.status(StatusCodes.CREATED).json(staff);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });

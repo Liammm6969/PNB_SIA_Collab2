@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const bankReserveController = require('../controllers/bankReserve.controller');
-
+const { verifyAccessToken } = require('../middleware/index.js');
 // Get current bank reserve
+
+router.use(verifyAccessToken); // Ensure all routes are protected
 router.get('/', bankReserveController.getBankReserve);
 
 // Get bank reserve statistics

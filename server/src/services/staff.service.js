@@ -1,7 +1,10 @@
 const { Staff } = require("../models/index.js");
-const mongoose = require('mongoose');
-
-class StaffService {  constructor() {
+const { generateAccessToken,
+  generateRefreshToken } = require('../lib/jwtmanager.js');
+const { StaffNotFoundError, InvalidPasswordError, DuplicateStaffEmailError } = require('../errors/index.js');
+const bcrypt = require('bcrypt');
+class StaffService {
+  constructor() {
     this.createStaff = this.createStaff.bind(this);
     this.getStaffById = this.getStaffById.bind(this);
     this.getAllStaff = this.getAllStaff.bind(this);
@@ -14,17 +17,20 @@ class StaffService {  constructor() {
   async createStaff(data) {
     const staff = new Staff(data);
 
-    const existingStaff = await Staff.findOne({ staffId: staff.staffId });
-    if (existingStaff) throw new Error(`Staff with ID ${staff.staffId} already exists`);
+    const existingStaff = await Staff.findOne({ email: staff.email });
+    if (existingStaff) throw new DuplicateStaffEmailError(`Staff with email ${staff.email} already exists`);
 
-    await staff.save()
+    const hashedPassword = await bcrypt.hash(staff.password, 10);
+    staff.password = hashedPassword;
+
+    await staff.save();
     return { message: `Staff with ID ${staff.staffId} created successfully`, staffId: staff.staffId };
   }
 
   async getStaffById(staffId) {
     const existingStaff = await Staff.findOne({ staffId: staffId });
 
-    if (!existingStaff) throw new Error(`Staff with ID ${staffId} not found`);
+    if (!existingStaff) throw new StaffNotFoundError(`Staff with ID ${staffId} not found`);
 
 
     return existingStaff;
@@ -32,7 +38,7 @@ class StaffService {  constructor() {
 
   async updateStaff(staffId, data) {
     const existingStaff = await Staff.findOne({ staffId: staffId });
-    if (!existingStaff) throw new Error(`Staff with ID ${staffId} not found`);
+    if (!existingStaff) throw new StaffNotFoundError(`Staff with ID ${staffId} not found`);
 
     const updatedStaff = await Staff.findOneAndUpdate({ staffId: staffId }, data, { new: true });
 
@@ -43,7 +49,7 @@ class StaffService {  constructor() {
     try {
       const existingStaff = await Staff.findOne({ staffId: staffId });
 
-      if (!existingStaff) throw new Error(`Staff with ID ${staffId} not found`);
+      if (!existingStaff) throw new StaffNotFoundError(`Staff with ID ${staffId} not found`);
 
       await Staff.findOneAndDelete({ staffId: staffId });
 
@@ -58,24 +64,42 @@ class StaffService {  constructor() {
   }
   async getStaffByDepartment(department) {
     const staff = await Staff.find({ department });
+    if(!staff) throw new StaffNotFoundError(`No staff found in department ${department}`);
     return staff;
   }
   async loginStaff(staffStringId, password) {
     try {
       const staff = await Staff.findOne({ staffStringId });
-      if (!staff) throw new Error('Staff not found');
-      
-      // For now, simple password comparison (can be enhanced with bcrypt later)
-      if (staff.password !== password) throw new Error('Invalid password');
-      
-      return { 
-        message: 'Login Successful',
+      if (!staff) throw new StaffNotFoundError('Staff not found');
+
+      const isMatch = await bcrypt.compare(password, staff.password);
+      if (!isMatch) throw new InvalidPasswordError('Invalid password');
+      const accessToken = generateAccessToken({
         staffId: staff.staffId,
         staffStringId: staff.staffStringId,
         department: staff.department,
         firstName: staff.firstName,
         lastName: staff.lastName,
         email: staff.email
+      });
+      const refreshToken = generateRefreshToken({
+        staffId: staff.staffId,
+        staffStringId: staff.staffStringId,
+        department: staff.department,
+        firstName: staff.firstName,
+        lastName: staff.lastName,
+        email: staff.email
+      });
+      return {
+        message: 'Login Successful',
+        staffId: staff.staffId,
+        staffStringId: staff.staffStringId,
+        department: staff.department,
+        firstName: staff.firstName,
+        lastName: staff.lastName,
+        email: staff.email,
+        accessToken,
+        refreshToken
       };
     } catch (err) {
       throw err;
