@@ -15,6 +15,22 @@ function generateOTP() {
   return randomatic('0', 6);
 }
 
+function generateTokens(user) {
+  const accessToken = generateAccessToken({
+    userId: user.userId,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+  });
+  const refreshToken = generateRefreshToken({
+    userId: user.userId,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+  });
+  return { accessToken, refreshToken };
+}
+
 class UserService {
   constructor() {
     this.registerUser = this.registerUser.bind(this);
@@ -52,7 +68,7 @@ class UserService {
 
       const userObj = {
         accountType,
-        accountNumber: generateAccountNumber(),
+        accountNumber: randomAccountNumber,
         email,
         password: hashedPassword,
         balance: balance
@@ -94,18 +110,7 @@ class UserService {
         return { message: 'OTP sent to email. Please verify to complete login.' };
       }
 
-      const accessToken = generateAccessToken({
-        userId: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-      });
-      const refreshToken = generateRefreshToken({
-        userId: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-      });
+      const { accessToken, refreshToken } = generateTokens(user);
 
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
     } catch (err) {
@@ -158,20 +163,10 @@ class UserService {
       if (user.otp !== otp) throw new Error('Invalid OTP.');
       if (user.otpExpires < new Date()) throw new OTPError('OTP expired. Please login again.');
       user.otp = undefined;
-      user.otpExpires = undefined
+      user.otpExpires = undefined;
+      await user.save();
 
-      const accessToken = generateAccessToken({
-        userId: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-      });
-      const refreshToken = generateRefreshToken({
-        userId: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-      });
+      const { accessToken, refreshToken } = generateTokens(user);
 
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
     } catch (err) {

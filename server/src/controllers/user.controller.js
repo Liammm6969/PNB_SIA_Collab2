@@ -14,11 +14,10 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { message, user, accessToken, refreshToken } = await UserService.loginUser(email, password);
-
-    res.status(StatusCodes.OK).json({ message, user, accessToken, refreshToken });
+    const result = await UserService.loginUser(email, password);
+    res.status(StatusCodes.OK).json(result);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
   }
 };
 
@@ -29,7 +28,11 @@ exports.getUserProfile = async (req, res) => {
     const user = await UserService.getUserProfile(userId);
     res.status(StatusCodes.OK).json(user);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    if (err.message === 'User not found') {
+      res.status(StatusCodes.NOT_FOUND).json({ error: err.message });
+    } else {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    }
   }
 };
 
@@ -43,20 +46,24 @@ exports.listUsers = async (req, res) => {
   }
 };
 
-
+// Verify OTP
 exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const { message, user, accessToken, refreshToken } = await UserService.verifyOTP(email, otp);
-    res.cookie('refreshToken', refreshToken, {
+    const result = await UserService.verifyOTP(email, otp);
+    res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
-    res.status(200).json({ message, user, accessToken });
+    res.status(StatusCodes.OK).json({
+      message: result.message,
+      user: result.user,
+      accessToken: result.accessToken
+    });
   } catch (err) {
-    res.status(401).json({ error: err.message });
+    res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
   }
 };
 
