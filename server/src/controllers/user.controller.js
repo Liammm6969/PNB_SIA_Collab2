@@ -14,8 +14,9 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { message, userId } = await UserService.loginUser(email, password);
-    res.status(StatusCodes.OK).json({ message, userId });
+    const {message,user} = await UserService.loginUser(email, password);
+
+    res.status(StatusCodes.OK).json({ message, user});
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
   }

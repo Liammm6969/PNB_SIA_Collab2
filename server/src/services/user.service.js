@@ -88,6 +88,8 @@ class UserService {
     try {
       const user = await User.findOne({ email });
       if (!user) throw new UserNotFoundError('User not found');
+
+      if(user.isActive ) throw new Error("Ok");
       // const isMatch = await bcrypt.compare(password, user.password);
       // if (!isMatch) throw new InvalidPasswordError('Invalid password! Please try again.');
       // const otp = generateOTP();
@@ -95,14 +97,38 @@ class UserService {
       // user.otp = otp;
       // user.otpExpires = otpExpires;
       await user.save();
+      const accessToken = generateAccessToken({
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+
+      });
+      const refreshToken = generateRefreshToken({
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+
+      });
+
+      localStorage.setItem('accessToken', accessToken);
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      });
+
       // await sendOTPEmail(user.email, otp);
       // return { message: 'OTP sent to email. Please verify to complete login.', userId: user.userId };
+      return { message: 'OTP verified. Login successful.', user: user.toObject() };
 
-      return { message: 'Login Successful.', userId: user.userId };
+
     } catch (err) {
       throw err;
     }
-  }  async getUserProfile(userId) {
+  } async getUserProfile(userId) {
     try {
       const user = await User.findOne({ userId }).select('-password');
       if (!user) throw new UserNotFoundError('User not found');
