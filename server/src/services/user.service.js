@@ -116,9 +116,6 @@ class UserService {
       });
 
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
-
-
-
     } catch (err) {
       throw err;
     }
