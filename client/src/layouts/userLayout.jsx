@@ -63,8 +63,8 @@ const UserLayout = () => {
       return user.firstName && user.lastName 
         ? `${user.firstName} ${user.lastName}` 
         : 'Personal User'
-    }
-  }
+    }  }
+  
   // Helper function to format account number for display
   const getDisplayAccountNumber = () => {
     if (!user || !user.accountNumber) return '****0000'
@@ -73,6 +73,7 @@ const UserLayout = () => {
     // Show only last 4 digits for security
     return `****${accountNum.slice(-4)}`
   }
+
   const navigationItems = [
     {
       title: "Dashboard",
@@ -88,6 +89,11 @@ const UserLayout = () => {
       title: "Deposit Request",
       path: "/user/deposit-request",
       icon: <PiggyBank className="me-2" />
+    },
+    {
+      title: "Transactions",
+      path: "/user/transactions",
+      icon: <FileText className="me-2" />
     },
     {
       title: "Statements",

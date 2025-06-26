@@ -1,0 +1,315 @@
+/* User Transactions (Ledger) Styles */
+
+.ledger-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ledger-header-content {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ledger-header-icon {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.ledger-header-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ledger-header-actions .btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.ledger-header-actions .btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+/* Summary Cards */
+.summary-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.credit-card {
+  border-left: 4px solid #28a745;
+}
+
+.debit-card {
+  border-left: 4px solid #dc3545;
+}
+
+.balance-card {
+  border-left: 4px solid #007bff;
+}
+
+.entries-card {
+  border-left: 4px solid #17a2b8;
+}
+
+/* Ledger Table */
+.ledger-table {
+  font-size: 14px;
+}
+
+.ledger-table th {
+  background: #343a40 !important;
+  color: white !important;
+  border: none !important;
+  font-weight: 600;
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+}
+
+.ledger-entry {
+  transition: background-color 0.2s ease;
+}
+
+.ledger-entry:hover {
+  background-color: #f8f9fa !important;
+}
+
+.ledger-entry td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+  border-color: #e9ecef;
+}
+
+.date-cell {
+  min-width: 120px;
+}
+
+.description-cell {
+  min-width: 300px;
+}
+
+.amount {
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.amount.credit {
+  color: #28a745;
+}
+
+.amount.debit {
+  color: #dc3545;
+}
+
+.balance-amount {
+  font-family: 'Courier New', monospace;
+  color: #007bff;
+  font-size: 15px;
+}
+
+/* Transaction Type Badges */
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0.4rem 0.6rem;
+}
+
+/* Spinning animation for refresh button */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Modal Styles */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row strong {
+  color: #495057;
+  min-width: 120px;
+  text-align: left;
+}
+
+/* Filter Section */
+.card .card-body {
+  padding: 1.25rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ledger-header-content {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .ledger-header-actions {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  .ledger-table {
+    font-size: 12px;
+  }
+
+  .ledger-table th,
+  .ledger-table td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .description-cell {
+    min-width: 200px;
+  }
+
+  .date-cell {
+    min-width: 80px;
+  }
+
+  .summary-card {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .ledger-header-content {
+    padding: 1rem;
+  }
+
+  .ledger-header-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .summary-card .card-body {
+    padding: 1rem;
+  }
+
+  .summary-card h4 {
+    font-size: 1.1rem;
+  }
+
+  .summary-card h6 {
+    font-size: 0.85rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .ledger-header-actions,
+  .card .card-header,
+  .pagination,
+  .modal,
+  .btn {
+    display: none !important;
+  }
+
+  .ledger-table {
+    font-size: 12px;
+  }
+
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .summary-card {
+    page-break-inside: avoid;
+  }
+}
+
+/* Custom scrollbar for table */
+.table-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Loading states */
+.table-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #6c757d;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+}
+
+.empty-state .empty-icon {
+  opacity: 0.5;
+  margin-bottom: 1rem;
+}
+
+/* Account validation indicators */
+.validation-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.validation-indicator.valid {
+  color: #28a745;
+}
+
+.validation-indicator.invalid {
+  color: #dc3545;
+}

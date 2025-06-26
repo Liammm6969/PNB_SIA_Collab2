@@ -16,7 +16,7 @@ const api = axios.create({
 // Request interceptor to add auth token if available
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('pnb-token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

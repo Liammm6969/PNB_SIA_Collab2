@@ -92,18 +92,19 @@ function useLoginForm(navigate) {
           }, 1500)
         } else {
           throw new Error(result.error)
-        }
-      } else if (accountType === 'user') {
+        }      } else if (accountType === 'user') {
         loginResponse = await UserService.loginUser(formData.identifier, formData.password)
-        if (loginResponse.userId) {
-          UserService.setUserData({ userId: loginResponse.userId, email: formData.identifier })
+        if (loginResponse.user && loginResponse.user.userId) {
+          UserService.setUserData({ userId: loginResponse.user.userId, email: formData.identifier })
+          setShowAlert({
+            show: true,
+            message: 'Login successful! Redirecting to dashboard...',
+            variant: 'success'
+          })
+          setTimeout(() => navigate('/user/dashboard'), 1500)
+        } else {
+          throw new Error('Login failed: Invalid response from server')
         }
-        setShowAlert({
-          show: true,
-          message: 'Login successful! Redirecting to dashboard...',
-          variant: 'success'
-        })
-        setTimeout(() => navigate('/user/dashboard'), 1500)
       } else {
         throw new Error('Unable to determine account type. Please check your credentials.')
       }

@@ -348,6 +348,48 @@ class TransactionService {
       throw error;
     }
   }
+
+  /**
+   * Get user ledger (comprehensive transaction log with running balance)
+   * @param {string} userId - User ID
+   * @param {Object} options - Query options
+   * @param {string} [options.startDate] - Start date filter (YYYY-MM-DD)
+   * @param {string} [options.endDate] - End date filter (YYYY-MM-DD)
+   * @param {string} [options.type] - Transaction type filter
+   * @param {string} [options.search] - Search term for description/reference
+   * @param {number} [options.limit] - Number of entries to fetch
+   * @param {number} [options.offset] - Number of entries to skip
+   * @param {string} [accessToken] - Access token for authentication
+   * @returns {Promise<Object>} Ledger response with entries and summary
+   */
+  static async getUserLedger(userId, options = {}, accessToken = null) {
+    try {
+      const config = {
+        params: {}
+      };
+
+      if (accessToken) {
+        config.headers = {
+          'Authorization': `Bearer ${accessToken}`
+        };
+      }
+
+      // Add query parameters
+      if (options.startDate) config.params.startDate = options.startDate;
+      if (options.endDate) config.params.endDate = options.endDate;
+      if (options.type && options.type !== 'all') config.params.type = options.type;
+      if (options.search) config.params.search = options.search;
+      if (options.limit) config.params.limit = options.limit;
+      if (options.offset) config.params.offset = options.offset;
+
+      const response = await api.get(`/users/${userId}/ledger`, config);
+
+      return response.data;
+    } catch (error) {
+      console.error('Get user ledger error:', error);
+      throw error;
+    }
+  }
 }
 
 export default TransactionService;

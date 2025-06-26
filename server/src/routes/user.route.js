@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require("../controllers/user.controller.js");
+const ledgerController = require("../controllers/ledger.controller.js");
 const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, verifyAccessToken, LoginLimiter, PermissionMiddleware } = require('../middleware/index.js');
 const Roles = require('../lib/roles.js');
 const { registerUserSchema,
@@ -27,6 +28,9 @@ router.post('/verify-otp', userController.verifyOTP);
 // router.get('/:userId', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER, Roles.USER), userController.getUserProfile);
 
 router.get('/:userId',  userController.getUserProfile);
+
+// Get user ledger (comprehensive transaction log)
+router.get('/:userId/ledger', ValidateRequestRouteParameterMiddleware(validateUserIdSchema), ledgerController.getUserLedger);
 
 // List all users
 // router.get('/', PermissionMiddleware(Roles.ADMIN, Roles.FINANCE), userController.listUsers);

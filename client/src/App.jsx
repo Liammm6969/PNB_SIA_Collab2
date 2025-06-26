@@ -10,6 +10,7 @@ import FinanceLayout from './layouts/financeLayout'
 import UserDashboard from './pages/_user/_userDashboard'
 import UserTransfer from './pages/_user/_userTransfer'
 import UserDepositRequest from './pages/_user/_userDepositRequest'
+import UserTransactions from './pages/_user/_userTransactions'
 import UserStatements from './pages/_user/_userStatements'
 import UserProfileSettings from './pages/_user/_userSettings'
 
@@ -26,11 +27,11 @@ const App = () => {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-          {/* User Routes with Layout */}
-        <Route path="/user" element={<UserLayout />}>
+          {/* User Routes with Layout */}        <Route path="/user" element={<UserLayout />}>
           <Route path="dashboard" element={<UserDashboard />} />
           <Route path="transfer" element={ <UserTransfer />} />
           <Route path="deposit-request" element={< UserDepositRequest/>} />
+          <Route path="transactions" element={< UserTransactions/>} />
           <Route path="statements" element={< UserStatements/>} />
           <Route path="profile" element={< UserProfileSettings/>} />
           <Route index element={<Navigate to="dashboard" replace />} />

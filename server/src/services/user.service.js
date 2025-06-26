@@ -112,13 +112,13 @@ class UserService {
 
       });
 
-      localStorage.setItem('accessToken', accessToken);
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-      });
+      // localStorage.setItem('accessToken', accessToken);
+      // res.cookie('refreshToken', refreshToken, {
+      //   httpOnly: true,
+      //   secure: false,
+      //   sameSite: 'strict',
+      //   maxAge: 7 * 24 * 60 * 60 * 1000
+      // });
 
       // await sendOTPEmail(user.email, otp);
       // return { message: 'OTP sent to email. Please verify to complete login.', userId: user.userId };
