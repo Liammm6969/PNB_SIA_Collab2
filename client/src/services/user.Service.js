@@ -54,7 +54,7 @@ class UserService {
    */  static async getUserProfile(userId, accessToken = null) {
     try {
       const config = {};
-      
+
       if (accessToken) {
         config.headers = {
           'Authorization': `Bearer ${accessToken}`
@@ -78,7 +78,7 @@ class UserService {
   static async getUserByUserIdSeq(userIdSeq, accessToken = null) {
     try {
       const config = {};
-      
+
       if (accessToken) {
         config.headers = {
           'Authorization': `Bearer ${accessToken}`
@@ -101,7 +101,7 @@ class UserService {
    */  static async listUsers(accessToken = null) {
     try {
       const config = {};
-      
+
       if (accessToken) {
         config.headers = {
           'Authorization': `Bearer ${accessToken}`
@@ -118,12 +118,25 @@ class UserService {
   }
   /**
    * Logout user by removing stored tokens
-   */  static logout() {
+   */  static async logout() {
+
+    const config = {};
+    const accessToken = localStorage.getItem('accessToken')
+    const userId = localStorage.getItem('userId');
+    if (accessToken) {
+      config.headers = {
+        'Authorization': `Bearer ${accessToken}`
+      };
+    }
+    const response = await api.post(`${USER_ENDPOINT}/logout/${userId}`, config);
+
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userId');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('accountNumber');
-    // Clear any other user-related data from localStorage
+
+
+    return response.data;
   }
   /**
    * Check if user is authenticated
