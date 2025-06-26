@@ -3,7 +3,7 @@ const { StatusCodes } = require("http-status-codes")
 
 const apiLimiterMiddleware = rateLimit({
   windowMs: 60 * 1000, // 60 seconds (1 minute)
-  max: 1,
+  max: 10,
   message: {
     status: StatusCodes.TOO_MANY_REQUESTS,
     error: 'Too many requests, please try again in a minute.'

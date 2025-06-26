@@ -3,7 +3,6 @@ const router = express.Router();
 const userController = require("../controllers/user.controller.js");
 const ledgerController = require("../controllers/ledger.controller.js");
 const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, verifyAccessToken, LoginLimiter, ApiLimiterMiddleware } = require('../middleware/index.js');
-const Roles = require('../lib/roles.js');
 const { registerUserSchema,
   loginUserSchema,
   validateUserIdSchema } = require('../schema/index.js');

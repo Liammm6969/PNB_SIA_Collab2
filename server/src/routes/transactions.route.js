@@ -2,13 +2,12 @@ const express = require('express');
 const router = express.Router();
 const transactionsController = require('../controllers/transactions.controller');
 
-const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, verifyAccessToken, PermissionMiddleware, ApiLimiterMiddleware } = require('../middleware');
+const { ValidateRequestBodyMiddleware, ValidateRequestRouteParameterMiddleware, verifyAccessToken, ApiLimiterMiddleware } = require('../middleware');
 const { addTransactionSchema,
-  validateTransactionIdSchema, validateUserIdSchema, updateTransactionSchema,withdrawSchema } = require('../schema');
-const Roles = require('../lib/roles');
+  validateTransactionIdSchema, validateUserIdSchema, updateTransactionSchema, withdrawSchema } = require('../schema');
 
 
-// router.use(verifyAccessToken);
+router.use(verifyAccessToken);
 // Create a new transaction
 // router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addTransactionSchema), PermissionMiddleware(Roles.ADMIN, Roles.FINANCE, Roles.BUSINESS_OWNER), transactionsController.createTransaction);
 

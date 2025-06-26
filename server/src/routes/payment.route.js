@@ -14,7 +14,6 @@ const {
 
 const {
   addPaymentSchema,
-  transferPaymentSchema,
   validatePaymentIdSchema,
   validateUserIdSchema,
   withdrawSchema,
@@ -24,7 +23,6 @@ const {
   ValidateRequestBodyMiddleware,
   ValidateRequestRouteParameterMiddleware, verifyAccessToken, ApiLimiterMiddleware
 } = require('../middleware/index.js');
-const Roles = require('../lib/roles.js');
 const express = require('express');
 
 

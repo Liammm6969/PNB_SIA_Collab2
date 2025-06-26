@@ -9,7 +9,7 @@ const { addStaffSchema,
 
 router.post('/login', staffController.loginStaff);
 
-// router.use(verifyAccessToken);
+router.use(verifyAccessToken);
 
 router.post('/', ValidateRequestBodyMiddleware(addStaffSchema), staffController.createStaff);
 

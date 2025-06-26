@@ -86,7 +86,11 @@ const registerUserSchema = joi.object({
     'string.base': 'Account type must be a string',
     'any.only': 'Account type must be either personal or business',
     'any.required': 'Account type is required'
-  })
+  }),
+  dateOfBirth: joi.date().less('now').optional().messages({
+    'date.base': 'Date of birth must be a valid date',
+    'date.less': 'Date of birth must be in the past',
+  }),
 
 });
 

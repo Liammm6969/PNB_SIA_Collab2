@@ -20,7 +20,7 @@ const {
 
 
 // Routes are currently open for development - add authentication later
-// router.use(verifyAccessToken);
+router.use(verifyAccessToken);
 
 // Add a new beneficiary
 router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addBeneficiarySchema), beneficiaryController.addBeneficiary);

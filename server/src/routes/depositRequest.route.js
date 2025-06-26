@@ -10,18 +10,19 @@ const {
 } = require('../middleware');
 
 const { 
-  createDepositRequestSchema,
+ 
   approveRejectDepositRequestSchema,
-  validateDepositRequestIdSchema,
-  validateUserIdSchema
-} = require('../schema');
+  depositRequestIdSchema,
+  validateUserIdSchema,
+  addDepositSchema
+} = require('../schema/index.js');
 
 
 // Routes are currently open for development - add authentication later
 router.use(verifyAccessToken);
 
 // Create a new deposit request
-router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(createDepositRequestSchema),  depositRequestController.createDepositRequest);
+router.post('/', ApiLimiterMiddleware, ValidateRequestBodyMiddleware(addDepositSchema),  depositRequestController.createDepositRequest);
 // router.post('/', ApiLimiterMiddleware, depositRequestController.createDepositRequest);
 
 // Get deposit request statistics (for Finance staff)
@@ -37,15 +38,15 @@ router.get('/user/:userId', ValidateRequestRouteParameterMiddleware(validateUser
 // router.get('/user/:userId', depositRequestController.getDepositRequestsByUser);
 
 // Get specific deposit request by ID
-router.get('/:depositRequestId', ValidateRequestRouteParameterMiddleware(validateDepositRequestIdSchema),  depositRequestController.getDepositRequestById);
+router.get('/:depositRequestId', ValidateRequestRouteParameterMiddleware(depositRequestIdSchema),  depositRequestController.getDepositRequestById);
 // router.get('/:depositRequestId', depositRequestController.getDepositRequestById);
 
 // Approve deposit request (Finance staff only)
-router.post('/:depositRequestId/approve', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validateDepositRequestIdSchema), ValidateRequestBodyMiddleware(approveRejectDepositRequestSchema), depositRequestController.approveDepositRequest);
+router.post('/:depositRequestId/approve', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(depositRequestIdSchema), ValidateRequestBodyMiddleware(approveRejectDepositRequestSchema), depositRequestController.approveDepositRequest);
 // router.post('/:depositRequestId/approve', ApiLimiterMiddleware, depositRequestController.approveDepositRequest);
 
 // Reject deposit request (Finance staff only)
-router.post('/:depositRequestId/reject', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(validateDepositRequestIdSchema), ValidateRequestBodyMiddleware(approveRejectDepositRequestSchema),  depositRequestController.rejectDepositRequest);
+router.post('/:depositRequestId/reject', ApiLimiterMiddleware, ValidateRequestRouteParameterMiddleware(depositRequestIdSchema), ValidateRequestBodyMiddleware(approveRejectDepositRequestSchema),  depositRequestController.rejectDepositRequest);
 // router.post('/:depositRequestId/reject', ApiLimiterMiddleware, depositRequestController.rejectDepositRequest);
 
 module.exports = router;
