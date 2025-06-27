@@ -110,7 +110,7 @@ class UserService {
         await sendOTPEmail(user.email, otp);
         return { message: 'OTP sent to email. Please verify to complete login.' };
       }
-      user.isActive = true;
+
       await user.save();
 
       const { accessToken, refreshToken } = generateTokens(user);
@@ -168,6 +168,7 @@ class UserService {
       if (user.otpExpires < new Date()) throw new OTPError('OTP expired. Please login again.');
       user.otp = undefined;
       user.otpExpires = undefined;
+      user.isActive = true;
       await user.save();
 
       const { accessToken, refreshToken } = generateTokens(user);
