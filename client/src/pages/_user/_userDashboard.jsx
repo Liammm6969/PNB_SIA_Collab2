@@ -259,12 +259,12 @@ const _userDashboard = () => {
   return (
     <>
       <WelcomeOverlay show={showWelcome} onClose={() => setShowWelcome(false)} userName={userName} />
-      <div className="dashboard-root">
+      <div className="dashboard-root" style={{background:'linear-gradient(135deg, #f3f6fb 0%, #e9effa 100%)',minHeight:'100vh',paddingBottom:'2rem'}}>
         <Container fluid className="py-4">
           {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
           <Row className="mb-4 g-4 align-items-stretch">
             {/* Bank Card */}
-            <Col lg={4} className="mb-3">
+            <Col lg={4} className="mb-3 d-flex align-items-stretch">
               <div className="bank-card" onClick={handleBankCardClick} style={{ cursor: 'pointer' }}>
                 <div className="bank-card-content">
                   <div className="card-header-section d-flex align-items-center justify-content-between mb-2">
@@ -310,33 +310,42 @@ const _userDashboard = () => {
               </div>
             </Col>
             {/* Quick Actions */}
-            <Col lg={3} md={12} className="mb-3 mb-lg-0">
-              <div className="quick-actions-card glass-card h-100 d-flex flex-column justify-content-between">
-                <h6 className="quick-actions-title mb-3">Quick Actions</h6>
-                <div className="quick-actions-buttons d-flex flex-column gap-3">
+            <Col lg={3} className="mb-3 d-flex align-items-stretch">
+              <div className="quick-actions-card w-100 d-flex flex-column justify-content-between">
+                <div className="quick-actions-header d-flex align-items-center mb-2">
+                  <span className="quick-actions-icon me-2"><Send size={22} color="#1e3a8a"/></span>
+                  <div>
+                    <h6 className="quick-actions-title mb-1">Quick Actions</h6>
+                    <p className="quick-actions-desc mb-0">Access your most used features</p>
+                  </div>
+                </div>
+                <div className="quick-actions-buttons flex-grow-1 d-flex flex-column justify-content-center">
                   <button
-                    className="action-btn primary-action d-flex align-items-center gap-2"
+                    className="action-btn primary-action d-flex align-items-center gap-2 mb-2"
+                    style={{minHeight:'40px',padding:'0.5rem 1rem'}}
                     onClick={handleSendMoney}
                     title="Send money to another account"
                   >
-                    <Send className="action-icon" size={20} />
+                    <Send className="action-icon" size={18} />
                     <span>Send Money</span>
-                    <LucideChevronRight size={18} className="ms-auto" />
+                    <LucideChevronRight size={16} className="ms-auto" />
                   </button>
+                  <div className="quick-actions-divider" style={{height:'1px',background:'#e5e7eb',margin:'0.7rem 0'}}></div>
                   <button
                     className="action-btn secondary-action d-flex align-items-center gap-2"
+                    style={{minHeight:'40px',padding:'0.5rem 1rem'}}
                     onClick={handleAddMoney}
                     title="Add funds to your account"
                   >
-                    <PlusCircle className="action-icon" size={20} />
+                    <PlusCircle className="action-icon" size={18} />
                     <span>Add Money</span>
-                    <LucideChevronRight size={18} className="ms-auto" />
+                    <LucideChevronRight size={16} className="ms-auto" />
                   </button>
                 </div>
               </div>
             </Col>
             {/* Stats with animated counters */}
-            <Col lg={5} md={12}>
+            <Col lg={5} className="mb-3">
               <div className="vertical-stats-cards d-flex flex-column h-100 gap-3">
                 <div className="stat-card income-card glass-card d-flex align-items-center gap-3 p-3">
                   <div className="stat-icon bg-success bg-opacity-10 rounded-circle p-2"><ArrowDownLeft size={28} /></div>
