@@ -64,7 +64,7 @@ function useLoginForm(navigate) {
     setOTPError('')
     alert(formData.identifier)
     try {
-      const result = await UserService.verifyOTP(formData.identifier, otp)
+      const result = await UserService.verifyOTP(localStorage.getItem('userEmail'), otp)
 
       if (result.user && result.user.userId) {
         UserService.setUserData({ userId: result.user.userId, email: formData.identifier })
@@ -132,6 +132,7 @@ function useLoginForm(navigate) {
         }
       } else if (accountType === 'user') {
         loginResponse = await UserService.loginUser(formData.identifier, formData.password)
+        localStorage.setItem('userEmail', formData.identifier)
         alert(formData.identifier)
         setFormData({ identifier: formData.identifier, password: '' })
         if (loginResponse.message && loginResponse.message.toLowerCase().includes('otp')) {
