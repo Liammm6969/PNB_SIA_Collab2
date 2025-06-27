@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Navbar, Nav, Container, Dropdown, Offcanvas } from 'react-bootstrap'
 import { 
-  PersonCircle, 
-  BoxArrowRight, 
+  User2, 
+  LogOut, 
   ArrowLeftRight, 
   FileText, 
-  House,
-  List,
-  PiggyBank
-} from 'react-bootstrap-icons'
+  Home, 
+  Menu, 
+  PiggyBank, 
+  ChevronDown, 
+  UserCog 
+} from 'lucide-react'
 import UserService from '../services/user.Service'
 
 const UserLayout = () => {
@@ -78,27 +80,27 @@ const UserLayout = () => {
     {
       title: "Dashboard",
       path: "/user/dashboard",
-      icon: <House className="me-2" />
+      icon: <Home className="me-2" size={20} />
     },
     {
       title: "Transfer",
       path: "/user/transfer",
-      icon: <ArrowLeftRight className="me-2" />
+      icon: <ArrowLeftRight className="me-2" size={20} />
     },
     {
       title: "Deposit Request",
       path: "/user/deposit-request",
-      icon: <PiggyBank className="me-2" />
+      icon: <PiggyBank className="me-2" size={20} />
     },
     {
       title: "Transactions",
       path: "/user/transactions",
-      icon: <FileText className="me-2" />
+      icon: <FileText className="me-2" size={20} />
     },
     {
       title: "Statements",
       path: "/user/statements",
-      icon: <FileText className="me-2" />
+      icon: <FileText className="me-2" size={20} />
     }
   ]
 
@@ -137,7 +139,7 @@ const UserLayout = () => {
             onClick={() => setShowOffcanvas(true)}
             className="d-lg-none border-0"
           >
-            <List size={24} />
+            <Menu size={24} />
           </Navbar.Toggle>
 
           {/* Brand/Logo */}
@@ -167,11 +169,12 @@ const UserLayout = () => {
           <div className="d-flex align-items-center">
             {/* User Profile Dropdown */}
             <Dropdown><Dropdown.Toggle variant="link" className="user-dropdown d-flex align-items-center text-decoration-none border-0">
-                <PersonCircle size={32} className="me-2" />
+                <User2 size={32} className="me-2" />
                 <div className="d-none d-md-block text-start">
                   <div className="fw-semibold">{getUserDisplayName()}</div>
                   <small className="text-muted">{getDisplayAccountNumber()}</small>
                 </div>
+                <ChevronDown size={18} className="ms-2 d-none d-md-inline" />
               </Dropdown.Toggle>
               <Dropdown.Menu align="end" className="user-dropdown-menu">
                 <Dropdown.Header>
@@ -180,13 +183,13 @@ const UserLayout = () => {
                 </Dropdown.Header>
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={() => navigate('/user/profile')}>
-                  <PersonCircle className="me-2" />
+                  <UserCog className="me-2" size={18} />
                   Profile Settings
                 </Dropdown.Item>
         
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={handleLogout} className="text-danger">
-                  <BoxArrowRight className="me-2" />
+                  <LogOut className="me-2" size={18} />
                   Logout
                 </Dropdown.Item>
               </Dropdown.Menu>

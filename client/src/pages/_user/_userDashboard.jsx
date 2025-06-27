@@ -2,20 +2,56 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { 
-  PersonCircle, 
-  CreditCard2Front, 
   ArrowUpRight, 
   ArrowDownLeft, 
-  Plus,
-  GraphUp,
-  Eye,
-  EyeSlash,
-  CreditCard
-} from 'react-bootstrap-icons';
+  Plus, 
+  Eye, 
+  EyeOff, 
+  CreditCard, 
+  TrendingUp, 
+  User2, 
+  Banknote, 
+  ReceiptText, 
+  Send, 
+  PlusCircle, 
+  ChevronRight, 
+  ArrowRightLeft, 
+  Wallet, 
+  CircleDollarSign, 
+  FileText, 
+  Loader2, 
+  UserCircle, 
+  Info, 
+  Eye as EyeIcon, 
+  ChevronDown, 
+  ChevronUp, 
+  ChevronLeft, 
+  ChevronRight as LucideChevronRight, 
+  Wifi 
+} from 'lucide-react';
 
 import UserService from '../../services/user.Service';
 import TransactionService from '../../services/transaction.Service';
 import '../../styles/userStyles/_userDashboard.css'
+import WelcomeOverlay from '../../components/WelcomeOverlay';
+
+
+function useAnimatedCounter(target, duration = 1000) {
+  const [value, setValue] = React.useState(0);
+  React.useEffect(() => {
+    let start = 0;
+    const startTime = performance.now();
+    function animate(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      setValue(Math.floor(progress * target));
+      if (progress < 1) requestAnimationFrame(animate);
+      else setValue(target);
+    }
+    animate(performance.now());
+  }, [target]);
+  return value;
+}
 
 const _userDashboard = () => {
   const navigate = useNavigate();
@@ -34,9 +70,20 @@ const _userDashboard = () => {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [spotlight, setSpotlight] = useState({ visible: false, x: 0, y: 0 });
   const enlargedCardRef = useRef(null);
+  const [showWelcome, setShowWelcome] = useState(() => localStorage.getItem('showWelcome') === 'true');
+
+  // Animated counters for stats
+  const animatedIncome = useAnimatedCounter(stats.totalIncome);
+  const animatedExpense = useAnimatedCounter(stats.totalExpense);
+  const animatedTransactionCount = useAnimatedCounter(stats.transactionCount);
 
   useEffect(() => {
     loadDashboardData();
+    if (showWelcome) {
+      const timer = setTimeout(() => setShowWelcome(false), 7500);
+      localStorage.removeItem('showWelcome');
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const loadDashboardData = async () => {
@@ -117,7 +164,7 @@ const _userDashboard = () => {
       case 'payment':
         return <ArrowUpRight className="text-warning" />;
       default:
-        return <CreditCard2Front />;
+        return <CreditCard size={32} />;
     }
   };
 
@@ -206,43 +253,207 @@ const _userDashboard = () => {
     );
   }
 
-  return (
-    <div className="dashboard-root">
-      <Container fluid className="py-4">
-        {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
+  // Grand Welcome Overlay JSX
+  const userName = user?.firstName ? `${user.firstName} ${user.lastName}` : user?.businessName || 'User';
 
-        {/* Bank Card, Quick Actions, and Vertical Stats */}
-        <Row className="mb-4">
-          <Col lg={4} className="mb-3">
-            <div className="bank-card" onClick={handleBankCardClick} style={{ cursor: 'pointer' }}>
+  return (
+    <>
+      <WelcomeOverlay show={showWelcome} onClose={() => setShowWelcome(false)} userName={userName} />
+      <div className="dashboard-root">
+        <Container fluid className="py-4">
+          {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
+          <Row className="mb-4 g-4 align-items-stretch">
+            {/* Bank Card */}
+            <Col lg={4} className="mb-3">
+              <div className="bank-card" onClick={handleBankCardClick} style={{ cursor: 'pointer' }}>
+                <div className="bank-card-content">
+                  <div className="card-header-section d-flex align-items-center justify-content-between mb-2">
+                    <div className="d-flex align-items-center">
+                      <CreditCard size={32} className="card-logo" />
+                      <Wifi size={24} className="card-contactless" />
+                    </div>
+                    <div className="card-avatar">
+                      {user?.firstName
+                        ? user.firstName[0] + (user.lastName ? user.lastName[0] : '')
+                        : (user?.businessName ? user.businessName[0] : 'U')}
+                    </div>
+                  </div>
+                  <div className="card-balance-section mb-3">
+                    <div className="balance-label">Current Balance</div>
+                    <div className="balance-display d-flex align-items-center gap-2">
+                      <span className="balance-amount">
+                        {showBalance ? TransactionService.formatCurrency(balance) : '₱ •••••••'}
+                      </span>
+                      <button
+                        className="balance-toggle btn btn-link p-0"
+                        onClick={() => setShowBalance(!showBalance)}
+                      >
+                        {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="card-chip"></div>
+                  <div className="card-details-section d-flex justify-content-between align-items-end">
+                    <div className="account-number">
+                      <span className="detail-label">Account Number</span>
+                      <span className="detail-value">{user?.accountNumber || '•••-••••-•••-••••'}</span>
+
+                    </div>
+                    <div className="account-type">
+                      <span className="detail-label">Account Type</span>
+                      <span className="badge bg-light text-dark account-type-badge">
+                        {user?.accountType || 'Personal'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Col>
+            {/* Quick Actions */}
+            <Col lg={3} md={12} className="mb-3 mb-lg-0">
+              <div className="quick-actions-card glass-card h-100 d-flex flex-column justify-content-between">
+                <h6 className="quick-actions-title mb-3">Quick Actions</h6>
+                <div className="quick-actions-buttons d-flex flex-column gap-3">
+                  <button
+                    className="action-btn primary-action d-flex align-items-center gap-2"
+                    onClick={handleSendMoney}
+                    title="Send money to another account"
+                  >
+                    <Send className="action-icon" size={20} />
+                    <span>Send Money</span>
+                    <LucideChevronRight size={18} className="ms-auto" />
+                  </button>
+                  <button
+                    className="action-btn secondary-action d-flex align-items-center gap-2"
+                    onClick={handleAddMoney}
+                    title="Add funds to your account"
+                  >
+                    <PlusCircle className="action-icon" size={20} />
+                    <span>Add Money</span>
+                    <LucideChevronRight size={18} className="ms-auto" />
+                  </button>
+                </div>
+              </div>
+            </Col>
+            {/* Stats with animated counters */}
+            <Col lg={5} md={12}>
+              <div className="vertical-stats-cards d-flex flex-column h-100 gap-3">
+                <div className="stat-card income-card glass-card d-flex align-items-center gap-3 p-3">
+                  <div className="stat-icon bg-success bg-opacity-10 rounded-circle p-2"><ArrowDownLeft size={28} /></div>
+                  <div className="stat-content">
+                    <div className="stat-amount text-success fw-bold fs-4">
+                      {TransactionService.formatCurrency(animatedIncome)}
+                    </div>
+                    <div className="stat-label">Total Income</div>
+                  </div>
+                </div>
+                <div className="stat-card expense-card glass-card d-flex align-items-center gap-3 p-3">
+                  <div className="stat-icon bg-danger bg-opacity-10 rounded-circle p-2"><ArrowUpRight size={28} /></div>
+                  <div className="stat-content">
+                    <div className="stat-amount text-danger fw-bold fs-4">
+                      {TransactionService.formatCurrency(animatedExpense)}
+                    </div>
+                    <div className="stat-label">Total Expenses</div>
+                  </div>
+                </div>
+                <div className="stat-card transaction-card glass-card d-flex align-items-center gap-3 p-3">
+                  <div className="stat-icon bg-primary bg-opacity-10 rounded-circle p-2"><TrendingUp size={28} /></div>
+                  <div className="stat-content">
+                    <div className="stat-amount fw-bold fs-4">
+                      {animatedTransactionCount}
+                    </div>
+                    <div className="stat-label">Transactions</div>
+                  </div>
+                </div>
+              </div>
+            </Col>
+          </Row>
+          {/* Recent Transactions */}
+          <Row>
+            <Col>
+              <div className="transactions-card glass-card p-4">
+                <div className="transactions-header d-flex align-items-center justify-content-between mb-3">
+                  <h5 className="transactions-title mb-0">Recent Transactions</h5>
+                  <Button variant="link" className="view-all-btn" onClick={handleViewAllTransactions}>
+                    View All <LucideChevronRight size={16} />
+                  </Button>
+                </div>
+                <div className="transactions-content">
+                  {recentTransactions.length === 0 ? (
+                    <div className="empty-transactions text-center py-5">
+                      <Wallet size={48} className="empty-icon mb-3" />
+                      <h6 className="empty-title">No Recent Transactions</h6>
+                      <p className="empty-subtitle">Your transaction history will appear here</p>
+                    </div>
+                  ) : (
+                    <div className="transactions-list">
+                      {recentTransactions.slice(0, 5).map((transaction) => (
+                        <div key={transaction.id} className="transaction-item d-flex align-items-center gap-3 p-3 glass-card mb-2">
+                          <div className="transaction-icon">
+                            {transaction.amount > 0 ? <ArrowDownLeft className="text-success" size={20} /> : <ArrowUpRight className="text-danger" size={20} />}
+                          </div>
+                          <div className="transaction-details flex-grow-1">
+                            <div className="transaction-main d-flex align-items-center justify-content-between">
+                              <h6 className="transaction-description mb-0 fw-semibold">{transaction.description}</h6>
+                              <span className={`transaction-amount fw-bold ${transaction.amount > 0 ? 'text-success' : 'text-danger'}`}>{transaction.amount > 0 ? '+' : '-'}{TransactionService.formatCurrency(Math.abs(transaction.amount))}</span>
+                            </div>
+                            <div className="transaction-meta d-flex align-items-center gap-2 mt-1">
+                              <span className="transaction-date small text-muted">{TransactionService.formatDate(transaction.date)}</span>
+                              <span className="transaction-separator">•</span>
+                              <span className="transaction-type small text-muted">{getTransactionTypeDisplay(transaction.type, transaction.amount)}</span>
+                            </div>
+                          </div>
+                          <span className={`badge rounded-pill px-3 py-2 ${TransactionService.getStatusColorClass(transaction.status)}`}>{transaction.status}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+        {/* Enlarged Card Modal/Overlay */}
+        {showEnlargedCard && (
+          <div className="enlarged-card-modal" onClick={handleCloseEnlargedCard} onMouseMove={handleModalMouseMove} onMouseLeave={() => setTilt({ x: 0, y: 0 })}>
+            <div
+              className="enlarged-bank-card glass-card"
+              ref={enlargedCardRef}
+              style={{
+                transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+              }}
+              onClick={e => e.stopPropagation()}
+              onMouseMove={handleCardMouseMove}
+              onMouseLeave={handleCardMouseLeave}
+            >
+              {/* Spotlight effect */}
+              {spotlight.visible && (
+                <div
+                  className="card-spotlight"
+                  style={{
+                    left: spotlight.x - 150,
+                    top: spotlight.y - 150,
+                  }}
+                />
+              )}
               <div className="bank-card-background">
                 <div className="card-pattern"></div>
               </div>
               <div className="bank-card-content">
-                <div className="card-header-section">
-                  <div className="card-logo">
-                    <CreditCard size={32} />
-                  </div>
-                  <div className="card-type">
-                    <span>DEBIT CARD</span>
-                  </div>
+                <div className="card-header-section d-flex align-items-center justify-content-between mb-2">
+                  <div className="card-logo"><CreditCard size={36} /></div>
+                  <div className="card-type"><span>DEBIT CARD</span></div>
                 </div>
-                <div className="card-balance-section">
+                <div className="card-balance-section mb-3">
                   <div className="balance-label">Current Balance</div>
-                  <div className="balance-display">
+                  <div className="balance-display d-flex align-items-center gap-2">
                     <span className="balance-amount">
                       {showBalance ? TransactionService.formatCurrency(balance) : '₱ •••••••'}
                     </span>
-                    <Button
-                      variant="link"
-                      className="balance-toggle"
-                      onClick={() => setShowBalance(!showBalance)}
-                    >
-                      {showBalance ? <EyeSlash size={20} /> : <Eye size={20} />}
-                    </Button>
                   </div>
                 </div>
-                <div className="card-details-section">
+                <div className="card-chip"></div>
+                <div className="card-details-section d-flex justify-content-between align-items-end">
                   <div className="account-number">
                     <span className="detail-label">Account Number</span>
                     <span className="detail-value">{user?.accountNumber || '•••-••••-•••-••••'}</span>
@@ -250,197 +461,17 @@ const _userDashboard = () => {
                   </div>
                   <div className="account-type">
                     <span className="detail-label">Account Type</span>
-                    <Badge bg="light" text="dark" className="account-type-badge">
+                    <span className="badge bg-light text-dark account-type-badge">
                       {user?.accountType || 'Personal'}
-                    </Badge>
+                    </span>
                   </div>
-                </div>
-              </div>
-            </div>
-          </Col>
-          <Col lg={3} md={12} className="mb-3 mb-lg-0">
-            <div className="quick-actions-card h-100">
-              <h6 className="quick-actions-title">Quick Actions</h6>
-              <div className="quick-actions-buttons">
-                <button 
-                  className="action-btn primary-action"
-                  onClick={handleSendMoney}
-                >
-                  <ArrowUpRight className="action-icon" />
-                  <span>Send Money</span>
-                </button>
-                <button 
-                  className="action-btn secondary-action"
-                  onClick={handleAddMoney}
-                >
-                  <Plus className="action-icon" />
-                  <span>Add Money</span>
-                </button>
-              </div>
-            </div>
-          </Col>
-          <Col lg={5} md={12}>
-            <div className="vertical-stats-cards d-flex flex-column h-100 justify-content-between">
-              <div className="stat-card income-card mb-3">
-                <div className="stat-icon">
-                  <ArrowDownLeft size={32} />
-                </div>
-                <div className="stat-content">
-                  <div className="stat-amount">
-                    {TransactionService.formatCurrency(stats.totalIncome)}
-                  </div>
-                  <div className="stat-label">Total Income</div>
-                </div>
-              </div>
-              <div className="stat-card expense-card mb-3">
-                <div className="stat-icon">
-                  <ArrowUpRight size={32} />
-                </div>
-                <div className="stat-content">
-                  <div className="stat-amount">
-                    {TransactionService.formatCurrency(stats.totalExpense)}
-                  </div>
-                  <div className="stat-label">Total Expenses</div>
-                </div>
-              </div>
-              <div className="stat-card transaction-card">
-                <div className="stat-icon">
-                  <GraphUp size={32} />
-                </div>
-                <div className="stat-content">
-                  <div className="stat-amount">{stats.transactionCount}</div>
-                  <div className="stat-label">Transactions</div>
-                </div>
-              </div>
-            </div>
-          </Col>
-        </Row>
-
-        {/* Recent Transactions */}
-        <Row>
-          <Col>
-            <div className="transactions-card">
-              <div className="transactions-header">
-                <h5 className="transactions-title">Recent Transactions</h5>
-                <Button variant="link" className="view-all-btn" onClick={handleViewAllTransactions}>
-                  View All
-                </Button>
-              </div>
-              <div className="transactions-content">
-                {recentTransactions.length === 0 ? (
-                  <div className="empty-transactions">
-                    <CreditCard2Front size={48} className="empty-icon" />
-                    <h6 className="empty-title">No Recent Transactions</h6>
-                    <p className="empty-subtitle">Your transaction history will appear here</p>
-                  </div>
-                ) : (
-                  <div className="transactions-list">
-                    {recentTransactions.slice(0, 5).map((transaction) => (
-                      <div key={transaction.id} className="transaction-item">
-                        <div className="transaction-icon">
-                          {getTransactionIcon(transaction.type)}
-                        </div>
-                        <div className="transaction-details">
-                          <div className="transaction-main">
-                            <h6 className="transaction-description">{transaction.description}</h6>
-                            <div className="transaction-meta">
-                              <span className="transaction-date">
-                                {TransactionService.formatDate(transaction.date)}
-                              </span>
-                              <span className="transaction-separator">•</span>
-                              <span className="transaction-type">
-                                {getTransactionTypeDisplay(transaction.type, transaction.amount)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="transaction-amount-section">
-                            <span className={`transaction-amount ${getTransactionColor(transaction.amount)}`}>
-                              {transaction.amount > 0 ? '+' : ''}
-                              {TransactionService.formatCurrency(Math.abs(transaction.amount))}
-                            </span>
-                            <Badge 
-                              bg={TransactionService.getStatusColorClass(transaction.status)}
-                              className="transaction-status"
-                            >
-                              {transaction.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-      {/* Enlarged Card Modal/Overlay */}
-      {showEnlargedCard && (
-        <div
-          className="enlarged-card-modal"
-          onClick={handleCloseEnlargedCard}
-          onMouseMove={handleModalMouseMove}
-          onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-        >
-          <div
-            className="enlarged-bank-card"
-            ref={enlargedCardRef}
-            style={{
-              transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-            }}
-            onClick={e => e.stopPropagation()}
-            onMouseMove={handleCardMouseMove}
-            onMouseLeave={handleCardMouseLeave}
-          >
-            {/* Spotlight effect */}
-            {spotlight.visible && (
-              <div
-                className="card-spotlight"
-                style={{
-                  left: spotlight.x - 150,
-                  top: spotlight.y - 150,
-                }}
-              />
-            )}
-            <div className="bank-card-background">
-              <div className="card-pattern"></div>
-            </div>
-            <div className="bank-card-content">
-              <div className="card-header-section">
-                <div className="card-logo">
-                  <CreditCard size={32} />
-                </div>
-                <div className="card-type">
-                  <span>DEBIT CARD</span>
-                </div>
-              </div>
-              <div className="card-balance-section">
-                <div className="balance-label">Current Balance</div>
-                <div className="balance-display">
-                  <span className="balance-amount">
-                    {showBalance ? TransactionService.formatCurrency(balance) : '₱ •••••••'}
-                  </span>
-                </div>
-              </div>
-              <div className="card-details-section">
-                <div className="account-number">
-                  <span className="detail-label">Account Number</span>
-                  <span className="detail-value">{user?.accountNumber || '•••-••••-•••-••••'}</span>
-                  <span className="card-number-label">{user?.firstName ? `${user.firstName} ${user.lastName}` : user?.businessName || 'User'}!</span>
-                </div>
-                <div className="account-type">
-                  <span className="detail-label">Account Type</span>
-                  <Badge bg="light" text="dark" className="account-type-badge">
-                    {user?.accountType || 'Personal'}
-                  </Badge>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 
