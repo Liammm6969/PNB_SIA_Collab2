@@ -1,6 +1,6 @@
 import React from 'react'
 import { Container, Row, Col, Form, Button, Alert, InputGroup, Card } from 'react-bootstrap'
-import { Eye, EyeSlash, Person, Building, Lock, Envelope, GeoAlt, Calendar, Calendar3 } from 'react-bootstrap-icons'
+import { Eye, EyeSlash, Person, Building, Lock, Envelope, GeoAlt, Calendar3 } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import UserService from '../services/user.Service.js'
 import '../styles/Register.css'
@@ -184,6 +184,163 @@ function PasswordField({ label, name, placeholder, value, onChange, error, show,
   )
 }
 
+// --- Form Side Component ---
+function RegisterFormSide(props) {
+  const {
+    formData,
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
+    errors,
+    isLoading,
+    showAlert,
+    setShowAlert,
+    handleChange,
+    handleAccountTypeChange,
+    handleSubmit
+  } = props
+
+  return (
+    <div className="form-side-pixel">
+      {/* Logo and tagline */}
+      <div className="pnb-logo-pixel">
+        <img src="/Logo.png" alt="PNB Logo" />
+      </div>
+      {/* Header */}
+      <div className="form-header-pixel">
+        <h2>Sign up</h2>
+      </div>
+      {/* Name fields */}
+      <Form onSubmit={handleSubmit} className="register-form-pixel">
+        <div className="form-row-pixel">
+          <div className="form-group-pixel">
+            <Envelope className="input-icon-pixel" />
+            <input
+              type="text"
+              className="form-control-pixel"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="Enter your first name"
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group-pixel">
+            <Envelope className="input-icon-pixel" />
+            <input
+              type="text"
+              className="form-control-pixel"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="Enter your last name"
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        <div className="form-group-pixel">
+          <Envelope className="input-icon-pixel" />
+          <input
+            type="text"
+            className="form-control-pixel"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            placeholder="Enter your address"
+            autoComplete="off"
+          />
+        </div>
+        <div className="form-group-pixel">
+          <Envelope className="input-icon-pixel" />
+          <input
+            type="date"
+            className="form-control-pixel"
+            name="dateOfBirth"
+            value={formData.dateOfBirth}
+            onChange={handleChange}
+            placeholder="Date of birth"
+            autoComplete="off"
+          />
+        </div>
+        <div className="form-group-pixel">
+          <Envelope className="input-icon-pixel" />
+          <input
+            type="email"
+            className="form-control-pixel"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            autoComplete="off"
+          />
+        </div>
+        <div className="form-group-pixel">
+          <Envelope className="input-icon-pixel" />
+          <input
+            type={showPassword ? 'text' : 'password'}
+            className="form-control-pixel"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter your password"
+            autoComplete="off"
+          />
+          <div className="password-toggle-pixel" onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <EyeSlash /> : <Eye />}
+          </div>
+        </div>
+        <div className="form-group-pixel">
+          <Envelope className="input-icon-pixel" />
+          <input
+            type={showConfirmPassword ? 'text' : 'password'}
+            className="form-control-pixel"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="Enter your password"
+            autoComplete="off"
+          />
+          <div className="password-toggle-pixel" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+            {showConfirmPassword ? <EyeSlash /> : <Eye />}
+          </div>
+        </div>
+        <button type="submit" className="submit-button-pixel" disabled={isLoading}>
+          Log in
+        </button>
+        <div className="or-divider-pixel">or</div>
+        <div className="sign-in-link-pixel">
+          Already have an account?{' '}
+          <Link to="/login" className="sign-in-link-pixel-link">Sign in</Link>
+        </div>
+      </Form>
+    </div>
+  )
+}
+
+// --- Banner Side Component ---
+function RegisterBannerSide() {
+  return (
+    <div className="banner-side-pixel">
+      <div className="banner-content-pixel">
+        <div className="banner-title-pixel">
+          <h2>
+            Hello, Welcome!
+            </h2>
+        <div className="banner-subtitle-gradient">
+          <h2>
+            <span>
+              Your success <br /> is our promise
+            </span>
+          </h2>
+        </div>
+        </div>
+        <div className="banner-desc-pixel">PNB crafts every service around your needs and future vision.</div>
+      </div>
+    </div>
+  )
+}
+
 const Register = () => {
   const navigate = useNavigate()
   const getInitialFormState = React.useCallback(() => ({
@@ -214,219 +371,23 @@ const Register = () => {
   } = useRegisterForm(getInitialFormState, navigate)
 
   return (
-    <div className="register-page">
-      <div className="register-card">
-        <div className="form-side">
-          {/* PNB Logo */}
-          <div className="pnb-logo">
-            <img src="/Logo.png" alt="PNB Logo" />
-          </div>
-          
-          {/* Form header */}
-          <div className="form-header">
-            <h1>Create Account</h1>
-            <p>Join our banking platform</p>
-          </div>
-          
-          {/* Alert for messages */}
-          {showAlert.show && (
-            <Alert 
-              variant={showAlert.variant} 
-              dismissible 
-              onClose={() => setShowAlert({ show: false, message: '', variant: '' })}
-              className="mb-4"
-            >
-              {showAlert.message}
-            </Alert>
-          )}
-          
-          {/* Account type selection */}
-          <div className="account-type">
-            <div className="account-type-label">Choose Account Type</div>
-            <div className="account-type-options">
-              <div 
-                className={`account-type-option ${formData.accountType === 'personal' ? 'active' : ''}`}
-                onClick={() => handleAccountTypeChange('personal')}
-              >
-                <div className="icon">
-                  <Person />
-                </div>
-                <div className="label">Personal</div>
-              </div>
-              <div 
-                className={`account-type-option ${formData.accountType === 'business' ? 'active' : ''}`}
-                onClick={() => handleAccountTypeChange('business')}
-              >
-                <div className="icon">
-                  <Building />
-                </div>
-                <div className="label">Business</div>
-              </div>
-            </div>
-          </div>
-          
-          <Form onSubmit={handleSubmit}>
-            {/* Name fields - conditional based on account type */}
-            {formData.accountType === 'personal' ? (
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">First Name</label>
-                  <input
-                    type="text"
-                    className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    placeholder="Enter first name"
-                  />
-                  {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Last Name</label>
-                  <input
-                    type="text"
-                    className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    placeholder="Enter last name"
-                  />
-                  {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
-                </div>
-              </div>
-            ) : (
-              <div className="form-group mb-3">
-                <label className="form-label">Business Name</label>
-                <input
-                  type="text"
-                  className={`form-control ${errors.businessName ? 'is-invalid' : ''}`}
-                  name="businessName"
-                  value={formData.businessName}
-                  onChange={handleChange}
-                  placeholder="Enter business name"
-                />
-                {errors.businessName && <div className="invalid-feedback">{errors.businessName}</div>}
-              </div>
-            )}
-            
-            {/* Address field */}
-            <div className="form-group mb-3">
-              <label className="form-label">Address</label>
-              <div className="input-with-icon">
-                <GeoAlt className="input-icon" />
-                <input
-                  type="text"
-                  className="form-control"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Enter your address"
-                />
-              </div>
-            </div>
-            
-            {/* Date of Birth field */}
-            <div className="form-group mb-3">
-              <label className="form-label">Date of Birth</label>
-              <div className="input-with-icon">
-                <Calendar3 className="input-icon" />
-                <input
-                  type="date"
-                  className="form-control"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-            
-            {/* Email field */}
-            <div className="form-group mb-3">
-              <label className="form-label">Email Address</label>
-              <div className="input-with-icon">
-                <Envelope className="input-icon" />
-                <input
-                  type="email"
-                  className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                />
-                {errors.email && <div className="invalid-feedback">{errors.email}</div>}
-              </div>
-            </div>
-            
-            {/* Password field */}
-            <div className="form-group mb-3">
-              <label className="form-label">Password</label>
-              <div className="input-with-icon">
-                <Lock className="input-icon" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Enter your password"
-                />
-                <div className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <EyeSlash /> : <Eye />}
-                </div>
-                {errors.password && <div className="invalid-feedback">{errors.password}</div>}
-              </div>
-            </div>
-            
-            {/* Confirm Password field */}
-            <div className="form-group mb-4">
-              <label className="form-label">Confirm Password</label>
-              <div className="input-with-icon">
-                <Lock className="input-icon" />
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm your password"
-                />
-                <div className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  {showConfirmPassword ? <EyeSlash /> : <Eye />}
-                </div>
-                {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
-              </div>
-            </div>
-            
-            {/* Submit button */}
-            <button 
-              type="submit" 
-              className="submit-button"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
-            </button>
-          </Form>
-          
-          {/* Sign in link */}
-          <div className="sign-in-link">
-            Already have an account? <Link to="/login">Sign In</Link>
-          </div>
-          
-          {/* Copyright */}
-          <div className="text-center mt-4">
-            <small className="text-muted">© 2025 PNB Banking System. All rights reserved.</small>
-          </div>
-        </div>
-        
-        {/* Right side - Banner */}
-        <div className="banner-side">
-          <div className="banner-content">
-            <h2>Hello,</h2>
-            <div className="tagline">Welcome!</div>
-            <h3>Your success is our promise</h3>
-            <p>PNB crafts every service around your needs and future vision.</p>
-          </div>
-        </div>
+    <div className="register-page-pixel">
+      <div className="register-card-pixel">
+        <RegisterFormSide
+          formData={formData}
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
+          showConfirmPassword={showConfirmPassword}
+          setShowConfirmPassword={setShowConfirmPassword}
+          errors={errors}
+          isLoading={isLoading}
+          showAlert={showAlert}
+          setShowAlert={setShowAlert}
+          handleChange={handleChange}
+          handleAccountTypeChange={handleAccountTypeChange}
+          handleSubmit={handleSubmit}
+        />
+        <RegisterBannerSide />
       </div>
     </div>
   )
