@@ -6,6 +6,13 @@ exports.loginStaff = async (req, res) => {
   try {
     const { staffStringId, password } = req.body;
     const loginResult = await StaffService.loginStaff(staffStringId, password);
+    res.cookie('refreshToken', loginResult.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+    console.log(loginResult)
     res.status(StatusCodes.OK).json(loginResult);
   } catch (err) {
     res.status(StatusCodes.UNAUTHORIZED).json({ error: err.message });

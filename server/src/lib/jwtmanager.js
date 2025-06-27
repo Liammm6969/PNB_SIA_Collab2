@@ -29,6 +29,32 @@ function generateRefreshToken(user) {
   );
 }
 
+function generateStaffAccessToken(staff) {
+  return jsonwebtoken.sign(
+    {
+      staffId: staff.staffId,
+      firstName: staff.firstName,
+      lastName: staff.lastName,
+      email: staff.email
+    },
+    config.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
+}
+
+function generateStaffRefreshToken(staff) {
+  return jsonwebtoken.sign(
+    {
+      staffId: staff.staffId,
+      firstName: staff.firstName,
+      lastName: staff.lastName,
+      email: staff.email,
+    },
+    config.JWT_REFRESH_SECRET,
+    { expiresIn: '7d' }
+  );
+}
+
 
 
 
@@ -36,5 +62,7 @@ function generateRefreshToken(user) {
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
+  generateStaffAccessToken,
+  generateStaffRefreshToken
 
 };

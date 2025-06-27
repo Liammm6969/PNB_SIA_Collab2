@@ -1,6 +1,5 @@
 const { Staff } = require("../models/index.js");
-const { generateAccessToken,
-  generateRefreshToken } = require('../lib/jwtmanager.js');
+const { generateStaffAccessToken, generateStaffRefreshToken } = require('../lib/jwtmanager.js');
 const { StaffNotFoundError, InvalidPasswordError, DuplicateStaffEmailError } = require('../errors/index.js');
 const bcrypt = require('bcrypt');
 class StaffService {
@@ -75,22 +74,19 @@ class StaffService {
 
       const isMatch = await bcrypt.compare(password, staff.password);
       if (!isMatch) throw new InvalidPasswordError('Invalid password');
-      const accessToken = generateAccessToken({
+      const accessToken = generateStaffAccessToken({
         staffId: staff.staffId,
-        staffStringId: staff.staffStringId,
-        department: staff.department,
         firstName: staff.firstName,
         lastName: staff.lastName,
         email: staff.email
       });
-      const refreshToken = generateRefreshToken({
+      const refreshToken = generateStaffRefreshToken({
         staffId: staff.staffId,
-        staffStringId: staff.staffStringId,
-        department: staff.department,
         firstName: staff.firstName,
         lastName: staff.lastName,
         email: staff.email
-      });
+      }); 
+       
       return {
         message: 'Login Successful',
         staffId: staff.staffId,
