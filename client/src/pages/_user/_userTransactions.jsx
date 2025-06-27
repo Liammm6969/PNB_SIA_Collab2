@@ -36,6 +36,7 @@ import {
 import UserService from '../../services/user.Service';
 import TransactionService from '../../services/transaction.Service';
 import '../../styles/userStyles/_userTransactions.css';
+import { TextField } from '@mui/material';
 
 const _userTransactions = () => {
   // State management
@@ -404,17 +405,13 @@ const _userTransactions = () => {
           <Row className="g-3 align-items-end">
             <Col md={4}>
               <Form.Label>Search Transactions</Form.Label>
-              <InputGroup>
-                <InputGroup.Text>
-                  <Search size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  type="text"
+              <TextField
+              type="text"
                   placeholder="Search by description, reference, or party"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </InputGroup>
+                  fullWidth
+                  />
             </Col>
             <Col md={2}>
               <Form.Label>Transaction Type</Form.Label>

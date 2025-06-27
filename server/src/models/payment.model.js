@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const paymentSchema = new mongoose.Schema({
   paymentId: { type: Number, unique: true },
-  paymentStringId: { type: String, unique: true },
+  paymentStringId: { type: String},
   fromUser: { type: Number, ref: 'User', required: true },
   toUser: { type: Number, ref: 'User', required: true },
   amount: Number,
