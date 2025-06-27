@@ -69,6 +69,7 @@ class StaffService {
   }
   async loginStaff(staffStringId, password) {
     try {
+      
       const staff = await Staff.findOne({ staffStringId });
       if (!staff) throw new StaffNotFoundError('Staff not found');
 
