@@ -111,6 +111,8 @@ class UserService {
         return { message: 'OTP sent to email. Please verify to complete login.' };
       }
       user.isActive = true;
+      await user.save();
+
       const { accessToken, refreshToken } = generateTokens(user);
 
       return { message: 'OTP verified. Login successful.', user: user.toObject(), accessToken, refreshToken };
