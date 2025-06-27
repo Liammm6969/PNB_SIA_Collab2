@@ -62,8 +62,10 @@ function useLoginForm(navigate) {
     e.preventDefault()
     setOTPLoading(true)
     setOTPError('')
+    alert(formData.identifier)
     try {
       const result = await UserService.verifyOTP(formData.identifier, otp)
+
       if (result.user && result.user.userId) {
         UserService.setUserData({ userId: result.user.userId, email: formData.identifier })
         localStorage.setItem('accessToken', result.accessToken)
@@ -130,6 +132,8 @@ function useLoginForm(navigate) {
         }
       } else if (accountType === 'user') {
         loginResponse = await UserService.loginUser(formData.identifier, formData.password)
+        alert(formData.identifier)
+        setFormData({ identifier: formData.identifier, password: '' })
         if (loginResponse.message && loginResponse.message.toLowerCase().includes('otp')) {
           setShowOTP(true)
           setShowAlert({
@@ -137,9 +141,10 @@ function useLoginForm(navigate) {
             message: 'OTP sent to your email. Please enter the code to continue.',
             variant: 'info'
           })
+
         } else if (loginResponse.user && loginResponse.user.userId) {
           UserService.setUserData({ userId: loginResponse.user.userId, email: formData.identifier })
-          localStorage.setItem('accessToken',loginResponse.accessToken)
+          localStorage.setItem('accessToken', loginResponse.accessToken)
           localStorage.setItem('showWelcome', 'true')
           setShowAlert({
             show: true,
@@ -326,12 +331,12 @@ const Login = () => {
                         onChange={handleChange}
                         placeholder="Enter your email or Staff ID"
                         className={`input ${errors.identifier
-                            ? 'error'
-                            : detectedType
-                              ? detectedType === 'staff'
-                                ? 'staff-detected'
-                                : 'user-detected'
-                              : ''
+                          ? 'error'
+                          : detectedType
+                            ? detectedType === 'staff'
+                              ? 'staff-detected'
+                              : 'user-detected'
+                            : ''
                           }`}
                       />
                       {errors.identifier && (

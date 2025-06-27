@@ -230,6 +230,7 @@ class UserService {
       const response = await api.post(`${USER_ENDPOINT}/verify-otp`, { email, otp });
       return response.data;
     } catch (error) {
+      console.log(email, otp)
       console.error('OTP verification error:', error);
       throw error;
     }

@@ -50,6 +50,7 @@ exports.listUsers = async (req, res) => {
 exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
+    console.log(req.body)
     const result = await UserService.verifyOTP(email, otp);
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,

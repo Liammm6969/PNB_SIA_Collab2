@@ -162,7 +162,8 @@ class UserService {
   async verifyOTP(email, otp) {
     try {
       const user = await User.findOne({ email });
-      if (!user || !user.otp || !user.otpExpires) throw new OTPError('OTP not found. Please login again.');
+      if (!user) throw new UserNotFoundError('User not found');
+      if (!user.otp || !user.otpExpires) throw new OTPError('OTP not found. Please login again.');
       if (user.otp !== otp) throw new Error('Invalid OTP.');
       if (user.otpExpires < new Date()) throw new OTPError('OTP expired. Please login again.');
       user.otp = undefined;
