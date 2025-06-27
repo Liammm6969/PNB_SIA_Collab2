@@ -218,6 +218,22 @@ class UserService {
       ...options,
     };
   }
+
+  /**
+   * Verify OTP for user login
+   * @param {string} email - User email
+   * @param {string} otp - One-time password
+   * @returns {Promise<Object>} OTP verification response
+   */
+  static async verifyOTP(email, otp) {
+    try {
+      const response = await api.post(`${USER_ENDPOINT}/verify-otp`, { email, otp });
+      return response.data;
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      throw error;
+    }
+  }
 }
 
 export default UserService;

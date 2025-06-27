@@ -14,6 +14,11 @@ function useLoginForm(navigate) {
   const [isLoading, setIsLoading] = React.useState(false)
   const [showAlert, setShowAlert] = React.useState({ show: false, message: '', variant: '' })
   const [detectedType, setDetectedType] = React.useState(null)
+  // OTP state
+  const [showOTP, setShowOTP] = React.useState(false)
+  const [otp, setOTP] = React.useState('')
+  const [otpLoading, setOTPLoading] = React.useState(false)
+  const [otpError, setOTPError] = React.useState('')
 
   const detectAccountType = React.useCallback((identifier) => {
     const emailPattern = /\S+@\S+\.\S+/
@@ -51,6 +56,35 @@ function useLoginForm(navigate) {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }, [formData, detectAccountType])
+
+  // OTP submit handler
+  const handleOTPSubmit = async (e) => {
+    e.preventDefault()
+    setOTPLoading(true)
+    setOTPError('')
+    try {
+      const result = await UserService.verifyOTP(formData.identifier, otp)
+      if (result.user && result.user.userId) {
+        UserService.setUserData({ userId: result.user.userId, email: formData.identifier })
+        localStorage.setItem('accessToken', result.accessToken)
+        localStorage.setItem('showWelcome', 'true')
+        setShowAlert({
+          show: true,
+          message: 'Login successful! Redirecting to dashboard...',
+          variant: 'success'
+        })
+        setShowOTP(false)
+        setOTP('')
+        setTimeout(() => navigate('/user/dashboard'), 1500)
+      } else {
+        throw new Error('OTP verification failed. Invalid response from server')
+      }
+    } catch (error) {
+      setOTPError(error.message || 'OTP verification failed. Please try again.')
+    } finally {
+      setOTPLoading(false)
+    }
+  }
 
   const handleSubmit = React.useCallback(async (e) => {
     e.preventDefault()
@@ -96,9 +130,17 @@ function useLoginForm(navigate) {
         }
       } else if (accountType === 'user') {
         loginResponse = await UserService.loginUser(formData.identifier, formData.password)
-        if (loginResponse.user && loginResponse.user.userId) {
+        if (loginResponse.message && loginResponse.message.toLowerCase().includes('otp')) {
+          setShowOTP(true)
+          setShowAlert({
+            show: true,
+            message: 'OTP sent to your email. Please enter the code to continue.',
+            variant: 'info'
+          })
+        } else if (loginResponse.user && loginResponse.user.userId) {
           UserService.setUserData({ userId: loginResponse.user.userId, email: formData.identifier })
           localStorage.setItem('accessToken',loginResponse.accessToken)
+          localStorage.setItem('showWelcome', 'true')
           setShowAlert({
             show: true,
             message: 'Login successful! Redirecting to dashboard...',
@@ -140,7 +182,15 @@ function useLoginForm(navigate) {
     setShowAlert,
     detectedType,
     handleChange,
-    handleSubmit
+    handleSubmit,
+    // OTP
+    showOTP,
+    setShowOTP,
+    otp,
+    setOTP,
+    otpLoading,
+    otpError,
+    handleOTPSubmit
   }
 }
 
@@ -177,7 +227,15 @@ const Login = () => {
     setShowAlert,
     detectedType,
     handleChange,
-    handleSubmit
+    handleSubmit,
+    // OTP
+    showOTP,
+    setShowOTP,
+    otp,
+    setOTP,
+    otpLoading,
+    otpError,
+    handleOTPSubmit
   } = useLoginForm(navigate)
 
   return (
@@ -356,6 +414,35 @@ const Login = () => {
           </div>
         </div>
       </div>
+      {/* OTP Modal/Input */}
+      {showOTP && (
+        <div className="otp-modal-overlay">
+          <div className="otp-modal">
+            <h4>Enter OTP</h4>
+            <p>Check your email for the One-Time Password (OTP).</p>
+            <form onSubmit={handleOTPSubmit}>
+              <input
+                type="text"
+                value={otp}
+                onChange={e => setOTP(e.target.value)}
+                placeholder="Enter OTP"
+                maxLength={6}
+                className="otp-input"
+                autoFocus
+              />
+              {otpError && <div className="otp-error">{otpError}</div>}
+              <div className="otp-actions">
+                <button type="submit" className="submit-button" disabled={otpLoading || otp.length !== 6}>
+                  {otpLoading ? 'Verifying...' : 'Verify OTP'}
+                </button>
+                <button type="button" className="cancel-button" onClick={() => setShowOTP(false)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
