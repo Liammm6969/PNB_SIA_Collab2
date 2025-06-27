@@ -46,6 +46,7 @@ import {
   GearFill,
   FileEarmarkText
 } from 'react-bootstrap-icons';
+import { TextField } from '@mui/material';
 import '../../styles/userStyles/UserSettings.css';
 import UserService from '../../services/user.Service';
 

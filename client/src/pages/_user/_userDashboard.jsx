@@ -10,9 +10,9 @@ import {
   GraphUp,
   Eye,
   EyeSlash,
-  Wifi,
   CreditCard
 } from 'react-bootstrap-icons';
+
 import UserService from '../../services/user.Service';
 import TransactionService from '../../services/transaction.Service';
 import '../../styles/userStyles/_userDashboard.css'
@@ -210,22 +210,6 @@ const _userDashboard = () => {
     <div className="dashboard-root">
       <Container fluid className="py-4">
         {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
-        {/* Welcome Section */}
-        <Row className="mb-4">
-          <Col>
-            <div className="welcome-section">
-              <div className="user-avatar">
-                <PersonCircle size={56} />
-              </div>
-              <div className="welcome-text">
-                <h2 className="welcome-title">
-                  Welcome back, {user?.firstName ? `${user.firstName} ${user.lastName}` : user?.businessName || 'User'}!
-                </h2>
-                <p className="welcome-subtitle">Here's your account overview</p>
-              </div>
-            </div>
-          </Col>
-        </Row>
 
         {/* Bank Card, Quick Actions, and Vertical Stats */}
         <Row className="mb-4">
@@ -262,6 +246,7 @@ const _userDashboard = () => {
                   <div className="account-number">
                     <span className="detail-label">Account Number</span>
                     <span className="detail-value">{user?.accountNumber || '•••-••••-•••-••••'}</span>
+                    <span className="card-number-label">{user?.firstName ? `${user.firstName} ${user.lastName}` : user?.businessName || 'User'}!</span>
                   </div>
                   <div className="account-type">
                     <span className="detail-label">Account Type</span>
@@ -442,6 +427,7 @@ const _userDashboard = () => {
                 <div className="account-number">
                   <span className="detail-label">Account Number</span>
                   <span className="detail-value">{user?.accountNumber || '•••-••••-•••-••••'}</span>
+                  <span className="card-number-label">{user?.firstName ? `${user.firstName} ${user.lastName}` : user?.businessName || 'User'}!</span>
                 </div>
                 <div className="account-type">
                   <span className="detail-label">Account Type</span>

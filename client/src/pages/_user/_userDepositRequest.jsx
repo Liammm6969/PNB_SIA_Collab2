@@ -30,6 +30,8 @@ import {
   Calendar3
 } from 'react-bootstrap-icons';
 
+import {TextField} from '@mui/material';
+
 import UserService from '../../services/user.Service';
 import DepositRequestService from '../../services/depositRequest.Service';
 
@@ -435,19 +437,18 @@ const _userDepositRequest = () => {
           <Modal.Body>
             <Form.Group className="mb-4">
               <Form.Label className="form-label">Amount to Deposit</Form.Label>
-              <InputGroup className="amount-input">
-                <InputGroup.Text className="currency-symbol">₱</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  name="amount"
-                  placeholder="0.00"
-                  value={formData.amount}
-                  onChange={handleInputChange}
-                  min="1"
+              <TextField
+                type="number"
+                name="amount"
+                placeholder="0.00"
+                value={formData.amount}
+                onChange={handleInputChange}
+                min="1"
                   step="0.01"
                   required
-                />
-              </InputGroup>
+                  fullWidth
+                  />
+                  <br></br>
               <Form.Text className="input-help">
                 Minimum amount: ₱1.00
               </Form.Text>
