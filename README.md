@@ -1,4 +1,5 @@
 # 🏦 Philippine National Bank - Multi-Role Banking System
+![Untitled](https://github.com/user-attachments/assets/82a7e8ff-24db-4d47-ba0f-a854f3816eb3)
 
 
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
